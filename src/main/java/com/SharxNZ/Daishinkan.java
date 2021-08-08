@@ -109,6 +109,6 @@ public class Daishinkan{
 
         jda.getTextChannelById(debugChannelID).sendMessage("אני דלוק").queue();
         // jda.getPresence().setStatus(OnlineStatus.DO_NOT_DISTURB);
-
+//hi world
     }
 }
