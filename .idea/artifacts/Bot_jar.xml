@@ -2,7 +2,7 @@
   <artifact type="jar" build-on-make="true" name="Bot:jar">
     <output-path>$PROJECT_DIR$/out/artifacts/Bot_jar</output-path>
     <root id="archive" name="Bot.jar">
-      <element id="module-output" name="Bot" />
+      <element id="module-output" name="Android 24" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/apache/commons/commons-lang3/3.0/commons-lang3-3.0.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/club/minnced/opus-java-api/1.1.0/opus-java-api-1.1.0.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/commons-io/commons-io/2.8.0/commons-io-2.8.0.jar" path-in-jar="/" />
