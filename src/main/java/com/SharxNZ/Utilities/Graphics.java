@@ -1,7 +1,7 @@
 package com.SharxNZ.Utilities;
 
+import com.SharxNZ.Android24;
 import com.SharxNZ.Commands.GameCommands.PowerPoints;
-import com.SharxNZ.Daishinkan;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 
@@ -55,7 +55,7 @@ public abstract class Graphics {
         try {
             URL = new URL(url);
         } catch (IOException e) {
-            Daishinkan.logError(e);
+            Android24.logError(e);
             e.printStackTrace();
         }
         return ImageIO.read(URL);
@@ -256,8 +256,8 @@ public abstract class Graphics {
         int backgroundHeight = background.getHeight();
         int userImageWidth = (int) (userImage.getWidth() * 1.3);
         int userImageHeight = (int) (userImage.getHeight() * 1.3);
-        long nextXP = (long) Math.pow(lvl + 1, 1 / Daishinkan.difficulty);
-        long previousXP = (long) Math.pow(lvl, 1 / Daishinkan.difficulty);
+        long nextXP = (long) Math.pow(lvl + 1, 1 / Android24.difficulty);
+        long previousXP = (long) Math.pow(lvl, 1 / Android24.difficulty);
 
         background2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                 RenderingHints.VALUE_ANTIALIAS_ON);

@@ -1,21 +1,19 @@
 package com.SharxNZ.Commands;
 
-import com.SharxNZ.Daishinkan;
+import com.SharxNZ.Android24;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
-import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
 public class Ping extends ListenerAdapter {
     public Ping(){
-        Daishinkan.commandListUpdateAction.addCommands(new CommandData("ping", "pong you"));
+        Android24.commandListUpdateAction.addCommands(new CommandData("ping", "pong you"));
     }
     String message;
 
     //@Override //s
     public void onMessageReceived(MessageReceivedEvent m) {
-        if (m.getMessage().getContentRaw().startsWith(Daishinkan.prefix)) {
+        if (m.getMessage().getContentRaw().startsWith(Android24.prefix)) {
             message = m.getMessage().getContentRaw().substring(1).toLowerCase();
 
             if (message.equals("ping")) {

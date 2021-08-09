@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import javax.security.auth.login.LoginException;
 
-public class Daishinkan{
+public class Android24 {
 
     public static JDA jda;
     public static CommandClientBuilder commandClientBuilder;
@@ -41,8 +41,8 @@ public class Daishinkan{
     private static final long cacheChannelID = 866689902758068244L;
 
     public static Statement getStatement() throws SQLException {
-        String url = "jdbc:mysql://127.0.0.1:3306/?user=Daishinkan";
-        String uname = "Daishinkan";
+        String url = "jdbc:mysql://127.0.0.1:3306/?user=Android24";
+        String uname = "Android24";
         String password = System.getenv("MySQLPass");
         Connection con = DriverManager.getConnection(url, uname, password);
         return con.createStatement();
@@ -56,7 +56,7 @@ public class Daishinkan{
         EmbedBuilder wrapper = new EmbedBuilder();
 
         value.set(
-        Daishinkan.jda.getTextChannelById(Daishinkan.cacheChannelID)
+        Android24.jda.getTextChannelById(Android24.cacheChannelID)
                 .sendFile(image, "png.png")
                 .setEmbeds(wrapper.setImage("attachment://png.png").build())
                 .complete().getEmbeds().get(0).getImage().getUrl());

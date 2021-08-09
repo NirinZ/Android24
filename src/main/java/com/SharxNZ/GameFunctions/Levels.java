@@ -1,6 +1,6 @@
 package com.SharxNZ.GameFunctions;
 
-import com.SharxNZ.Daishinkan;
+import com.SharxNZ.Android24;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceJoinEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceLeaveEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
@@ -86,7 +86,7 @@ public class Levels extends ListenerAdapter {
     }
 
     private void updateDatabase() throws SQLException {
-        final Statement sqlStatement = Daishinkan.getStatement();
+        final Statement sqlStatement = Android24.getStatement();
         Timer timer = new Timer();
         TimerTask timerTask = new TimerTask() {
             @Override
@@ -108,10 +108,10 @@ public class Levels extends ListenerAdapter {
                             totalXP = tempMap.get(key)[0] + resultSet.getLong(1);
                             zeni = tempMap.get(key)[0];
                             currentLvl = resultSet.getShort(2);
-                            lvlShouldBe = (int) Math.floor(Math.pow(totalXP, Daishinkan.difficulty));
+                            lvlShouldBe = (int) Math.floor(Math.pow(totalXP, Android24.difficulty));
                             powerPoints = 4 * (lvlShouldBe - currentLvl);
 
-                            Daishinkan.jda.getTextChannelById(Daishinkan.debugChannelID).sendMessage("Your XP: " + tempMap.get(key)[0]).queue();
+                            Android24.jda.getTextChannelById(Android24.debugChannelID).sendMessage("Your XP: " + tempMap.get(key)[0]).queue();
 
                             sql.add("UPDATE `" + guildID + "`.`users_data` SET" +
                                     " `XP` = " + totalXP +
@@ -126,7 +126,7 @@ public class Levels extends ListenerAdapter {
                             resultSet.close();
                         } else {
                             sql.add("INSERT INTO `" + guildID + "`.`users_data` (`UserID`, `UserName`) VALUES (" + userID + ", '" +
-                                    Daishinkan.jda.retrieveUserById(userID).complete().getAsTag().replace("'", "''") + "');");
+                                    Android24.jda.retrieveUserById(userID).complete().getAsTag().replace("'", "''") + "');");
                             System.out.println(sql);
                         }
                         for (String query: sql) {
@@ -135,9 +135,9 @@ public class Levels extends ListenerAdapter {
                     } catch (SQLException throwables) {
                         for (String query: sql) {
                             System.out.println("The query:\n" + query);
-                            Daishinkan.jda.getTextChannelById(Daishinkan.debugChannelID).sendMessage(query).queue();
+                            Android24.jda.getTextChannelById(Android24.debugChannelID).sendMessage(query).queue();
                         }
-                        Daishinkan.logError(throwables);
+                        Android24.logError(throwables);
                         throwables.printStackTrace();
                     }
                 }

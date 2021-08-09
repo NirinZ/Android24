@@ -1,16 +1,12 @@
 package com.SharxNZ.Commands.GameCommands;
 
-import com.SharxNZ.Daishinkan;
+import com.SharxNZ.Android24;
 import com.SharxNZ.Game.Race;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-
-import java.sql.SQLException;
-import java.sql.SQLIntegrityConstraintViolationException;
-import java.sql.Statement;
 
 public class StartGameCommand extends Command {
 
@@ -24,7 +20,7 @@ public class StartGameCommand extends Command {
         for (Race race: Race.values()){
             optionData.addChoice(race.name(), race.name());
         }
-        Daishinkan.commandListUpdateAction.addCommands(new CommandData("start_game", "Let's you start the game and choose your race")
+        Android24.commandListUpdateAction.addCommands(new CommandData("start_game", "Let's you start the game and choose your race")
                 .addOptions(optionData));
     }
 

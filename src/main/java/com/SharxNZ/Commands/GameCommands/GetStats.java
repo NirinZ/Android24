@@ -1,7 +1,7 @@
 package com.SharxNZ.Commands.GameCommands;
 
 
-import com.SharxNZ.Daishinkan;
+import com.SharxNZ.Android24;
 import com.SharxNZ.Game.Being;
 import com.SharxNZ.Game.Saiyan;
 import com.jagrosh.jdautilities.command.Command;
@@ -10,10 +10,8 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
-import java.sql.SQLException;
-
-import static com.SharxNZ.Daishinkan.debugChannelID;
-import static com.SharxNZ.Daishinkan.jda;
+import static com.SharxNZ.Android24.debugChannelID;
+import static com.SharxNZ.Android24.jda;
 
 public class GetStats extends Command {
 
@@ -21,7 +19,7 @@ public class GetStats extends Command {
         super.name = "getStats";
         super.aliases = new String[]{"gs"};
         super.help = "Display you stats";
-        Daishinkan.commandListUpdateAction.addCommands(new CommandData(super.name.toLowerCase(), this.help)
+        Android24.commandListUpdateAction.addCommands(new CommandData(super.name.toLowerCase(), this.help)
                 .addOptions(new OptionData(OptionType.BOOLEAN, "display", "display your stats")));
     }
 
@@ -61,7 +59,7 @@ public class GetStats extends Command {
         );
     }
 //    public static Being getStats(String guildID, String userID) throws SQLException {
-//        Statement sql = Daishinkan.getSql();
+//        Statement sql = Android24.getSql();
 //        String query = "SELECT up.*, Level " +
 //                "FROM `"+ guildID +"`.users_power up " +
 //                "join users_data ud " +

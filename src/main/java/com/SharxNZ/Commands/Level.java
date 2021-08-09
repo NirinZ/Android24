@@ -1,6 +1,6 @@
 package com.SharxNZ.Commands;
 
-import com.SharxNZ.Daishinkan;
+import com.SharxNZ.Android24;
 import com.SharxNZ.Utilities.Graphics;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -17,14 +17,14 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class Level extends Command {
 
-    private final Statement sqlStatement = Daishinkan.getStatement();
+    private final Statement sqlStatement = Android24.getStatement();
 
     public Level() throws SQLException {
         super.name = "level";
         super.aliases = new String[]{"l", "lvl"};
         super.help = "Returns your level";
         super.arguments = "[The person you want to get the rank of (optional)]";
-        Daishinkan.commandListUpdateAction.addCommands(new CommandData(super.name.toLowerCase(), this.help)
+        Android24.commandListUpdateAction.addCommands(new CommandData(super.name.toLowerCase(), this.help)
                 .addOptions(new OptionData(OptionType.BOOLEAN, "display", "display your level")));
         //super.category = new Category("XP");
     }
@@ -62,13 +62,13 @@ public class Level extends Command {
     }
     public static byte[] returnLevel(String guildID, String userID){
         try {
-            Statement sqlStatement = Daishinkan.getStatement();
+            Statement sqlStatement = Android24.getStatement();
             ResultSet resultLvl = sqlStatement.executeQuery(
                     "SELECT Level, XP FROM `" + guildID + "`.users_data " +
                             "where UserID=" + userID + ";");
             if(resultLvl.next()) {
-                String userURL = Daishinkan.jda.getUserById(userID).getAvatarUrl();
-                String guildName = Daishinkan.jda.getGuildById(guildID).getName();
+                String userURL = Android24.jda.getUserById(userID).getAvatarUrl();
+                String guildName = Android24.jda.getGuildById(guildID).getName();
                 short level = resultLvl.getShort(1);
                 long xp = resultLvl.getLong(2);
                 sqlStatement.close();
@@ -77,7 +77,7 @@ public class Level extends Command {
             else return null;
         } catch (Exception throwables) {
             System.out.println("Im here");
-            Daishinkan.jda.getTextChannelById(Daishinkan.debugChannelID).sendMessage(throwables.toString()).queue();
+            Android24.jda.getTextChannelById(Android24.debugChannelID).sendMessage(throwables.toString()).queue();
             throwables.printStackTrace();
             return null;
         }
@@ -85,7 +85,7 @@ public class Level extends Command {
 
     public static MessageEmbed returnLevelEmbed(String guildID, String userID){
         AtomicReference<String> imageUrl = new AtomicReference<>();
-        Daishinkan.getImageUrl(Level.returnLevel(guildID, userID), imageUrl);
+        Android24.getImageUrl(Level.returnLevel(guildID, userID), imageUrl);
         return new EmbedBuilder().setImage(imageUrl.get()).build();
     }
 }

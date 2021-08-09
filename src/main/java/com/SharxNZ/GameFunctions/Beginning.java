@@ -1,6 +1,6 @@
 package com.SharxNZ.GameFunctions;
 
-import com.SharxNZ.Daishinkan;
+import com.SharxNZ.Android24;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.events.guild.GuildLeaveEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -11,7 +11,7 @@ import java.sql.Statement;
 
 public class Beginning extends ListenerAdapter {
 
-    private final Statement sqlStatement = Daishinkan.getStatement();
+    private final Statement sqlStatement = Android24.getStatement();
     private final String[] tableCreation = new String[]{
             "CREATE TABLE IF NOT EXISTS `users_data` (\n" +
                     "  `UserID` varchar(18) NOT NULL,\n" +

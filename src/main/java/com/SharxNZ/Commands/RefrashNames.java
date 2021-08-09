@@ -1,6 +1,6 @@
 package com.SharxNZ.Commands;
 
-import com.SharxNZ.Daishinkan;
+import com.SharxNZ.Android24;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 
@@ -10,7 +10,7 @@ import java.sql.Statement;
 
 public class RefrashNames extends Command {
 
-    private final Statement sqlStatement = Daishinkan.getStatement();
+    private final Statement sqlStatement = Android24.getStatement();
 
     public RefrashNames() throws SQLException {
         super.name = "Refresh name";
@@ -27,7 +27,7 @@ public class RefrashNames extends Command {
                 ResultSet result = sqlStatement.executeQuery("SELECT UserID FROM `"+ commandEvent.getGuild().getId() +"`.users_data limit "+limit+", 1;");
                 if (result.next()) {
                     String id = result.getString(1);
-                    Daishinkan.jda.retrieveUserById(id).queue(user -> {
+                    Android24.jda.retrieveUserById(id).queue(user -> {
                         try {
                             String query = "UPDATE `24 gaming`.`users_data` SET `UserName` = '" +
                                     user.getAsTag().replace("'", "''") + "' WHERE `UserID` = '" + id + "';";

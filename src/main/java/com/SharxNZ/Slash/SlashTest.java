@@ -14,7 +14,7 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.Button;
 
-import static com.SharxNZ.Daishinkan.*;
+import static com.SharxNZ.Android24.*;
 import static net.dv8tion.jda.api.interactions.commands.OptionType.*;
 
 

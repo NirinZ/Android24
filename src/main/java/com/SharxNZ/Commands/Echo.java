@@ -1,6 +1,6 @@
 package com.SharxNZ.Commands;
 
-import com.SharxNZ.Daishinkan;
+import com.SharxNZ.Android24;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -13,7 +13,7 @@ public class Echo extends Command {
         super.name = "echo";
         super.aliases = new String[]{"ec"};
         super.help = "Echo back your world";
-        Daishinkan.commandListUpdateAction.addCommands(new CommandData("echo", "Echo what you say")
+        Android24.commandListUpdateAction.addCommands(new CommandData("echo", "Echo what you say")
                 .addOptions(new OptionData(OptionType.STRING, "content", "the content to echo").setRequired(true)));
     }
 

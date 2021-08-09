@@ -1,7 +1,7 @@
 package com.SharxNZ.Commands.GameCommands;
 
 
-import com.SharxNZ.Daishinkan;
+import com.SharxNZ.Android24;
 import com.SharxNZ.Game.Being;
 import com.SharxNZ.Game.Stat;
 import com.SharxNZ.Utilities.Utils;
@@ -107,12 +107,12 @@ public void previousValue(){
                 ", `Speed` = " + getSpeed() +
                 " WHERE `UserID` = " + getUserID() + ";";
         try {
-            Statement statement = Daishinkan.getStatement();
+            Statement statement = Android24.getStatement();
             statement.executeUpdate(sql);
             statement.close();
         } catch (SQLException throwables) {
-            Daishinkan.jda.getTextChannelById(Daishinkan.debugChannelID).sendMessage(sql).queue();
-            Daishinkan.logError(throwables);
+            Android24.jda.getTextChannelById(Android24.debugChannelID).sendMessage(sql).queue();
+            Android24.logError(throwables);
             throwables.printStackTrace();
         }
     }

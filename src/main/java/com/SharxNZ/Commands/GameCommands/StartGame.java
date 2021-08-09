@@ -1,6 +1,6 @@
 package com.SharxNZ.Commands.GameCommands;
 
-import com.SharxNZ.Daishinkan;
+import com.SharxNZ.Android24;
 import com.SharxNZ.Game.Race;
 import net.dv8tion.jda.api.interactions.components.Button;
 
@@ -15,7 +15,7 @@ public abstract class StartGame {
     }
 
     private static void startGameButton(){
-        Daishinkan.jda.getTextChannelById(869983208698163250L).sendMessage("Test")
+        Android24.jda.getTextChannelById(869983208698163250L).sendMessage("Test")
                 .setActionRow(Button.primary("12", "Test 1"),
                         Button.danger("13", "Test 2")).queue();
 
@@ -24,14 +24,14 @@ public abstract class StartGame {
     public static String startGame(String guildID, String userID, Race race){
         try {
             // Setting it in th SQL
-            Statement sqlStatement = Daishinkan.getStatement();
+            Statement sqlStatement = Android24.getStatement();
             String query = "INSERT INTO `"+guildID+"`.`users_power` (`UserID`, `Race`) VALUES ('"+userID+"', '"+race+"');";
             sqlStatement.execute(query);
             sqlStatement.close();
 
             //Adding the role
-            Daishinkan.jda.getGuildById(guildID).addRoleToMember(userID,
-                    Daishinkan.jda.getRoleById(race.getID())).queue();
+            Android24.jda.getGuildById(guildID).addRoleToMember(userID,
+                    Android24.jda.getRoleById(race.getID())).queue();
 
             return "You have been added successfully";
         } catch (SQLIntegrityConstraintViolationException exception) {
@@ -39,7 +39,7 @@ public abstract class StartGame {
         } catch (IllegalArgumentException exception) {
             return "The role ID isn't correct";
         } catch (Exception throwables) {
-            Daishinkan.logError(throwables);
+            Android24.logError(throwables);
             return "Some error accrued";
         }
     }

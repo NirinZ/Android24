@@ -1,6 +1,6 @@
 package com.SharxNZ.Commands.GameCommands;
 
-import com.SharxNZ.Daishinkan;
+import com.SharxNZ.Android24;
 import com.SharxNZ.Utilities.Graphics;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -15,7 +15,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public abstract class Stats {
 
     public static void Start(){
-        Daishinkan.commandListUpdateAction.addCommands(new CommandData("get_power_points", "Display and let you edit your power points")
+        Android24.commandListUpdateAction.addCommands(new CommandData("get_power_points", "Display and let you edit your power points")
         .addOptions(new OptionData(OptionType.BOOLEAN, "display", "display your stats"))
         .addOptions(new OptionData(OptionType.BOOLEAN, "refresh",
                 "Refreshes the image for every change. (Might by slow if display is false)")));
@@ -27,7 +27,7 @@ public abstract class Stats {
         if (ephemeral && image) {
              thread = new Thread("thread") {
                 public void run() {
-                    Daishinkan.getImageUrl(Graphics.statsImage(powerPoints), imageUrl);
+                    Android24.getImageUrl(Graphics.statsImage(powerPoints), imageUrl);
                 }
             };
             thread.start();
@@ -74,7 +74,7 @@ public abstract class Stats {
         ppEmbed.addField(String.valueOf(charPointer[4]), strings[4], true);
         ppEmbed.addField(String.valueOf(charPointer[5]), strings[5], true);
         try {
-            User user = Daishinkan.jda.retrieveUserById(powerPoints.getUserID()).submit().get();
+            User user = Android24.jda.retrieveUserById(powerPoints.getUserID()).submit().get();
             ppEmbed.setFooter("The stats of: " + user.getName(), user.getAvatarUrl());
             if (ephemeral && image) {
                 thread.join();
@@ -82,7 +82,7 @@ public abstract class Stats {
             }
 
         } catch (Exception e) {
-            Daishinkan.logError(e);
+            Android24.logError(e);
             e.printStackTrace();
         }
         ppEmbed.setImage(imageUrl.get());
@@ -95,7 +95,7 @@ public abstract class Stats {
         if (ephemeral) {
             thread = new Thread("thread") {
                 public void run() {
-                    Daishinkan.getImageUrl(Graphics.statsImage(powerPoints), imageUrl);
+                    Android24.getImageUrl(Graphics.statsImage(powerPoints), imageUrl);
                 }
             };
             thread.start();
@@ -125,13 +125,13 @@ public abstract class Stats {
         ppEmbed.addField("", "```Defence: " + powerPoints.getDefence() + "```", true);
         ppEmbed.addField("", "```Speed: " + powerPoints.getSpeed() + "```", true);
         try {
-            User user = Daishinkan.jda.retrieveUserById(powerPoints.getUserID()).submit().get();
+            User user = Android24.jda.retrieveUserById(powerPoints.getUserID()).submit().get();
             ppEmbed.setFooter("The stats of: " + user.getName(), user.getAvatarUrl());
             if (ephemeral)
                 thread.join();
 
         } catch (Exception e) {
-            Daishinkan.logError(e);
+            Android24.logError(e);
             e.printStackTrace();
         }
 

@@ -1,6 +1,6 @@
 package com.SharxNZ.Utilities;
 import com.SharxNZ.Commands.GameCommands.PowerPoints;
-import com.SharxNZ.Daishinkan;
+import com.SharxNZ.Android24;
 import com.SharxNZ.Game.Being;
 import com.SharxNZ.Game.Race;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -27,7 +27,7 @@ public abstract class Utils{
     }
 
     public static short getLevel(String guildID, String userID) throws SQLException {
-        Statement sqlLevel = Daishinkan.getStatement();
+        Statement sqlLevel = Android24.getStatement();
         ResultSet resultLvl = sqlLevel.executeQuery(
                 "SELECT Level FROM `" + guildID + "`.users_data " +
                         "where UserID=" + userID + ";");
@@ -38,7 +38,7 @@ public abstract class Utils{
     }
 
     public static Race getRace(String guildID, String userID) throws SQLException {
-        Statement sqlLevel = Daishinkan.getStatement();
+        Statement sqlLevel = Android24.getStatement();
         ResultSet resultLvl = sqlLevel.executeQuery(
                 "SELECT Race FROM `" + guildID + "`.users_power " +
                         "where UserID=" + userID + ";");
@@ -50,7 +50,7 @@ public abstract class Utils{
 
     public static short getPowerPoints(String guildID, String userID){
         try {
-            Statement sqlLevel = Daishinkan.getStatement();
+            Statement sqlLevel = Android24.getStatement();
         ResultSet resultLvl = sqlLevel.executeQuery(
                 "SELECT PowerPoints FROM `" + guildID + "`.users_power " +
                         "where UserID=" + userID + ";");

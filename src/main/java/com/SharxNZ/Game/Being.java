@@ -1,6 +1,6 @@
 package com.SharxNZ.Game;
 
-import com.SharxNZ.Daishinkan;
+import com.SharxNZ.Android24;
 import com.SharxNZ.Utilities.Utils;
 
 import java.sql.ResultSet;
@@ -34,7 +34,7 @@ public class Being {
 
     protected Being(String guildID, String userID){
         try {
-            Statement statement = Daishinkan.getStatement();
+            Statement statement = Android24.getStatement();
             String sql = "SELECT up.*, Level " +
                     "FROM `" + guildID + "`.users_power up " +
                     "JOIN `" + guildID + "`.users_data ud " +
@@ -65,7 +65,7 @@ public class Being {
             statement.close();
 
         }catch (SQLException throwables) {
-            Daishinkan.jda.getTextChannelById(Daishinkan.debugChannelID).sendMessage(throwables.toString()).queue();
+            Android24.jda.getTextChannelById(Android24.debugChannelID).sendMessage(throwables.toString()).queue();
             throwables.printStackTrace();
         }
     }
@@ -95,11 +95,11 @@ public class Being {
                 ", `Speed` = " + getSpeed() +
                 " WHERE `UserID` = " + getUserID() + ";";
         try {
-            Statement statement = Daishinkan.getStatement();
+            Statement statement = Android24.getStatement();
             statement.executeUpdate(sql);
             statement.close();
         } catch (SQLException throwables) {
-            Daishinkan.logError(throwables);
+            Android24.logError(throwables);
             throwables.printStackTrace();
         }
     }
@@ -132,7 +132,7 @@ public class Being {
 
 
     static void setBeing(String guidID, String userID, String type) throws SQLException {
-        Statement sqlStatement =  Daishinkan.getStatement();
+        Statement sqlStatement =  Android24.getStatement();
         String query = "INSERT INTO `"+guidID+"`.`users_power` (`UserID`, `Type`) VALUES ('"+userID+"', '"+type+"');";
         sqlStatement.execute(query);
         sqlStatement.close();

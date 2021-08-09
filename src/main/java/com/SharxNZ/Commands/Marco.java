@@ -1,6 +1,6 @@
 package com.SharxNZ.Commands;
 
-import com.SharxNZ.Daishinkan;
+import com.SharxNZ.Android24;
 import com.SharxNZ.Utilities.Graphics;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
@@ -15,7 +15,7 @@ public class Marco extends ListenerAdapter {
 
     //@Override //s
     public void onMessageReceived(@Nonnull MessageReceivedEvent m) {
-        if (m.getMessage().getContentRaw().startsWith(Daishinkan.prefix)) {
+        if (m.getMessage().getContentRaw().startsWith(Android24.prefix)) {
             message = m.getMessage().getContentRaw().substring(1).toLowerCase();
             if (message.equals("marco")) {
 
