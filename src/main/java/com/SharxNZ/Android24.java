@@ -70,7 +70,7 @@ public class Android24 {
 
         List<GatewayIntent> gatewayIntents = new ArrayList<>();
 
-        JDABuilder jdaBuilder = JDABuilder.createDefault(System.getenv("DaishinkenToken"))
+        JDABuilder jdaBuilder = JDABuilder.createDefault(System.getenv("Android24Token"))
                 .setStatus(OnlineStatus.DO_NOT_DISTURB)
                 .setActivity(Activity.watching("24 GAMING's videos"));
 
