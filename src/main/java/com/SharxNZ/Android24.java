@@ -72,7 +72,7 @@ public class Android24 {
 
         JDABuilder jdaBuilder = JDABuilder.createDefault(System.getenv("DaishinkenToken"))
                 .setStatus(OnlineStatus.DO_NOT_DISTURB)
-                .setActivity(Activity.watching("over Zen-ho sana"));
+                .setActivity(Activity.watching("24 GAMING's videos"));
 
         gatewayIntents.add(GatewayIntent.GUILD_MEMBERS);
         jdaBuilder.enableIntents(gatewayIntents);
