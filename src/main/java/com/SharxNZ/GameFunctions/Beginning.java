@@ -11,7 +11,7 @@ import java.sql.Statement;
 
 public class Beginning extends ListenerAdapter {
 
-    private final Statement sqlStatement = Android24.getStatement();
+    private final Statement sqlStatement = Android24.getConnection().createStatement();
     private final String[] tableCreation = new String[]{
             "CREATE TABLE IF NOT EXISTS `users_data` (\n" +
                     "  `UserID` varchar(18) NOT NULL,\n" +

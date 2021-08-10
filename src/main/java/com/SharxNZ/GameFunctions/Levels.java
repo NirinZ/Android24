@@ -86,7 +86,7 @@ public class Levels extends ListenerAdapter {
     }
 
     private void updateDatabase() throws SQLException {
-        final Statement sqlStatement = Android24.getStatement();
+        final Statement sqlStatement = Android24.getConnection().createStatement();
         Timer timer = new Timer();
         TimerTask timerTask = new TimerTask() {
             @Override

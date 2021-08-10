@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -17,7 +18,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class Level extends Command {
 
-    private final Statement sqlStatement = Android24.getStatement();
+    private final Statement sqlStatement = Android24.getConnection().createStatement();
 
     public Level() throws SQLException {
         super.name = "level";
@@ -62,15 +63,20 @@ public class Level extends Command {
     }
     public static byte[] returnLevel(String guildID, String userID, String userURL){
         try {
-            Statement sqlStatement = Android24.getStatement();
+            Statement sqlStatement = Android24.getConnection().createStatement();
             ResultSet resultLvl = sqlStatement.executeQuery(
                     "SELECT Level, XP FROM `" + guildID + "`.users_data " +
                             "where UserID=" + userID + ";");
+//            PreparedStatement pst = Android24.getConnection().prepareStatement(
+//                    "SELECT Level, XP FROM `?`.users_data where UserID=?;");
+//            pst.setString(1, guildID);
+//            pst.setString(2, userID);
+//            ResultSet resultLvl = pst.executeQuery();
             if(resultLvl.next()) {
                 String guildName = Android24.jda.getGuildById(guildID).getName();
                 short level = resultLvl.getShort(1);
                 long xp = resultLvl.getLong(2);
-                sqlStatement.close();
+                //sqlStatement.close();
                 return Graphics.levelImage(userURL, guildName, level, xp);
             }
             else return null;

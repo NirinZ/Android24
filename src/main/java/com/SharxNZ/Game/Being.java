@@ -34,7 +34,7 @@ public class Being {
 
     protected Being(String guildID, String userID){
         try {
-            Statement statement = Android24.getStatement();
+            Statement statement = Android24.getConnection().createStatement();
             String sql = "SELECT up.*, Level " +
                     "FROM `" + guildID + "`.users_power up " +
                     "JOIN `" + guildID + "`.users_data ud " +
@@ -95,7 +95,7 @@ public class Being {
                 ", `Speed` = " + getSpeed() +
                 " WHERE `UserID` = " + getUserID() + ";";
         try {
-            Statement statement = Android24.getStatement();
+            Statement statement = Android24.getConnection().createStatement();
             statement.executeUpdate(sql);
             statement.close();
         } catch (SQLException throwables) {
@@ -132,7 +132,7 @@ public class Being {
 
 
     static void setBeing(String guidID, String userID, String type) throws SQLException {
-        Statement sqlStatement =  Android24.getStatement();
+        Statement sqlStatement =  Android24.getConnection().createStatement();
         String query = "INSERT INTO `"+guidID+"`.`users_power` (`UserID`, `Type`) VALUES ('"+userID+"', '"+type+"');";
         sqlStatement.execute(query);
         sqlStatement.close();

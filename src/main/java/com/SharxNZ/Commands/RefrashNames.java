@@ -10,7 +10,7 @@ import java.sql.Statement;
 
 public class RefrashNames extends Command {
 
-    private final Statement sqlStatement = Android24.getStatement();
+    private final Statement sqlStatement = Android24.getConnection().createStatement();
 
     public RefrashNames() throws SQLException {
         super.name = "Refresh name";

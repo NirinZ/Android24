@@ -107,7 +107,7 @@ public void previousValue(){
                 ", `Speed` = " + getSpeed() +
                 " WHERE `UserID` = " + getUserID() + ";";
         try {
-            Statement statement = Android24.getStatement();
+            Statement statement = Android24.getConnection().createStatement();
             statement.executeUpdate(sql);
             statement.close();
         } catch (SQLException throwables) {

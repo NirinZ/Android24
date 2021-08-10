@@ -44,9 +44,10 @@ public class SlashCommands extends ListenerAdapter {
                 if(!slashCommandEvent.getOptions().isEmpty() && slashCommandEvent.getOptions().get(0).getAsBoolean()) {
                     slashCommandEvent.deferReply().queue();
                     slashCommandEvent.getHook().sendFile(Objects.requireNonNull(Level.returnLevel(guildID, userID, userURL)), "Level.jpg").queue();
+                } else {
+                    slashCommandEvent.deferReply(true).queue();
+                    slashCommandEvent.getHook().sendMessageEmbeds(Level.returnLevelEmbed(guildID, userID, userURL)).queue();
                 }
-                else
-                    slashCommandEvent.deferReply(true).addEmbeds(Level.returnLevelEmbed(guildID, userID, userURL)).queue();
                 break;
 
             case "get_power_points":

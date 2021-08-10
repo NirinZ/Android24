@@ -24,7 +24,7 @@ public abstract class StartGame {
     public static String startGame(String guildID, String userID, Race race){
         try {
             // Setting it in th SQL
-            Statement sqlStatement = Android24.getStatement();
+            Statement sqlStatement = Android24.getConnection().createStatement();
             String query = "INSERT INTO `"+guildID+"`.`users_power` (`UserID`, `Race`) VALUES ('"+userID+"', '"+race+"');";
             sqlStatement.execute(query);
             sqlStatement.close();
