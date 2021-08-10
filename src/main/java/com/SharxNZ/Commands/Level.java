@@ -39,7 +39,7 @@ public class Level extends Command {
 //                privateChannel.sendMessage("On " + commandEvent.getGuild().getName() + " server: \nYour level is: " + lvl +
 //                        "\nAnd your XP is: " + xp).queue();
                 privateChannel.sendFile(returnLevel(commandEvent.getGuild().getId(),
-                        commandEvent.getAuthor().getId()), "level.jpg").queue();
+                        commandEvent.getAuthor().getId(), commandEvent.getAuthor().getAvatarUrl()), "level.jpg").queue();
             });
         } else{
             String memberId  = commandEvent.getMessage().getMentionedMembers().get(0).getId();
@@ -60,14 +60,13 @@ public class Level extends Command {
             }
         }
     }
-    public static byte[] returnLevel(String guildID, String userID){
+    public static byte[] returnLevel(String guildID, String userID, String userURL){
         try {
             Statement sqlStatement = Android24.getStatement();
             ResultSet resultLvl = sqlStatement.executeQuery(
                     "SELECT Level, XP FROM `" + guildID + "`.users_data " +
                             "where UserID=" + userID + ";");
             if(resultLvl.next()) {
-                String userURL = Android24.jda.retrieveUserById(userID).complete().getAvatarUrl();
                 String guildName = Android24.jda.getGuildById(guildID).getName();
                 short level = resultLvl.getShort(1);
                 long xp = resultLvl.getLong(2);
@@ -76,16 +75,15 @@ public class Level extends Command {
             }
             else return null;
         } catch (Exception throwables) {
-            System.out.println("Im here");
-            Android24.jda.getTextChannelById(Android24.debugChannelID).sendMessage(throwables.toString()).queue();
+            Android24.logError(throwables);
             throwables.printStackTrace();
             return null;
         }
     }
 
-    public static MessageEmbed returnLevelEmbed(String guildID, String userID){
+    public static MessageEmbed returnLevelEmbed(String guildID, String userID, String userURL){
         AtomicReference<String> imageUrl = new AtomicReference<>();
-        Android24.getImageUrl(Level.returnLevel(guildID, userID), imageUrl);
+        Android24.getImageUrl(Level.returnLevel(guildID, userID, userURL), imageUrl);
         return new EmbedBuilder().setImage(imageUrl.get()).build();
     }
 }
