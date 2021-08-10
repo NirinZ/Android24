@@ -67,7 +67,7 @@ public class Level extends Command {
                     "SELECT Level, XP FROM `" + guildID + "`.users_data " +
                             "where UserID=" + userID + ";");
             if(resultLvl.next()) {
-                String userURL = Android24.jda.getUserById(userID).getAvatarUrl();
+                String userURL = Android24.jda.retrieveUserById(userID).complete().getAvatarUrl();
                 String guildName = Android24.jda.getGuildById(guildID).getName();
                 short level = resultLvl.getShort(1);
                 long xp = resultLvl.getLong(2);
