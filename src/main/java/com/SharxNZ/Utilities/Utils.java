@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 
 import java.awt.*;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -26,41 +27,16 @@ public abstract class Utils{
         return embedBuilder.build();
     }
 
-    public static short getLevel(String guildID, String userID) throws SQLException {
-        Statement sqlLevel = Android24.getConnection().createStatement();
-        ResultSet resultLvl = sqlLevel.executeQuery(
-                "SELECT Level FROM `" + guildID + "`.users_data " +
-                        "where UserID=" + userID + ";");
-        if (resultLvl.next())
-            return resultLvl.getShort(1);
-        else
-            return 0;
-    }
-
-    public static Race getRace(String guildID, String userID) throws SQLException {
-        Statement sqlLevel = Android24.getConnection().createStatement();
-        ResultSet resultLvl = sqlLevel.executeQuery(
-                "SELECT Race FROM `" + guildID + "`.users_power " +
-                        "where UserID=" + userID + ";");
-        if (resultLvl.next())
-            return Race.valueOf(resultLvl.getString(1));
-        else
-            return Race.Saiyan;
-    }
-
-    public static short getPowerPoints(String guildID, String userID){
+    public static boolean checkInGame(long userID){
         try {
-            Statement sqlLevel = Android24.getConnection().createStatement();
-        ResultSet resultLvl = sqlLevel.executeQuery(
-                "SELECT PowerPoints FROM `" + guildID + "`.users_power " +
-                        "where UserID=" + userID + ";");
-        if (resultLvl.next())
-            return resultLvl.getShort(1);
-        else
-            return 0;
+            PreparedStatement statement = Android24.getConnection().prepareStatement(
+                    "SELECT `Race` FROM `android24`.`users_data` WHERE `UserID` = ?;");
+            statement.setLong(1, userID);
+            return statement.executeQuery().next();
         } catch (SQLException throwables) {
+            Android24.logError(throwables);
             throwables.printStackTrace();
-            return 0;
+            return false;
         }
     }
 
@@ -95,15 +71,15 @@ public abstract class Utils{
         }
     }
 
-    public static <T> void garbageCollector(HashMap<String, T> hashMap){
+    public static <T1, T2> void garbageCollector(HashMap<T1, T2> hashMap){
         Lock lock = new ReentrantLock();
         Timer timer = new Timer();
         final int[] i = {0};
-        HashMap<String, T> tempMap = (HashMap<String, T>) hashMap.clone();
+        HashMap<T1, T2> tempMap = (HashMap<T1, T2>) hashMap.clone();
         TimerTask timerTask = new TimerTask() {
             @Override
             public void run() {
-                for(String key : tempMap.keySet()){
+                for(T1 key : tempMap.keySet()){
                     lock.lock();
                     if(inUse(tempMap.get(key))) {
                         setInUse(tempMap.get(key));

@@ -1,8 +1,10 @@
 package com.SharxNZ.Game;
 
 import com.SharxNZ.Android24;
+import com.SharxNZ.Commands.Level;
 import com.SharxNZ.Utilities.Utils;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -11,7 +13,7 @@ import java.util.List;
 
 public class Being {
 
-    protected String guildID, userID;
+    protected long userID;
     protected Race race;
     protected Stat<Integer> powerPoints = new Stat<>(0);
     protected Stat<Integer> health = new Stat<>(0);
@@ -26,28 +28,34 @@ public class Being {
     protected List<Stat<Integer>> powerStats = List.of(health, ki, strikeAttack,
     kiAttack, defence, speed);
 
-    private static final HashMap<String, Being> beings = new HashMap<>();
+    private static final HashMap<Long, Being> beings = new HashMap<>();
+    protected static PreparedStatement getBeingStatement;
+    protected static PreparedStatement saveBeingStatement;
 
     static{
         Utils.garbageCollector(beings);
+        try {
+            getBeingStatement = Android24.getConnection().prepareStatement(
+                    "SELECT `Race`, `XP`, `PowerPoints`, `Health`, `Ki`, `StrikeAttack`, `KiAttack`, `Defence`, `Speed`" +
+                            " FROM `android24`.users_data where `UserID` = ?;");
+            saveBeingStatement = Android24.getConnection().prepareStatement(
+                    "UPDATE `android24`.`users_power` SET `PowerPoints` = ?, `Health` = ?, `Ki` = ?, `StrikeAttack` = ?, `KiAttack` = ?, `Defence` = ?, `Speed` =?" +
+                            " WHERE `UserID` = ?;");
+        } catch (Exception throwables) {
+            Android24.logError(throwables);
+            throwables.printStackTrace();
+        }
     }
 
-    protected Being(String guildID, String userID){
+    protected Being(long userID){
         try {
-            Statement statement = Android24.getConnection().createStatement();
-            String sql = "SELECT up.*, Level " +
-                    "FROM `" + guildID + "`.users_power up " +
-                    "JOIN `" + guildID + "`.users_data ud " +
-                    "on ud.UserID = up.UserID " +
-                    "where ud.UserID=" + userID + ";";
-
-            ResultSet resultSet = statement.executeQuery(sql);
-
-            this.guildID = guildID;
+            getBeingStatement.setLong(1, userID);
+            ResultSet resultSet = getBeingStatement.executeQuery();
             this.userID = userID;
             if (resultSet.next()) {
                 // resultSet.getMetaData().getColumnCount()
-                this.race = Race.valueOf(resultSet.getString(2));
+                this.race = Race.valueOf(resultSet.getString(1));
+                this.level.set((int) Level.calculateLevel(resultSet.getInt(2)));
                 this.powerPoints.set(resultSet.getInt(3));
                 this.health.set(resultSet.getInt(4));
                 this.ki.set(resultSet.getInt(5));
@@ -55,14 +63,12 @@ public class Being {
                 this.kiAttack.set(resultSet.getInt(7));
                 this.defence.set(resultSet.getInt(8));
                 this.speed.set(resultSet.getInt(9));
-                this.level.set(resultSet.getInt(10));
             }
             else {
                 this.race = Race.Saiyan;
             }
             this.inUse = true;
             resultSet.close();
-            statement.close();
 
         }catch (SQLException throwables) {
             Android24.jda.getTextChannelById(Android24.debugChannelID).sendMessage(throwables.toString()).queue();
@@ -70,43 +76,39 @@ public class Being {
         }
     }
 
-    public static Being getBeing(String guildID, String userID){
-        String key = guildID+"#"+userID;
+    public static Being getBeing(long userID){
         Being being;
-        if(beings.containsKey(key)){
-            being = beings.get(key);
+        if(beings.containsKey(userID)){
+            being = beings.get(userID);
             being.inUse = true;
         }
         else{
-            being = new Being(guildID, userID);
-            beings.put(key, being);
+            being = new Being(userID);
+            beings.put(userID, being);
         }
         return being;
 
     }
 
     public void save(){
-        String sql = "UPDATE `" + getGuildID() + "`.`users_power` SET" +
-                " `Health` = " + getHealth() +
-                ", `Ki` = " + getKi() +
-                ", `StrikeAttack` = " + getStrikeAttack() +
-                ", `KiAttack` = " + getKiAttack() +
-                ", `Defence` = " + getDefence() +
-                ", `Speed` = " + getSpeed() +
-                " WHERE `UserID` = " + getUserID() + ";";
         try {
-            Statement statement = Android24.getConnection().createStatement();
-            statement.executeUpdate(sql);
-            statement.close();
+            saveBeingStatement.setInt(1, getPowerPoints());
+            saveBeingStatement.setInt(2, getHealth());
+            saveBeingStatement.setInt(3, getKi());
+            saveBeingStatement.setInt(4, getStrikeAttack());
+            saveBeingStatement.setInt(5, getKiAttack());
+            saveBeingStatement.setInt(6, getDefence());
+            saveBeingStatement.setInt(7, getSpeed());
+            saveBeingStatement.setLong(8, userID);
+            saveBeingStatement.executeUpdate();
         } catch (SQLException throwables) {
             Android24.logError(throwables);
             throwables.printStackTrace();
         }
     }
 
-    public String getGuildID(){return this.guildID;}
 
-    public String getUserID(){return this.userID;}
+    public long getUserID(){return this.userID;}
 
     public Race getRace(){return this.race;}
 

@@ -13,18 +13,17 @@ import java.util.HashSet;
 
 public class ButtonClick extends ListenerAdapter {
 
-    public static HashSet<String> save = new HashSet<>();
+    public static HashSet<Long> save = new HashSet<>();
     
     @Override
     public void onButtonClick(ButtonClickEvent buttonClickEvent){
         String[] split = buttonClickEvent.getComponentId().split("#");
-        String guildID = buttonClickEvent.getGuild().getId();
-        String userID = buttonClickEvent.getUser().getId();
-        if (!split[0].equals(userID)) {
+        long userID = buttonClickEvent.getUser().getIdLong();
+        if (!split[0].equals(Long.toString(userID))) {
             return;
         }
-        String[] args = split[2].split(":");
         String command = split[1];
+        String[] args = split[2].split(":");
 
         //For power points
         String buttonID = userID + "#$#" + split[2];
@@ -32,7 +31,7 @@ public class ButtonClick extends ListenerAdapter {
                 Button.secondary(buttonID.replace("$","Right"), "➡"),
                 Button.secondary(buttonID.replace("$","Up"), "⬆"), Button.secondary(buttonID.replace("$","Down"), "⬇"),
                 Button.primary(buttonID.replace("$","Save"), "Save ✅"));
-        PowerPoints powerPoints = PowerPoints.getPowerPoints(guildID, userID);
+        PowerPoints powerPoints = PowerPoints.getPowerPoints(userID);
 
 
         switch (command) {
@@ -73,9 +72,8 @@ public class ButtonClick extends ListenerAdapter {
                         Boolean.parseBoolean(args[0]), false)).queue();
             }
             case "Save" -> {
-                String key = guildID + "#" + userID;
-                if (!save.contains(key)) {
-                    save.add(key);
+                if (!save.contains(userID)) {
+                    save.add(userID);
                     if(Boolean.parseBoolean(args[0]))
                         buttonClickEvent.deferEdit().setEmbeds(Stats.getPowerPointsEmbed(
                                 powerPoints, true)).queue();

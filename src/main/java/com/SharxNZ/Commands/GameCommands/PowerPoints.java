@@ -21,36 +21,34 @@ public class PowerPoints extends Being {
     protected Stat<Integer> kiAttack = new Stat<>();
     protected Stat<Integer> defence = new Stat<>();
     protected Stat<Integer> speed = new Stat<>();
-    protected Stat<Integer> level = new Stat<>();
 
     public String imageUrl = "https://www.pngjoy.com/pngm/135/2736064_warning-symbol-error-png-transparent-png.png";
 
     protected List<Stat<Integer>> powerStats = List.of(health, ki, strikeAttack,
             kiAttack, defence, speed);
 
-    private static final HashMap<String, PowerPoints> ppoints = new HashMap<>();
+    private static final HashMap<Long, PowerPoints> ppoints = new HashMap<>();
 
     static{
         Utils.garbageCollector(ppoints);
     }
 
-    private PowerPoints(String guildID, String userID){
-        super(guildID, userID);
+    private PowerPoints(long userID){
+        super(userID);
         for(int i = 0; i < 6; i++){
             this.powerStats.get(i).set(0);
         }
     }
 
-    public static PowerPoints getPowerPoints(String guildID, String userID){
-        String key = guildID+"#"+userID;
+    public static PowerPoints getPowerPoints(long userID){
         PowerPoints powerPoints;
-        if(ppoints.containsKey(key)){
-            powerPoints = ppoints.get(key);
+        if(ppoints.containsKey(userID)){
+            powerPoints = ppoints.get(userID);
             powerPoints.inUse = true;
         }
         else{
-            powerPoints = new PowerPoints(guildID, userID);
-            ppoints.put(key, powerPoints);
+            powerPoints = new PowerPoints(userID);
+            ppoints.put(userID, powerPoints);
         }
         return powerPoints;
     }
@@ -96,22 +94,17 @@ public void previousValue(){
 
     @Override
     public void save(){
-        String sql = "UPDATE `" + getGuildID() + "`.`users_power` SET" +
-                " " +
-                "`PowerPoints` = " + getPowerPoints() +
-                ", `Health` = " + getHealth() +
-                ", `Ki` = " + getKi() +
-                ", `StrikeAttack` = " + getStrikeAttack() +
-                ", `KiAttack` = " + getKiAttack() +
-                ", `Defence` = " + getDefence() +
-                ", `Speed` = " + getSpeed() +
-                " WHERE `UserID` = " + getUserID() + ";";
         try {
-            Statement statement = Android24.getConnection().createStatement();
-            statement.executeUpdate(sql);
-            statement.close();
+            saveBeingStatement.setInt(1, getPowerPoints());
+            saveBeingStatement.setInt(2, getHealth());
+            saveBeingStatement.setInt(3, getKi());
+            saveBeingStatement.setInt(4, getStrikeAttack());
+            saveBeingStatement.setInt(5, getKiAttack());
+            saveBeingStatement.setInt(6, getDefence());
+            saveBeingStatement.setInt(7, getSpeed());
+            saveBeingStatement.setLong(8, userID);
+            saveBeingStatement.executeUpdate();
         } catch (SQLException throwables) {
-            Android24.jda.getTextChannelById(Android24.debugChannelID).sendMessage(sql).queue();
             Android24.logError(throwables);
             throwables.printStackTrace();
         }
@@ -151,6 +144,6 @@ public void previousValue(){
         return this.speed.get() + super.speed.get();
     }
 
-    public static HashMap<String, PowerPoints> getPPoints(){return ppoints;}
+    public static HashMap<Long, PowerPoints> getPPoints(){return ppoints;}
 
 }

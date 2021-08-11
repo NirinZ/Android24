@@ -8,10 +8,10 @@ import java.util.*;
 import com.SharxNZ.Commands.*;
 import com.SharxNZ.Commands.GameCommands.GetStats;
 import com.SharxNZ.Commands.GameCommands.StartGame;
-import com.SharxNZ.Commands.GameCommands.Stats;
 import com.SharxNZ.Commands.GameCommands.StartGameCommand;
+import com.SharxNZ.Commands.GameCommands.Stats;
 import com.SharxNZ.GameFunctions.Beginning;
-import com.SharxNZ.GameFunctions.Levels;
+import com.SharxNZ.GameFunctions.XP;
 import com.SharxNZ.Slash.ButtonClick;
 import com.SharxNZ.Slash.SlashCommands;
 import com.jagrosh.jdautilities.command.CommandClient;
@@ -41,14 +41,19 @@ public class Android24 {
     private static final long cacheChannelID = 866689902758068244L;
 
     public static Connection getConnection() throws SQLException {
+
         String url = "jdbc:mysql://127.0.0.1:3306/?user=Android24";
         String uname = "Android24";
         String password = System.getenv("MySQLPass");
         return DriverManager.getConnection(url, uname, password);
     }
 
-    public static void logError(Exception e){
-        jda.getTextChannelById(debugChannelID).sendMessage(e.toString()).queue();
+    public static void logError(Exception throwables){
+        jda.getTextChannelById(debugChannelID).sendMessage(throwables.toString()).queue();
+    }
+
+    public static void log(String log){
+        jda.getTextChannelById(debugChannelID).sendMessage(log + "").queue();
     }
 
     public static void getImageUrl(byte[] image, AtomicReference<String> value){
@@ -67,6 +72,7 @@ public class Android24 {
 
         //System.exit(9);
 
+
         List<GatewayIntent> gatewayIntents = new ArrayList<>();
 
         JDABuilder jdaBuilder = JDABuilder.createDefault(System.getenv("Android24Token"))
@@ -82,12 +88,13 @@ public class Android24 {
         commandListUpdateAction = jda.getGuildById(728638053559828581L).updateCommands();
 
         jda.addEventListener(new Ping());
-        jda.addEventListener(new Levels());
+        jda.addEventListener(new XP());
         jda.addEventListener(new Beginning());
         jda.addEventListener(new Marco());
         jda.addEventListener(new SlashCommands());
         jda.addEventListener(new ButtonClick());
-        Stats.Start();
+        Stats.Stats();
+        Level.Level();
         StartGame.StartGame();
         //jda.addEventListener(new SlashTest());
 
@@ -96,8 +103,7 @@ public class Android24 {
         commandClientBuilder.setPrefix(prefix);
         commandClientBuilder.setHelpWord("help");
         commandClientBuilder.addCommand(new Echo());
-        commandClientBuilder.addCommand(new RefrashNames());
-        commandClientBuilder.addCommand(new Level());
+        commandClientBuilder.addCommand(new RefreshNames());
         commandClientBuilder.addCommand(new StartGameCommand());
         commandClientBuilder.addCommand(new GetStats());
         CommandClient commandClient = commandClientBuilder.build();

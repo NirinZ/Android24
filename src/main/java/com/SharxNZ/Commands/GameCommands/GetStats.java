@@ -25,7 +25,7 @@ public class GetStats extends Command {
 
     @Override
     protected void execute(CommandEvent commandEvent) {
-        commandEvent.reply(getStats(Being.getBeing(commandEvent.getGuild().getId(), commandEvent.getAuthor().getId())));
+        commandEvent.reply(getStats(Being.getBeing(commandEvent.getAuthor().getIdLong())));
     }
     public static String getStats(Being being){
 

@@ -2,6 +2,7 @@ package com.SharxNZ.Utilities;
 
 import com.SharxNZ.Android24;
 import com.SharxNZ.Commands.GameCommands.PowerPoints;
+import com.SharxNZ.Commands.Level;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 
@@ -241,7 +242,9 @@ public abstract class Graphics {
         return output.toByteArray();
     }
 
-    public static byte[] levelImage(String userURL, String guildName, short lvl, long xp) throws IOException {
+    public static byte[] levelImage(String userURL, String guildName, long xp) throws IOException {
+
+        short lvl = Level.calculateLevel(xp);
 
         //Starting
         BufferedImage background = imageFromURL("https://c4.wallpaperflare.com/wallpaper/844/6/554/dragon-ball-dragon-ball-z-nappa-dragon-ball-raditz-dragon-ball-wallpaper-preview.jpg");

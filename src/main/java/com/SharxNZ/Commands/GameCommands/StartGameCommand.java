@@ -31,6 +31,6 @@ public class StartGameCommand extends Command {
             race = Race.valueOf(commandEvent.getArgs());
         else
             race = Race.Saiyan;
-        commandEvent.reply(StartGame.startGame(commandEvent.getGuild().getId(), commandEvent.getAuthor().getId(), race));
+        commandEvent.reply(StartGame.startGame(commandEvent.getAuthor().getIdLong(), race));
     }
 }
