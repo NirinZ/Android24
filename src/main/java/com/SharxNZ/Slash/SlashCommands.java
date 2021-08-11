@@ -4,6 +4,7 @@ import com.SharxNZ.Commands.GameCommands.*;
 import com.SharxNZ.Commands.Level;
 import com.SharxNZ.Game.Being;
 import com.SharxNZ.Game.Race;
+import com.SharxNZ.GameFunctions.StartGame;
 import com.SharxNZ.Utilities.Graphics;
 import com.SharxNZ.Utilities.Utils;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
@@ -11,7 +12,6 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.Button;
 
-import javax.swing.text.Utilities;
 import java.util.Objects;
 
 public class SlashCommands extends ListenerAdapter {
@@ -67,7 +67,7 @@ public class SlashCommands extends ListenerAdapter {
                 }
                 break;
             case "get_power_points":
-                ButtonClick.save.remove(userID);
+                GCButtons.save.remove(userID);
                 PowerPoints.getPPoints().remove(userID);
                 boolean ephemeral = slashCommandEvent.getOptionsByName("display").isEmpty() || !slashCommandEvent.getOptionsByName("display").get(0).getAsBoolean();
                 boolean refresh = !(slashCommandEvent.getOptionsByName("refresh").isEmpty() || !slashCommandEvent.getOptionsByName("refresh").get(0).getAsBoolean());

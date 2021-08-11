@@ -7,12 +7,13 @@ import java.util.*;
 //Discord (JDA/JDA utilities)
 import com.SharxNZ.Commands.*;
 import com.SharxNZ.Commands.GameCommands.GetStats;
-import com.SharxNZ.Commands.GameCommands.StartGame;
+import com.SharxNZ.GameFunctions.GFButtons;
+import com.SharxNZ.GameFunctions.StartGame;
 import com.SharxNZ.Commands.GameCommands.StartGameCommand;
 import com.SharxNZ.Commands.GameCommands.Stats;
 import com.SharxNZ.GameFunctions.Beginning;
 import com.SharxNZ.GameFunctions.XP;
-import com.SharxNZ.Slash.ButtonClick;
+import com.SharxNZ.Commands.GameCommands.GCButtons;
 import com.SharxNZ.Slash.SlashCommands;
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
@@ -92,7 +93,8 @@ public class Android24 {
         jda.addEventListener(new Beginning());
         jda.addEventListener(new Marco());
         jda.addEventListener(new SlashCommands());
-        jda.addEventListener(new ButtonClick());
+        jda.addEventListener(new GCButtons());
+        jda.addEventListener(new GFButtons());
         Stats.Stats();
         Level.Level();
         StartGame.StartGame();
