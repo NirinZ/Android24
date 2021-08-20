@@ -2,6 +2,7 @@ package com.SharxNZ.GameFunctions;
 
 import com.SharxNZ.Android24;
 import com.SharxNZ.Game.Race;
+import com.SharxNZ.Utilities.Utils;
 import net.dv8tion.jda.api.interactions.components.Button;
 
 import java.sql.PreparedStatement;
@@ -18,9 +19,9 @@ public abstract class StartGame {
         try {
             startGameButton();
             setRace = Android24.getConnection().prepareStatement(
-                    "UPDATE `android24`.`users_data` SET `Race` = ? WHERE (`UserID` = ?);");
+                    "UPDATE `" + Android24.schema + "`.`users_data` SET `Race` = ? WHERE (`UserID` = ?);");
             insertUser = Android24.getConnection().prepareStatement(
-                    "INSERT INTO `android24`.`users_data` (`UserID`, `UserName`, `Race`)" +
+                    "INSERT INTO `" + Android24.schema + "`.`users_data` (`UserID`, `UserName`, `Race`)" +
                             " VALUES (?, ?, ?);"
             );
         } catch (Exception throwables) {
@@ -40,13 +41,16 @@ public abstract class StartGame {
     public static String startGame(long userID, Race race){
         try {
             // Setting it in th SQL
-            if (Android24.getConnection().prepareStatement("SELECT `Race` FROM `android24`.`users_data` where `UserID` = " + userID + ";").executeQuery().next())
+            if (Utils.checkInGame(userID))
                 return "You're already in the game";
-            else if(Android24.getConnection().prepareStatement("SELECT `UserID` FROM `android24`.`users_data` where `UserID` = " + userID + ";").executeQuery().next()) {
+            //Adding the race to the user
+            else if(Android24.getConnection().prepareStatement("SELECT `UserID` FROM `" + Android24.schema + "`.`users_data` where `UserID` = " + userID + ";").executeQuery().next()) {
                 setRace.setString(1, race.toString());
                 setRace.setLong(2, userID);
                 setRace.executeUpdate();
-            }else {
+            }
+            //Creating a whole mew user
+            else {
                 insertUser.setLong(1, userID);
                 insertUser.setString(3, race.toString());
                 Android24.jda.retrieveUserById(userID).queue(user -> {

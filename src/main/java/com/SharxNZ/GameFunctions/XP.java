@@ -27,12 +27,12 @@ public class XP extends ListenerAdapter {
 
     public XP() throws SQLException {
         getXP = Android24.getConnection().prepareStatement(
-                "SELECT XP FROM `android24`.users_data where UserID = ?;");
+                "SELECT XP FROM `" + Android24.schema + "`.users_data where UserID = ?;");
         updateData = Android24.getConnection().prepareStatement(
-                "UPDATE `android24`.`users_data` SET `XP` = ?, `Zeni` = `Zeni` + ?," +
+                "UPDATE `" + Android24.schema + "`.`users_data` SET `XP` = ?, `Zeni` = `Zeni` + ?," +
                         " `PowerPoints` = `PowerPoints` + ? WHERE `UserID` = ?;");
         insertUser = Android24.getConnection().prepareStatement(
-                "INSERT INTO `android24`.`users_data` (`UserID`, `UserName`, `XP`, `Zeni`, `PowerPoints`)" +
+                "INSERT INTO `" + Android24.schema + "`.`users_data` (`UserID`, `UserName`, `XP`, `Zeni`, `PowerPoints`)" +
                         " VALUES (?, ?, ?, ?, ?);"
         );
         updateDatabase();

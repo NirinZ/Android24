@@ -1,5 +1,6 @@
 package com.SharxNZ.Slash;
 
+import com.SharxNZ.Android24;
 import com.SharxNZ.Commands.GameCommands.*;
 import com.SharxNZ.Commands.Level;
 import com.SharxNZ.Game.Being;
@@ -12,6 +13,8 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.Button;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Objects;
 
 public class SlashCommands extends ListenerAdapter {
@@ -95,7 +98,14 @@ public class SlashCommands extends ListenerAdapter {
 
                 break;
             case "test":
-                slashCommandEvent.reply("").queue();
+                try {
+                    ResultSet r =  Android24.getConnection().prepareStatement("Select UserName from `"+Android24.schema+"`.`users_data` where UserID = 739532349280354404").executeQuery();
+                    r.next();
+                    slashCommandEvent.reply(r.getString(1)).queue();
+                } catch (SQLException throwables) {
+                    throwables.printStackTrace();
+                }
+                break;
                 //slashCommandEvent.getHook().sendFile().addEmbeds().queue();
             default:
                 slashCommandEvent.reply("What is that?").queue();
