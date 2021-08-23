@@ -50,7 +50,7 @@ public class Android24 {
         //String uname = "Android24";
         String uname = "sql11431925";
         //String password =  System.getenv("MySQLPass");
-        String password =  "hKG2jG1Ddr";
+        String password =  System.getenv("RemoteSQLPass");
         return DriverManager.getConnection(url, uname, password);
     }
 
@@ -81,8 +81,8 @@ public class Android24 {
 
         List<GatewayIntent> gatewayIntents = new ArrayList<>();
 
-        //System.getenv("Android24Token")
-        JDABuilder jdaBuilder = JDABuilder.createDefault("ODM4MTE5Njc2MjAyMDU3ODA5.YI2dxg.8sq_GjmSq78t8MafjK2uGxG-qpE")
+
+        JDABuilder jdaBuilder = JDABuilder.createDefault(System.getenv("Android24Token"))
                 .setStatus(OnlineStatus.DO_NOT_DISTURB)
                 .setActivity(Activity.watching("24 GAMING's videos"));
 
