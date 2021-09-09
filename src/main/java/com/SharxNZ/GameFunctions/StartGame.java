@@ -19,9 +19,9 @@ public abstract class StartGame {
         try {
             startGameButton();
             setRace = Android24.getConnection().prepareStatement(
-                    "UPDATE `" + Android24.schema + "`.`users_data` SET `Race` = ? WHERE (`UserID` = ?);");
+                    "UPDATE `android24`.`users_data` SET `Race` = ? WHERE (`UserID` = ?);");
             insertUser = Android24.getConnection().prepareStatement(
-                    "INSERT INTO `" + Android24.schema + "`.`users_data` (`UserID`, `UserName`, `Race`)" +
+                    "INSERT INTO `android24`.`users_data` (`UserID`, `UserName`, `Race`)" +
                             " VALUES (?, ?, ?);"
             );
         } catch (Exception throwables) {
@@ -44,7 +44,7 @@ public abstract class StartGame {
             if (Utils.checkInGame(userID))
                 return "You're already in the game";
             //Adding the race to the user
-            else if(Android24.getConnection().prepareStatement("SELECT `UserID` FROM `" + Android24.schema + "`.`users_data` where `UserID` = " + userID + ";").executeQuery().next()) {
+            else if(Android24.getConnection().prepareStatement("SELECT `UserID` FROM `android24`.`users_data` where `UserID` = " + userID + ";").executeQuery().next()) {
                 setRace.setString(1, race.toString());
                 setRace.setLong(2, userID);
                 setRace.executeUpdate();

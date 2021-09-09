@@ -18,8 +18,8 @@ public class RefreshNames extends Command {
         super.name = "Refresh name";
         super.aliases = new String[]{"rn", "RN"};
         super.help = "Refresh all the names in the DataBase";
-        getNames = Android24.getConnection().prepareStatement("SELECT UserID FROM `" + Android24.schema + "`.users_data limit ?, 10;");
-        setNames = Android24.getConnection().prepareStatement("UPDATE `" + Android24.schema + "`.`users_data` SET `UserName` = ? WHERE `UserID` = ?;");
+        getNames = Android24.getConnection().prepareStatement("SELECT UserID FROM `android24`.users_data limit ?, 10;");
+        setNames = Android24.getConnection().prepareStatement("UPDATE `android24`.`users_data` SET `UserName` = ? WHERE `UserID` = ?;");
 
     }
 

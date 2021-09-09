@@ -23,7 +23,7 @@ public abstract class Level{
     public static void Level(){
         try {
             levelStatement = Android24.getConnection().prepareStatement(
-                        "SELECT XP FROM `" + Android24.schema + "`.users_data where UserID = ?;");
+                        "SELECT XP FROM `android24`.users_data where UserID = ?;");
             Android24.commandListUpdateAction.addCommands(new CommandData("level", "Returns your level")
                     .addOptions(new OptionData(OptionType.BOOLEAN, "display", "display your level")));
         } catch (Exception throwables) {

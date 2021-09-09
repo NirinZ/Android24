@@ -99,7 +99,7 @@ public class SlashCommands extends ListenerAdapter {
                 break;
             case "test":
                 try {
-                    ResultSet r =  Android24.getConnection().prepareStatement("Select UserName from `"+Android24.schema+"`.`users_data` where UserID = 739532349280354404").executeQuery();
+                    ResultSet r =  Android24.getConnection().prepareStatement("Select UserName from `android24`.`users_data` where UserID = 739532349280354404").executeQuery();
                     r.next();
                     slashCommandEvent.reply(r.getString(1)).queue();
                 } catch (SQLException throwables) {

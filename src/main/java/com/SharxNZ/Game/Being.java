@@ -37,9 +37,9 @@ public class Being {
         try {
             getBeingStatement = Android24.getConnection().prepareStatement(
                     "SELECT `Race`, `XP`, `PowerPoints`, `Health`, `Ki`, `StrikeAttack`, `KiAttack`, `Defence`, `Speed`" +
-                            " FROM `" + Android24.schema + "`.users_data where `UserID` = ?;");
+                            " FROM `android24`.users_data where `UserID` = ?;");
             saveBeingStatement = Android24.getConnection().prepareStatement(
-                    "UPDATE `" + Android24.schema + "`.`users_power` SET `PowerPoints` = ?, `Health` = ?, `Ki` = ?, `StrikeAttack` = ?, `KiAttack` = ?, `Defence` = ?, `Speed` =?" +
+                    "UPDATE `android24`.`users_power` SET `PowerPoints` = ?, `Health` = ?, `Ki` = ?, `StrikeAttack` = ?, `KiAttack` = ?, `Defence` = ?, `Speed` =?" +
                             " WHERE `UserID` = ?;");
         } catch (Exception throwables) {
             Android24.logError(throwables);

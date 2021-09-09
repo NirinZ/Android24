@@ -41,16 +41,11 @@ public class Android24 {
     public static float difficulty = 0.3f;
     public static final long debugChannelID = 728653495900569603L;
     private static final long cacheChannelID = 866689902758068244L;
-    //public static final String schema = "android24";
-    public static final String schema = "sql11431925";
 
     public static Connection getConnection() throws SQLException {
-        //String url = "jdbc:mysql://127.0.0.1:3306/?user=Android24";
-        String url = "jdbc:mysql://sql11.freesqldatabase.com/";
-        //String uname = "Android24";
-        String uname = "sql11431925";
-        //String password =  System.getenv("MySQLPass");
-        String password =  System.getenv("RemoteSQLPass");
+        String url = "jdbc:mysql://159.89.111.155:3306/?user=Android24";
+        String uname = "Android24";
+        String password =  System.getenv("MySQLPass");
         return DriverManager.getConnection(url, uname, password);
     }
 

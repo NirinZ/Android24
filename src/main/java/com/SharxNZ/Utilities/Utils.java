@@ -30,7 +30,7 @@ public abstract class Utils{
     public static boolean checkInGame(long userID){
         try {
             PreparedStatement statement = Android24.getConnection().prepareStatement(
-                    "SELECT `Race` FROM `" + Android24.schema + "`.`users_data` WHERE `UserID` = ?;");
+                    "SELECT `Race` FROM `android24`.`users_data` WHERE `UserID` = ?;");
             statement.setLong(1, userID);
             ResultSet resultSet = statement.executeQuery();
             if(resultSet.next())
