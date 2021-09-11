@@ -3,11 +3,15 @@ package com.SharxNZ.GameFunctions;
 import com.SharxNZ.Android24;
 import com.SharxNZ.Game.Race;
 import com.SharxNZ.Utilities.Utils;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.Button;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.SQLIntegrityConstraintViolationException;
 
 
 public abstract class StartGame {
@@ -17,6 +21,13 @@ public abstract class StartGame {
 
     public static void StartGame() {
         try {
+            OptionData optionData = new OptionData(OptionType.STRING, "race", "choose the race you want to play").setRequired(true);
+            ResultSet resultSet = Android24.getConnection().createStatement().executeQuery("SELECT RaceName FROM android24.races;");
+            while (resultSet.next())
+                optionData.addChoice(resultSet.getString(1), resultSet.getString(1));
+            Android24.commandListUpdateAction.addCommands(new CommandData("start_game", "Let's you start the game and choose your race")
+                    .addOptions(optionData));
+
             startGameButton();
             setRace = Android24.getConnection().prepareStatement(
                     "UPDATE `android24`.`users_data` SET `Race` = ? WHERE (`UserID` = ?);");

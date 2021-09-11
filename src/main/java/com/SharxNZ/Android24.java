@@ -25,14 +25,19 @@ import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
+import org.apache.commons.dbcp2.BasicDataSource;
 
 //SQL
 import java.sql.*;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import javax.security.auth.login.LoginException;
+import javax.sql.ConnectionPoolDataSource;
+import javax.sql.DataSource;
+import javax.sql.PooledConnection;
+import javax.sql.PooledConnectionBuilder;
 
-public class Android24 {
+public abstract class Android24 {
 
     public static JDA jda;
     public static CommandClientBuilder commandClientBuilder;
@@ -41,13 +46,18 @@ public class Android24 {
     public static float difficulty = 0.3f;
     public static final long debugChannelID = 728653495900569603L;
     private static final long cacheChannelID = 866689902758068244L;
+    private static final BasicDataSource dataSource = new BasicDataSource();
 
-    public static Connection getConnection() throws SQLException {
-        String url = "jdbc:mysql://159.89.111.155:3306/?user=Android24";
-        String uname = "Android24";
-        String password =  System.getenv("MySQLPass");
-        return DriverManager.getConnection(url, uname, password);
+    public static Connection getConnection() {
+        try {
+            return dataSource.getConnection();
+        } catch (SQLException throwables) {
+            logError(throwables);
+            throwables.printStackTrace();
+            return null;
+        }
     }
+
 
     public static void logError(Exception throwables){
         jda.getTextChannelById(debugChannelID).sendMessage(throwables.toString()).queue();
@@ -72,6 +82,14 @@ public class Android24 {
         //System.out.println(ASaiyan.getSpeed("45656"));
 
         //System.exit(9);
+
+        // Set the data source for the SQL connection
+        dataSource.setUrl("jdbc:mysql://159.89.111.155:3306/?user=Android24");
+        dataSource.setUsername("Android24");
+        dataSource.setPassword(System.getenv("MySQLPass"));
+        dataSource.setMinIdle(1);
+        dataSource.setMaxIdle(3);
+        dataSource.setMaxTotal(50);
 
 
         List<GatewayIntent> gatewayIntents = new ArrayList<>();
@@ -118,6 +136,6 @@ public class Android24 {
 
         jda.getTextChannelById(debugChannelID).sendMessage("אני דלוק").queue();
         // jda.getPresence().setStatus(OnlineStatus.DO_NOT_DISTURB);
-// test 2
+        // test 2
     }
 }

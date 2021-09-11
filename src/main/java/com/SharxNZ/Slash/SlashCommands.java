@@ -15,6 +15,8 @@ import net.dv8tion.jda.api.interactions.components.Button;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Objects;
 
 public class SlashCommands extends ListenerAdapter {
@@ -76,16 +78,24 @@ public class SlashCommands extends ListenerAdapter {
                 boolean refresh = !(slashCommandEvent.getOptionsByName("refresh").isEmpty() || !slashCommandEvent.getOptionsByName("refresh").get(0).getAsBoolean());
                 String args = ephemeral + ":" + refresh;
                 String buttonID = userID + "#$#" + args;
-                ActionRow actionRow = ActionRow.of(Button.secondary(buttonID.replace("$","Left"), "⬅"),
-                        Button.secondary(buttonID.replace("$","Right"), "➡"),
-                        Button.secondary(buttonID.replace("$","Up"), "⬆"), Button.secondary(buttonID.replace("$","Down"), "⬇"),
-                        Button.primary(buttonID.replace("$","Save"), "Save ✅")/*.withEmoji(Emoji.fromEmote())*/);
+                ArrayList<ActionRow> actionRows = new ArrayList<>(Arrays.asList(
+                        //Raw 1
+                        ActionRow.of(Button.secondary(buttonID.replace("$","Left"), "⬅"),
+                                Button.secondary(buttonID.replace("$","Right"), "➡"),
+                                Button.secondary(buttonID.replace("$","Up"), "⬆"),
+                                Button.secondary(buttonID.replace("$","Down"), "⬇")),
+                        //Raw 2
+                        ActionRow.of(Button.success(buttonID.replace("$","Save"), "Save ✅")/*.withEmoji(Emoji.fromEmote())*/,
+                                Button.danger(buttonID.replace("$","Discard"), "Discard ❌"),
+                                Button.primary(buttonID.replace("$","Refresh"), "Refresh 🔄"))
+                ));
+
                 if (ephemeral){
                     slashCommandEvent.deferReply(true).queue();
                     slashCommandEvent.getHook()
                             .sendMessageEmbeds(Stats.getPowerPointsEmbed(
                                     PowerPoints.getPowerPoints(userID), true, true))
-                            .setEphemeral(true).addActionRows(actionRow).queue();
+                            .setEphemeral(true).addActionRows(actionRows).queue();
                 }
                 else{
                     PowerPoints powerPoints = PowerPoints.getPowerPoints(userID);
@@ -93,7 +103,7 @@ public class SlashCommands extends ListenerAdapter {
                     slashCommandEvent.getHook().sendFile(Graphics.statsImage(powerPoints), "png.png")
                             .addEmbeds(Stats.getPowerPointsEmbed(
                                     PowerPoints.getPowerPoints(userID), false, true))
-                            .addActionRows(actionRow).queue();
+                            .addActionRows(actionRows).queue();
                 }
 
                 break;

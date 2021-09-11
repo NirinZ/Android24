@@ -14,7 +14,7 @@ import java.util.List;
 public class Being {
 
     protected long userID;
-    protected Race race;
+    protected String race;
     protected Stat<Integer> powerPoints = new Stat<>(0);
     protected Stat<Integer> health = new Stat<>(0);
     protected Stat<Integer> ki = new Stat<>(0);
@@ -39,7 +39,7 @@ public class Being {
                     "SELECT `Race`, `XP`, `PowerPoints`, `Health`, `Ki`, `StrikeAttack`, `KiAttack`, `Defence`, `Speed`" +
                             " FROM `android24`.users_data where `UserID` = ?;");
             saveBeingStatement = Android24.getConnection().prepareStatement(
-                    "UPDATE `android24`.`users_power` SET `PowerPoints` = ?, `Health` = ?, `Ki` = ?, `StrikeAttack` = ?, `KiAttack` = ?, `Defence` = ?, `Speed` =?" +
+                    "UPDATE `android24`.`users_data` SET `PowerPoints` = ?, `Health` = ?, `Ki` = ?, `StrikeAttack` = ?, `KiAttack` = ?, `Defence` = ?, `Speed` =?" +
                             " WHERE `UserID` = ?;");
         } catch (Exception throwables) {
             Android24.logError(throwables);
@@ -54,7 +54,7 @@ public class Being {
             this.userID = userID;
             if (resultSet.next()) {
                 // resultSet.getMetaData().getColumnCount()
-                this.race = Race.valueOf(resultSet.getString(1));
+                this.race = resultSet.getString(1);
                 this.level.set((int) Level.calculateLevel(resultSet.getInt(2)));
                 this.powerPoints.set(resultSet.getInt(3));
                 this.health.set(resultSet.getInt(4));
@@ -65,7 +65,7 @@ public class Being {
                 this.speed.set(resultSet.getInt(9));
             }
             else {
-                this.race = Race.Saiyan;
+                //this.race = Race.Saiyan;
             }
             this.inUse = true;
             resultSet.close();
@@ -110,7 +110,7 @@ public class Being {
 
     public long getUserID(){return this.userID;}
 
-    public Race getRace(){return this.race;}
+    public String getRace(){return this.race;}
 
     public int getPowerPoints(){return this.powerPoints.get();}
 

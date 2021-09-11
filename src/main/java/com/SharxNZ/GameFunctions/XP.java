@@ -2,7 +2,6 @@ package com.SharxNZ.GameFunctions;
 
 import com.SharxNZ.Android24;
 import com.SharxNZ.Commands.Level;
-import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceJoinEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceLeaveEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;

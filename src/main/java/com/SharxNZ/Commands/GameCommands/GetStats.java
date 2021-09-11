@@ -10,10 +10,14 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
-import static com.SharxNZ.Android24.debugChannelID;
-import static com.SharxNZ.Android24.jda;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import static com.SharxNZ.Android24.*;
 
 public class GetStats extends Command {
+    private static PreparedStatement raceStats;
 
     public GetStats(){
         super.name = "getStats";
@@ -21,6 +25,13 @@ public class GetStats extends Command {
         super.help = "Display you stats";
         Android24.commandListUpdateAction.addCommands(new CommandData(super.name.toLowerCase(), this.help)
                 .addOptions(new OptionData(OptionType.BOOLEAN, "display", "display your stats")));
+        try {
+            raceStats = Android24.getConnection().prepareStatement(
+                    "SELECT * FROM android24.races WHERE RaceName = ?;");
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+            logError(throwables);
+        }
     }
 
     @Override
@@ -37,26 +48,31 @@ public class GetStats extends Command {
                         ASaiyan.getSpeed(commandEvent.getGuild().getId(), commandEvent.getAuthor().getId())
                 };*/
         long[] stats = new long[6];
-        switch (being.getRace()) {
-            case Saiyan:
-                stats[0] = ((long)being.getHealth() + Saiyan.baseHealth) * being.getLevel();
-                stats[1] = ((long)being.getKi() + Saiyan.baseKi) * being.getLevel();
-                stats[2] = ((long)being.getStrikeAttack() + Saiyan.baseStrikeAttack) * being.getLevel();
-                stats[3] = ((long)being.getKiAttack() + Saiyan.baseKiAttack) * being.getLevel();
-                stats[4] = ((long)being.getDefence() + Saiyan.baseDefence) * being.getLevel();
-                stats[5] = ((long) being.getSpeed() + Saiyan.baseSpeed) * being.getLevel();
-                break;
-            default:
-                jda.getTextChannelById(debugChannelID).sendMessage("I got to default").queue();
-                jda.getTextChannelById(debugChannelID).sendMessage(being.getRace().toString()).queue();
+        try {
+            raceStats.setString(1, being.getRace());
+            ResultSet resultSet = raceStats.executeQuery();
+            if(!resultSet.next())
+                return "No there is no a race like this";
+
+            stats[0] = ((long)being.getHealth() + resultSet.getShort(2)) * being.getLevel();
+            stats[1] = ((long)being.getKi() + resultSet.getShort(3)) * being.getLevel();
+            stats[2] = ((long)being.getStrikeAttack() + resultSet.getShort(4)) * being.getLevel();
+            stats[3] = ((long)being.getKiAttack() + resultSet.getShort(5)) * being.getLevel();
+            stats[4] = ((long)being.getDefence() + resultSet.getShort(6)) * being.getLevel();
+            stats[5] = ((long) being.getSpeed() + resultSet.getShort(7)) * being.getLevel();
+
+            return ("Your health: " + stats[0] +
+                    "\nYour ki: " + stats[1] +
+                    "\nYour strike attack: " + stats[2] +
+                    "\nYour ki attack: " + stats[3] +
+                    "\nYour defence: " + stats[4] +
+                    "\nYour speed: " + stats[5]
+            );
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+            logError(throwables);
+            return "An error in the execute";
         }
-        return ("Your health: " + stats[0] +
-                "\nYour ki: " + stats[1] +
-                "\nYour strike attack: " + stats[2] +
-                "\nYour ki attack: " + stats[3] +
-                "\nYour defence: " + stats[4] +
-                "\nYour speed: " + stats[5]
-        );
     }
 //    public static Being getStats(String guildID, String userID) throws SQLException {
 //        Statement sql = Android24.getSql();

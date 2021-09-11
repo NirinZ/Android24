@@ -2,8 +2,6 @@ package com.SharxNZ.Commands;
 
 import com.SharxNZ.Android24;
 import com.SharxNZ.Utilities.Graphics;
-import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -12,8 +10,6 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.concurrent.atomic.AtomicReference;
 
 public abstract class Level{

@@ -2,7 +2,6 @@ package com.SharxNZ.Utilities;
 import com.SharxNZ.Commands.GameCommands.PowerPoints;
 import com.SharxNZ.Android24;
 import com.SharxNZ.Game.Being;
-import com.SharxNZ.Game.Race;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 
@@ -10,7 +9,6 @@ import java.awt.*;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -24,6 +22,14 @@ public abstract class Utils{
         embedBuilder.setColor(Color.green);
         embedBuilder.addField("All changes has been saved!", "", true);
         embedBuilder.setImage("https://user-images.githubusercontent.com/11019190/45695978-d59faa00-bb62-11e8-8f37-7b447356d237.png");
+        return embedBuilder.build();
+    }
+
+    public static MessageEmbed discardEmbed(){
+        EmbedBuilder embedBuilder = new EmbedBuilder();
+        embedBuilder.setColor(Color.red);
+        embedBuilder.addField("Your changes has been discarded!", "", true);
+        embedBuilder.setImage("https://static.thenounproject.com/png/2025351-200.png");
         return embedBuilder.build();
     }
 

@@ -16,13 +16,6 @@ public class StartGameCommand extends Command {
         super.aliases = new String[]{"sg", "s"};
         super.help = "Start the game";
         super.arguments = "[Your type]";
-
-        OptionData optionData = new OptionData(OptionType.STRING, "race", "choose the race you want to play").setRequired(true);
-        for (Race race: Race.values()){
-            optionData.addChoice(race.name(), race.name());
-        }
-        Android24.commandListUpdateAction.addCommands(new CommandData("start_game", "Let's you start the game and choose your race")
-                .addOptions(optionData));
     }
 
     @Override
