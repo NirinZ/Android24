@@ -6,6 +6,7 @@ import com.SharxNZ.Commands.Level;
 import com.SharxNZ.Game.Being;
 import com.SharxNZ.Game.Race;
 import com.SharxNZ.GameFunctions.StartGame;
+import com.SharxNZ.Utilities.Embeds;
 import com.SharxNZ.Utilities.Graphics;
 import com.SharxNZ.Utilities.Utils;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
@@ -39,39 +40,36 @@ public class SlashCommands extends ListenerAdapter {
         }
 
         switch (slashCommandEvent.getName()) {
-            case "start_game":
+            case "start_game" -> {
                 slashCommandEvent.reply(StartGame.startGame(userID,
                         Race.valueOf(slashCommandEvent.getOption("race").getAsString())))
                         .setEphemeral(true).queue();
-                break;
-            case "echo":
-                slashCommandEvent.reply(slashCommandEvent.getOption("content").getAsString()).queue();
-                break;
-            case "ping":
-                slashCommandEvent.reply("Pong!").queue();
+            }
+            case "echo" -> slashCommandEvent.reply(slashCommandEvent.getOption("content").getAsString()).queue();
+
+            case "ping" -> slashCommandEvent.reply("Pong!").queue();
                 //slashCommandEvent.getHook().sendFile()
-                break;
-            case "getstats":
-                if(!slashCommandEvent.getOptions().isEmpty() && slashCommandEvent.getOptions().get(0).getAsBoolean()) {
+
+            case "getstats" -> {
+                if (!slashCommandEvent.getOptions().isEmpty() && slashCommandEvent.getOptions().get(0).getAsBoolean()) {
                     slashCommandEvent.reply(GetStats.getStats(Being.getBeing(userID))).queue();
-                }
-                else{
+                } else {
                     slashCommandEvent.reply(GetStats.getStats(Being.getBeing(userID)))
                             .setEphemeral(true).queue();
                 }
-                break;
+            }
 
-            case "level":
+            case "level" -> {
                 String userURL = slashCommandEvent.getUser().getAvatarUrl();
-                if(!slashCommandEvent.getOptions().isEmpty() && slashCommandEvent.getOptions().get(0).getAsBoolean()) {
+                if (!slashCommandEvent.getOptions().isEmpty() && slashCommandEvent.getOptions().get(0).getAsBoolean()) {
                     slashCommandEvent.deferReply().queue();
                     slashCommandEvent.getHook().sendFile(Objects.requireNonNull(Level.returnLevel(guildID, userID, userURL)), "Level.jpg").queue();
                 } else {
                     slashCommandEvent.deferReply(true).queue();
                     slashCommandEvent.getHook().sendMessageEmbeds(Level.returnLevelEmbed(guildID, userID, userURL)).queue();
                 }
-                break;
-            case "get_power_points":
+            }
+            case "get_power_points" -> {
                 GCButtons.save.remove(userID);
                 PowerPoints.getPPoints().remove(userID);
                 boolean ephemeral = slashCommandEvent.getOptionsByName("display").isEmpty() || !slashCommandEvent.getOptionsByName("display").get(0).getAsBoolean();
@@ -80,24 +78,23 @@ public class SlashCommands extends ListenerAdapter {
                 String buttonID = userID + "#$#" + args;
                 ArrayList<ActionRow> actionRows = new ArrayList<>(Arrays.asList(
                         //Raw 1
-                        ActionRow.of(Button.secondary(buttonID.replace("$","Left"), "⬅"),
-                                Button.secondary(buttonID.replace("$","Right"), "➡"),
-                                Button.secondary(buttonID.replace("$","Up"), "⬆"),
-                                Button.secondary(buttonID.replace("$","Down"), "⬇")),
+                        ActionRow.of(Button.secondary(buttonID.replace("$", "Left"), "⬅"),
+                                Button.secondary(buttonID.replace("$", "Right"), "➡"),
+                                Button.secondary(buttonID.replace("$", "Up"), "⬆"),
+                                Button.secondary(buttonID.replace("$", "Down"), "⬇")),
                         //Raw 2
-                        ActionRow.of(Button.success(buttonID.replace("$","Save"), "Save ✅")/*.withEmoji(Emoji.fromEmote())*/,
-                                Button.danger(buttonID.replace("$","Discard"), "Discard ❌"),
-                                Button.primary(buttonID.replace("$","Refresh"), "Refresh 🔄"))
+                        ActionRow.of(Button.success(buttonID.replace("$", "Save"), "Save ✅")/*.withEmoji(Emoji.fromEmote())*/,
+                                Button.danger(buttonID.replace("$", "Discard"), "Discard ❌"),
+                                Button.primary(buttonID.replace("$", "Refresh"), "Refresh 🔄"))
                 ));
 
-                if (ephemeral){
+                if (ephemeral) {
                     slashCommandEvent.deferReply(true).queue();
                     slashCommandEvent.getHook()
                             .sendMessageEmbeds(Stats.getPowerPointsEmbed(
                                     PowerPoints.getPowerPoints(userID), true, true))
                             .setEphemeral(true).addActionRows(actionRows).queue();
-                }
-                else{
+                } else {
                     PowerPoints powerPoints = PowerPoints.getPowerPoints(userID);
                     slashCommandEvent.deferReply().queue();
                     slashCommandEvent.getHook().sendFile(Graphics.statsImage(powerPoints), "png.png")
@@ -106,20 +103,41 @@ public class SlashCommands extends ListenerAdapter {
                             .addActionRows(actionRows).queue();
                 }
 
-                break;
-            case "test":
+            }
+
+            case "shop" -> {
+                if(slashCommandEvent.getSubcommandName().equals("view")) {
+                    String item = slashCommandEvent.getOptionsByName("item").isEmpty() ? null : slashCommandEvent.getOption("item").getAsString();
+                    if (slashCommandEvent.getOptionsByName("item").isEmpty()) {
+                        switch (slashCommandEvent.getOption("type").getAsString()) {
+                            case "Special Attacks" -> slashCommandEvent.replyEmbeds(Embeds.attacksShop(userID)).setEphemeral(true).queue();
+                            case "Transformations" -> slashCommandEvent.replyEmbeds(Embeds.transformationsShop(userID)).setEphemeral(true).queue();
+                        }
+                    }
+                    else{
+                        switch (slashCommandEvent.getOption("type").getAsString()) {
+                            case "Special Attacks" -> slashCommandEvent.replyEmbeds(Embeds.displayAttack(slashCommandEvent.getOption("item").getAsString())).setEphemeral(true).queue();
+                            case "Transformations" -> slashCommandEvent.replyEmbeds(Embeds.displayTransformation(slashCommandEvent.getOption("item").getAsString())).setEphemeral(true).queue();
+                        }
+                    }
+                }
+                else{
+
+                }
+            }
+
+            case "test" -> {
                 try {
-                    ResultSet r =  Android24.getConnection().prepareStatement("Select UserName from `android24`.`users_data` where UserID = 739532349280354404").executeQuery();
+                    ResultSet r = Android24.getConnection().prepareStatement("Select UserName from `android24`.`users_data` where UserID = 739532349280354404").executeQuery();
                     r.next();
                     slashCommandEvent.reply(r.getString(1)).queue();
                 } catch (SQLException throwables) {
                     throwables.printStackTrace();
                 }
-                break;
-                //slashCommandEvent.getHook().sendFile().addEmbeds().queue();
-            default:
-                slashCommandEvent.reply("What is that?").queue();
-
+            }
+            //slashCommandEvent.getHook().sendFile().addEmbeds().queue();
+            default -> slashCommandEvent.reply("Unregistered command :" + slashCommandEvent.getName() + " | " + slashCommandEvent.getSubcommandName()
+             + " ~ " + slashCommandEvent.getSubcommandGroup()).queue();
         }
     }
 }

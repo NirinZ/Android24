@@ -15,7 +15,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public abstract class Stats {
 
     public static void Stats() {
-        Android24.commandListUpdateAction.addCommands(new CommandData("get_power_points", "Display and let you edit your power points")
+        Android24.addCommand(new CommandData("get_power_points", "Display and let you edit your power points")
         .addOptions(new OptionData(OptionType.BOOLEAN, "display", "display your stats"))
         .addOptions(new OptionData(OptionType.BOOLEAN, "refresh",
                 "Refreshes the image for every change. (Might by slow if display is false)")));

@@ -13,7 +13,7 @@ public class Echo extends Command {
         super.name = "echo";
         super.aliases = new String[]{"ec"};
         super.help = "Echo back your world";
-        Android24.commandListUpdateAction.addCommands(new CommandData("echo", "Echo what you say")
+        Android24.addCommand(new CommandData("echo", "Echo what you say")
                 .addOptions(new OptionData(OptionType.STRING, "content", "the content to echo").setRequired(true)));
     }
 

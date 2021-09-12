@@ -3,7 +3,6 @@ package com.SharxNZ.Commands.GameCommands;
 
 import com.SharxNZ.Android24;
 import com.SharxNZ.Game.Being;
-import com.SharxNZ.Game.Saiyan;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -23,7 +22,7 @@ public class GetStats extends Command {
         super.name = "getStats";
         super.aliases = new String[]{"gs"};
         super.help = "Display you stats";
-        Android24.commandListUpdateAction.addCommands(new CommandData(super.name.toLowerCase(), this.help)
+        Android24.addCommand(new CommandData(super.name.toLowerCase(), this.help)
                 .addOptions(new OptionData(OptionType.BOOLEAN, "display", "display your stats")));
         try {
             raceStats = Android24.getConnection().prepareStatement(

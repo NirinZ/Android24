@@ -6,9 +6,9 @@ import com.SharxNZ.Utilities.Utils;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import net.dv8tion.jda.api.interactions.components.Button;
 
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -25,7 +25,7 @@ public abstract class StartGame {
             ResultSet resultSet = Android24.getConnection().createStatement().executeQuery("SELECT RaceName FROM android24.races;");
             while (resultSet.next())
                 optionData.addChoice(resultSet.getString(1), resultSet.getString(1));
-            Android24.commandListUpdateAction.addCommands(new CommandData("start_game", "Let's you start the game and choose your race")
+            Android24.addCommand(new CommandData("start_game", "Let's you start the game and choose your race")
                     .addOptions(optionData));
 
             startGameButton();
@@ -35,6 +35,18 @@ public abstract class StartGame {
                     "INSERT INTO `android24`.`users_data` (`UserID`, `UserName`, `Race`)" +
                             " VALUES (?, ?, ?);"
             );
+
+            Android24.addCommand(new CommandData("shop", "All the operations that you can do in the shop")
+                .addSubcommands(new SubcommandData("view", "View the items in the shop")
+                                    .addOptions(new OptionData(OptionType.STRING, "type", "The type of the shop you want to view")
+                                                    .addChoice("Special Attacks", "Special Attacks")
+                                                    .addChoice("Transformations", "Transformations")
+                                                    //.addChoice("Others", "Others")
+                                                    .setRequired(true))
+                                    .addOptions(new OptionData(OptionType.STRING, "item", "The name of the item you want to expend (Can be the abbreviated name)")))
+                .addSubcommands(new SubcommandData("buy", "Buy items from the shop")
+                                    .addOptions(new OptionData(OptionType.STRING, "item", "The name of the item you want to buy (Can be the abbreviated name)")
+                                                    .setRequired(true))));
         } catch (Exception throwables) {
             Android24.logError(throwables);
             throwables.printStackTrace();

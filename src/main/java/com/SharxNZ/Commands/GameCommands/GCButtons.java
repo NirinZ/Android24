@@ -2,6 +2,7 @@ package com.SharxNZ.Commands.GameCommands;
 
 import com.SharxNZ.Commands.GameCommands.PowerPoints;
 import com.SharxNZ.Commands.GameCommands.Stats;
+import com.SharxNZ.Utilities.Embeds;
 import com.SharxNZ.Utilities.Utils;
 import com.SharxNZ.Utilities.Graphics;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
@@ -105,14 +106,14 @@ public class GCButtons extends ListenerAdapter {
                     }
                 } else {
                     powerPoints.save();
-                    buttonClickEvent.editMessageEmbeds(Utils.savedEmbed()).queue();
+                    buttonClickEvent.editMessageEmbeds(Embeds.savedEmbed()).queue();
                     //buttonClickEvent.getMessage().delete().queue();
                 }
             }
             case "Discard" -> {
                 save.remove(userID);
                 PowerPoints.getPPoints().remove(userID);
-                buttonClickEvent.editMessageEmbeds(Utils.discardEmbed()).queue();
+                buttonClickEvent.editMessageEmbeds(Embeds.discardEmbed()).queue();
             }
             case "Refresh" -> {
                 if (save.contains(userID))

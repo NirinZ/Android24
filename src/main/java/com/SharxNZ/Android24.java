@@ -15,6 +15,7 @@ import com.SharxNZ.GameFunctions.Beginning;
 import com.SharxNZ.GameFunctions.XP;
 import com.SharxNZ.Commands.GameCommands.GCButtons;
 import com.SharxNZ.Slash.SlashCommands;
+import com.SharxNZ.Utilities.PreparedSql;
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -32,16 +33,13 @@ import java.sql.*;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import javax.security.auth.login.LoginException;
-import javax.sql.ConnectionPoolDataSource;
-import javax.sql.DataSource;
-import javax.sql.PooledConnection;
-import javax.sql.PooledConnectionBuilder;
 
 public abstract class Android24 {
 
     public static JDA jda;
-    public static CommandClientBuilder commandClientBuilder;
-    public static CommandListUpdateAction commandListUpdateAction;
+    private static CommandClientBuilder commandClientBuilder;
+    private static CommandListUpdateAction commandListDebug;
+    private static CommandListUpdateAction commandListAll;
     public static String prefix = "!";
     public static float difficulty = 0.3f;
     public static final long debugChannelID = 728653495900569603L;
@@ -77,6 +75,12 @@ public abstract class Android24 {
                 .complete().getEmbeds().get(0).getImage().getUrl());
     }
 
+    public static void addCommand(CommandData commandData){
+        commandListDebug.addCommands(commandData);
+        commandListAll.addCommands(commandData);
+    }
+
+
     public static void main(String[] args) throws LoginException, InterruptedException, SQLException, IOException {
 
         //System.out.println(ASaiyan.getSpeed("45656"));
@@ -105,8 +109,10 @@ public abstract class Android24 {
         jda = jdaBuilder.build();
         jda.awaitReady();
 
-        commandListUpdateAction = jda.getGuildById(728638053559828581L).updateCommands();
-        commandListUpdateAction.addCommands(new CommandData("test", "test command"));
+        commandListDebug = jda.getGuildById(728638053559828581L).updateCommands();
+        commandListAll = jda.updateCommands();
+
+        commandListDebug.addCommands(new CommandData("test", "test command"));
 
         jda.addEventListener(new Ping());
         jda.addEventListener(new XP());
@@ -132,7 +138,7 @@ public abstract class Android24 {
         jda.addEventListener(commandClient);
 
         // commandListUpdateAction = jda.updateCommands();
-        commandListUpdateAction.queue();
+        commandListDebug.queue();
 
         jda.getTextChannelById(debugChannelID).sendMessage("אני דלוק").queue();
         // jda.getPresence().setStatus(OnlineStatus.DO_NOT_DISTURB);

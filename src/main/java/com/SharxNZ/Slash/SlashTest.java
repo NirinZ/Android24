@@ -1,6 +1,7 @@
 package com.SharxNZ.Slash;
 
 //compileJava.options.encoding = 'UTF-8';
+import com.SharxNZ.Android24;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageChannel;
@@ -22,7 +23,7 @@ import static net.dv8tion.jda.api.interactions.commands.OptionType.*;
 public class SlashTest extends ListenerAdapter {
     public SlashTest(){
         // Moderation commands with required options
-        commandListUpdateAction.addCommands(
+        Android24.addCommand(
                 new CommandData("ban", "Ban a user from this server. Requires permission to Ban users.")
                         .addOptions(new OptionData(USER, "user", "The user to ban") // USER type allows to include members of the server or other users by id
                                 .setRequired(true)) // This command requires a parameter
@@ -30,24 +31,24 @@ public class SlashTest extends ListenerAdapter {
         );
 
         // Simple reply commands
-        commandListUpdateAction.addCommands(
+        Android24.addCommand(
                 new CommandData("say", "Makes the bot say what you tell it to")
                         .addOptions(new OptionData(STRING, "content", "What the bot should say")
                                 .setRequired(true))
         );
 
         // Commands without any inputs
-        commandListUpdateAction.addCommands(
+        Android24.addCommand(
                 new CommandData("leave", "Make the bot leave the server")
         );
 
-        commandListUpdateAction.addCommands(
+        Android24.addCommand(
                 new CommandData("prune", "Prune messages from this channel")
                         .addOptions(new OptionData(INTEGER, "amount", "How many messages to prune (Default 100)"))
         );
 
         // Send the new set of commands to discord, this will override any existing global commands with the new set provided here
-        commandListUpdateAction.queue();
+        // commandListDebug.queue();
         //commandListUpdateAction.queue(list -> list.forEach(command -> System.out.println(command.getId())));
 
     }
