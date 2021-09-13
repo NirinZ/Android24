@@ -52,9 +52,9 @@ public class Marco extends ListenerAdapter {
 
     public void onGuildMemberJoin(GuildMemberJoinEvent guildMemberJoinEvent){
         System.out.println("Joined");
-        guildMemberJoinEvent.getGuild().getDefaultChannel().sendMessage(guildMemberJoinEvent.getMember().getAsMention() + " Joined he is cool!").queue();
+        guildMemberJoinEvent.getGuild().getTextChannelsByName("『:wave:』welcome", true).get(0).sendMessage(guildMemberJoinEvent.getMember().getAsMention() + " Joined he is cool!").queue();
         try {
-            guildMemberJoinEvent.getGuild().getDefaultChannel().sendFile(Graphics.welcomeImage(guildMemberJoinEvent), "welcome.jpg").queue();
+            guildMemberJoinEvent.getGuild().getTextChannelsByName("『:wave:』welcome", true).get(0).sendFile(Graphics.welcomeImage(guildMemberJoinEvent), "welcome.jpg").queue();
         } catch (IOException e) {
             e.printStackTrace();
         }

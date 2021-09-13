@@ -113,7 +113,7 @@ public class SlashCommands extends ListenerAdapter {
                                 .setEphemeral(true).queue();
                     else
                         slashCommandEvent.replyEmbeds(Shop.shopView(slashCommandEvent.getOption("type").getAsString(), slashCommandEvent.getOption("item").getAsString(), userID))
-                                .setEphemeral(true).addActionRow(Button.success(slashCommandEvent.getOption("item").getAsString(), "Buy 💵")).queue();
+                                .setEphemeral(true).addActionRow(Button.success("shop#"+slashCommandEvent.getOption("item").getAsString(), "Buy 💵")).queue();
                 }
                 else if(slashCommandEvent.getSubcommandName().equals("buy"))
                     slashCommandEvent.replyEmbeds(
@@ -123,7 +123,7 @@ public class SlashCommands extends ListenerAdapter {
             case "nuke" -> {
                 slashCommandEvent.reply("""
                         **You got busted and reported to the admin!**
-                        https://cdn.discordapp.com/attachments/770691140772036690/886979603846029342/busted.gif
+                        https://tenor.com/view/f-bi-raid-swat-gif-11500735
                         https://tenor.com/view/busted-police-unmarked-undercove-gif-20202846""").setEphemeral(true).queue();
                 slashCommandEvent.getJDA().retrieveUserById(303807596555534337L).queue(user -> {
                     slashCommandEvent.getJDA().getTextChannelById(790508049222729739L).sendMessage(
