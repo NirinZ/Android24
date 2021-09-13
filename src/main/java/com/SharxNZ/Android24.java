@@ -39,7 +39,8 @@ public abstract class Android24 {
     private static CommandListUpdateAction commandListDebug;
     private static CommandListUpdateAction commandListAll;
     public static String prefix = "!";
-    public static float difficulty = 0.3f;
+    public static float difficulty = 0.4f; // should be 0.3
+    public static short xp = 50; // should be 20
     public static final long debugChannelID = 728653495900569603L;
     private static final long cacheChannelID = 866689902758068244L;
     private static final BasicDataSource dataSource = new BasicDataSource();
@@ -60,7 +61,7 @@ public abstract class Android24 {
     }
 
     public static void log(String log){
-        jda.getTextChannelById(debugChannelID).sendMessage(log + "").queue();
+        jda.getTextChannelById(debugChannelID).sendMessage(log).queue();
     }
 
     public static void getImageUrl(byte[] image, AtomicReference<String> value){
@@ -118,7 +119,7 @@ public abstract class Android24 {
 
         jda.addEventListener(new Ping());
         jda.addEventListener(new XP());
-        jda.addEventListener(new Beginning());
+//        jda.addEventListener(new Beginning());
         jda.addEventListener(new Marco());
         jda.addEventListener(new SlashCommands());
         jda.addEventListener(new PPButtons());
@@ -129,6 +130,7 @@ public abstract class Android24 {
         StartGame.StartGame();
         Embeds.Embeds();
         Shop.Shop();
+        Scams.Scams();
         //jda.addEventListener(new SlashTest());
 
         CommandClientBuilder commandClientBuilder = new CommandClientBuilder();

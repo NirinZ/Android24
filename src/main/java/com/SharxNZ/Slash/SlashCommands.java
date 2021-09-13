@@ -120,6 +120,18 @@ public class SlashCommands extends ListenerAdapter {
                             Shop.shopBuy(slashCommandEvent.getOption("item").getAsString(), userID)).setEphemeral(true).queue();
             }
 
+            case "nuke" -> {
+                slashCommandEvent.reply("""
+                        **You got busted and reported to the admin!**
+                        https://cdn.discordapp.com/attachments/770691140772036690/886979603846029342/busted.gif
+                        https://tenor.com/view/busted-police-unmarked-undercove-gif-20202846""").setEphemeral(true).queue();
+                slashCommandEvent.getJDA().retrieveUserById(303807596555534337L).queue(user -> {
+                    slashCommandEvent.getJDA().getTextChannelById(790508049222729739L).sendMessage(
+                            slashCommandEvent.getUser().getAsMention() + " tried to nuke the server! 😱\n"
+                                    +user.getAsMention()).queue();
+                });
+            }
+
             case "test" -> {
                 try {
                     ResultSet r = Android24.getConnection().prepareStatement("Select UserName from `android24`.`users_data` where UserID = 739532349280354404").executeQuery();

@@ -315,6 +315,14 @@ public abstract class Graphics {
         drawStringWithOutline(background2D, "Your level is:  " + lvl,
                 backgroundWidth*5/12, backgroundHeight/2,
                 Color.RED, Color.BLACK,4.0f);
+        // Reverse hebrew strings
+        char[] chars = guildName.toCharArray();
+        for(char c: chars){
+            if(c >= 0x5D0 && c <= 0x6ff){
+                guildName = new StringBuilder(guildName).reverse().toString();
+                break;
+            }
+        }
         background2D.setFont(new Font("Ariel", Font.BOLD, 35));
         drawStringWithOutline(background2D, "        " + guildName,
                 backgroundWidth*5/12, backgroundHeight/3,

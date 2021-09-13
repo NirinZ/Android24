@@ -39,7 +39,7 @@ public class XP extends ListenerAdapter {
     }
 
     private short giveXP(){
-        return (short) rand.nextInt(21);
+        return (short) rand.nextInt(Android24.xp + 1);
     }
 
     @Override
