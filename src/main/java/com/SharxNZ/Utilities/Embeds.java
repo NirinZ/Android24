@@ -19,10 +19,10 @@ public abstract class Embeds {
             "$Name, $Abbreviated, Cost, MinimalLevel, AttackPowerUp, DefencePowerUp, SpeedPowerUp, KiConsumption, Description, ?, Gif" +
             " FROM android24.#s" +
             " JOIN" +
-            " android24.shop ON $Name = Name" +
+            " android24.Shop ON $Name = Name" +
             " WHERE $Name = '?' OR $Abbreviated = ?;";*/
 
-    static {
+    public static void Embeds(){
         try {
             asStatement = Android24.getConnection().prepareStatement("SELECT " +
                     "AttackName, Cost, MinimalLevel" +
@@ -79,6 +79,14 @@ public abstract class Embeds {
         return new EmbedBuilder().setImage("https://www.computerhope.com/jargon/e/error.png").setColor(Color.red).build();
     }
 
+    public static MessageEmbed errorTextEmbed(String text){
+        return new EmbedBuilder().setTitle(text).setColor(Color.red).build();
+    }
+
+    public static MessageEmbed successTextEmbed(String text){
+        return new EmbedBuilder().setTitle(text).setColor(Color.green).build();
+    }
+
     public static MessageEmbed attacksShop(long userID){
         try {
             EmbedBuilder asEmbed = new EmbedBuilder();
@@ -132,7 +140,7 @@ public abstract class Embeds {
                 diEmbed.setImage(resultSet.getString(resultSet.getMetaData().getColumnCount()));
                 return diEmbed.build();
             }else {
-                return new EmbedBuilder().setTitle("The requested item doesn't exist...").setColor(Color.red).build();
+                return errorTextEmbed("The requested item doesn't exist...");
             }
 
         } catch (SQLException throwables) {
@@ -159,7 +167,7 @@ public abstract class Embeds {
                 diEmbed.setImage(resultSet.getString(resultSet.getMetaData().getColumnCount()));
                 return diEmbed.build();
             }else {
-                return new EmbedBuilder().setTitle("The requested item doesn't exist...").setColor(Color.red).build();
+                return errorTextEmbed("The requested item doesn't exist...");
             }
 
         } catch (SQLException throwables) {

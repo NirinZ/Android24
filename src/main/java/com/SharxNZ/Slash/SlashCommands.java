@@ -1,12 +1,12 @@
 package com.SharxNZ.Slash;
 
 import com.SharxNZ.Android24;
+import com.SharxNZ.Buttons.PPButtons;
 import com.SharxNZ.Commands.GameCommands.*;
 import com.SharxNZ.Commands.Level;
 import com.SharxNZ.Game.Being;
 import com.SharxNZ.Game.Race;
 import com.SharxNZ.GameFunctions.StartGame;
-import com.SharxNZ.Utilities.Embeds;
 import com.SharxNZ.Utilities.Graphics;
 import com.SharxNZ.Utilities.Utils;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
@@ -70,13 +70,14 @@ public class SlashCommands extends ListenerAdapter {
                 }
             }
             case "get_power_points" -> {
-                GCButtons.save.remove(userID);
+                PPButtons.save.remove(userID);
                 PowerPoints.getPPoints().remove(userID);
                 boolean ephemeral = slashCommandEvent.getOptionsByName("display").isEmpty() || !slashCommandEvent.getOptionsByName("display").get(0).getAsBoolean();
                 boolean refresh = !(slashCommandEvent.getOptionsByName("refresh").isEmpty() || !slashCommandEvent.getOptionsByName("refresh").get(0).getAsBoolean());
                 String args = ephemeral + ":" + refresh;
                 String buttonID = userID + "#$#" + args;
-                ArrayList<ActionRow> actionRows = new ArrayList<>(Arrays.asList(
+                // userID#command#ephemeral:refresh
+                ArrayList<ActionRow> ppButtons = new ArrayList<>(Arrays.asList(
                         //Raw 1
                         ActionRow.of(Button.secondary(buttonID.replace("$", "Left"), "⬅"),
                                 Button.secondary(buttonID.replace("$", "Right"), "➡"),
@@ -93,37 +94,30 @@ public class SlashCommands extends ListenerAdapter {
                     slashCommandEvent.getHook()
                             .sendMessageEmbeds(Stats.getPowerPointsEmbed(
                                     PowerPoints.getPowerPoints(userID), true, true))
-                            .setEphemeral(true).addActionRows(actionRows).queue();
+                            .setEphemeral(true).addActionRows(ppButtons).queue();
                 } else {
                     PowerPoints powerPoints = PowerPoints.getPowerPoints(userID);
                     slashCommandEvent.deferReply().queue();
                     slashCommandEvent.getHook().sendFile(Graphics.statsImage(powerPoints), "png.png")
                             .addEmbeds(Stats.getPowerPointsEmbed(
                                     PowerPoints.getPowerPoints(userID), false, true))
-                            .addActionRows(actionRows).queue();
+                            .addActionRows(ppButtons).queue();
                 }
 
             }
 
             case "shop" -> {
                 if(slashCommandEvent.getSubcommandName().equals("view")) {
-                    String item = slashCommandEvent.getOptionsByName("item").isEmpty() ? null : slashCommandEvent.getOption("item").getAsString();
-                    if (slashCommandEvent.getOptionsByName("item").isEmpty()) {
-                        switch (slashCommandEvent.getOption("type").getAsString()) {
-                            case "Special Attacks" -> slashCommandEvent.replyEmbeds(Embeds.attacksShop(userID)).setEphemeral(true).queue();
-                            case "Transformations" -> slashCommandEvent.replyEmbeds(Embeds.transformationsShop(userID)).setEphemeral(true).queue();
-                        }
-                    }
-                    else{
-                        switch (slashCommandEvent.getOption("type").getAsString()) {
-                            case "Special Attacks" -> slashCommandEvent.replyEmbeds(Embeds.displayAttack(slashCommandEvent.getOption("item").getAsString())).setEphemeral(true).queue();
-                            case "Transformations" -> slashCommandEvent.replyEmbeds(Embeds.displayTransformation(slashCommandEvent.getOption("item").getAsString())).setEphemeral(true).queue();
-                        }
-                    }
+                    if (slashCommandEvent.getOptionsByName("item").isEmpty())
+                        slashCommandEvent.replyEmbeds(Shop.shopView(slashCommandEvent.getOption("type").getAsString(), null, userID))
+                                .setEphemeral(true).queue();
+                    else
+                        slashCommandEvent.replyEmbeds(Shop.shopView(slashCommandEvent.getOption("type").getAsString(), slashCommandEvent.getOption("item").getAsString(), userID))
+                                .setEphemeral(true).addActionRow(Button.success(slashCommandEvent.getOption("item").getAsString(), "Buy 💵")).queue();
                 }
-                else{
-
-                }
+                else if(slashCommandEvent.getSubcommandName().equals("buy"))
+                    slashCommandEvent.replyEmbeds(
+                            Shop.shopBuy(slashCommandEvent.getOption("item").getAsString(), userID)).setEphemeral(true).queue();
             }
 
             case "test" -> {

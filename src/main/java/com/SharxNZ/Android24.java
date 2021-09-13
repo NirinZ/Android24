@@ -5,17 +5,16 @@ import java.io.IOException;
 import java.util.*;
 
 //Discord (JDA/JDA utilities)
+import com.SharxNZ.Buttons.PPButtons;
+import com.SharxNZ.Buttons.ShopButton;
 import com.SharxNZ.Commands.*;
-import com.SharxNZ.Commands.GameCommands.GetStats;
+import com.SharxNZ.Commands.GameCommands.*;
 import com.SharxNZ.GameFunctions.GFButtons;
 import com.SharxNZ.GameFunctions.StartGame;
-import com.SharxNZ.Commands.GameCommands.StartGameCommand;
-import com.SharxNZ.Commands.GameCommands.Stats;
 import com.SharxNZ.GameFunctions.Beginning;
 import com.SharxNZ.GameFunctions.XP;
-import com.SharxNZ.Commands.GameCommands.GCButtons;
 import com.SharxNZ.Slash.SlashCommands;
-import com.SharxNZ.Utilities.PreparedSql;
+import com.SharxNZ.Utilities.Embeds;
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -37,7 +36,6 @@ import javax.security.auth.login.LoginException;
 public abstract class Android24 {
 
     public static JDA jda;
-    private static CommandClientBuilder commandClientBuilder;
     private static CommandListUpdateAction commandListDebug;
     private static CommandListUpdateAction commandListAll;
     public static String prefix = "!";
@@ -80,6 +78,10 @@ public abstract class Android24 {
         commandListAll.addCommands(commandData);
     }
 
+    private static void queueCommands(){
+        commandListDebug.queue();
+        commandListAll.queue();
+    }
 
     public static void main(String[] args) throws LoginException, InterruptedException, SQLException, IOException {
 
@@ -119,14 +121,17 @@ public abstract class Android24 {
         jda.addEventListener(new Beginning());
         jda.addEventListener(new Marco());
         jda.addEventListener(new SlashCommands());
-        jda.addEventListener(new GCButtons());
+        jda.addEventListener(new PPButtons());
+        jda.addEventListener(new ShopButton());
         jda.addEventListener(new GFButtons());
         Stats.Stats();
         Level.Level();
         StartGame.StartGame();
+        Embeds.Embeds();
+        Shop.Shop();
         //jda.addEventListener(new SlashTest());
 
-        commandClientBuilder = new CommandClientBuilder();
+        CommandClientBuilder commandClientBuilder = new CommandClientBuilder();
         commandClientBuilder.setOwnerId("739532349280354404");
         commandClientBuilder.setPrefix(prefix);
         commandClientBuilder.setHelpWord("help");
@@ -138,7 +143,7 @@ public abstract class Android24 {
         jda.addEventListener(commandClient);
 
         // commandListUpdateAction = jda.updateCommands();
-        commandListDebug.queue();
+        queueCommands();
 
         jda.getTextChannelById(debugChannelID).sendMessage("אני דלוק").queue();
         // jda.getPresence().setStatus(OnlineStatus.DO_NOT_DISTURB);

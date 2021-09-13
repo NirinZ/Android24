@@ -5,6 +5,13 @@ import java.util.HashMap;
 
 public class PreparedSql {
 
+    /**
+     * $ -> replace all
+     * # -> replace all with lowercase
+     * ? -> replace one time and add ''
+     * The way the changes are done is by the order you use the `stringChange` commands;
+     */
+
     private String sql;
     private String allValue;
     private final ArrayList<String> stringChanges = new ArrayList<>();

@@ -36,17 +36,6 @@ public abstract class StartGame {
                             " VALUES (?, ?, ?);"
             );
 
-            Android24.addCommand(new CommandData("shop", "All the operations that you can do in the shop")
-                .addSubcommands(new SubcommandData("view", "View the items in the shop")
-                                    .addOptions(new OptionData(OptionType.STRING, "type", "The type of the shop you want to view")
-                                                    .addChoice("Special Attacks", "Special Attacks")
-                                                    .addChoice("Transformations", "Transformations")
-                                                    //.addChoice("Others", "Others")
-                                                    .setRequired(true))
-                                    .addOptions(new OptionData(OptionType.STRING, "item", "The name of the item you want to expend (Can be the abbreviated name)")))
-                .addSubcommands(new SubcommandData("buy", "Buy items from the shop")
-                                    .addOptions(new OptionData(OptionType.STRING, "item", "The name of the item you want to buy (Can be the abbreviated name)")
-                                                    .setRequired(true))));
         } catch (Exception throwables) {
             Android24.logError(throwables);
             throwables.printStackTrace();
