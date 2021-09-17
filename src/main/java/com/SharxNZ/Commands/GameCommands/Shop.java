@@ -1,14 +1,17 @@
 package com.SharxNZ.Commands.GameCommands;
 
 import com.SharxNZ.Android24;
+import com.SharxNZ.Game.DisplayAttack;
+import com.SharxNZ.Game.DisplayTransformation;
+import com.SharxNZ.Utilities.DoublyCircularLinkedList;
 import com.SharxNZ.Utilities.Embeds;
 import com.SharxNZ.Utilities.PreparedSql;
+import com.SharxNZ.Utilities.Utils;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.CommandData;
-import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
+import net.dv8tion.jda.api.entities.User;
 
+import javax.naming.NameNotFoundException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -17,20 +20,42 @@ public abstract class Shop {
 
     private static PreparedStatement buyAttack;
     private static PreparedStatement buyTransformation;
+    private static PreparedStatement checkType;
+    public static PreparedStatement asStatement;
+    public static PreparedStatement tsStatement;
 
     public static void Shop(){
-        Android24.addCommand(new CommandData("shop", "All the operations that you can do in the Shop")
-                .addSubcommands(new SubcommandData("view", "View the items in the Shop")
-                        .addOptions(new OptionData(OptionType.STRING, "type", "The type of the Shop you want to view")
-                                .addChoice("Special Attacks", "Special Attacks")
-                                .addChoice("Transformations", "Transformations")
-                                //.addChoice("Others", "Others")
-                                .setRequired(true))
-                        .addOptions(new OptionData(OptionType.STRING, "item", "The name of the item you want to expend (Can be the abbreviated name)")))
-                .addSubcommands(new SubcommandData("buy", "Buy items from the Shop")
-                        .addOptions(new OptionData(OptionType.STRING, "item", "The name of the item you want to buy (Can be the abbreviated name)")
-                                .setRequired(true))));
         try {
+            checkType = Android24.getConnection().prepareStatement("""
+                    SELECT
+                        IF(? IN (SELECT
+                                    Name
+                                FROM
+                                    android24.attacks
+                                        JOIN
+                                    android24.shop ON Name = AttackName
+                                    UNION
+                                    SELECT
+                                    AttackAbbreviated
+                                FROM
+                                    android24.attacks
+                                        JOIN
+                                    android24.shop ON Name = AttackName),
+                            'Attack',
+                            IF(? IN (SELECT
+                                    Name
+                                FROM
+                                    android24.transformations
+                                        JOIN
+                                    android24.shop ON Name = TransformationName
+                                    UNION
+                                    SELECT
+                                    TransformationAbbreviated
+                                FROM
+                                    android24.transformations
+                                        JOIN
+                                    android24.shop ON Name = TransformationName), 'Transformation', Null)) AS 'Type'
+                    """);
             buyAttack = Android24.getConnection().prepareStatement("SELECT \n" +
                     "    IF('Already owned' NOT IN (SELECT \n" +
                     "                'Already owned' AS 'Check if exist'\n" +
@@ -89,36 +114,50 @@ public abstract class Shop {
                     "    UserID = ?\n" +
                     "        AND (TransformationName = ?\n" +
                     "        OR TransformationAbbreviated = ?);");
+            asStatement = Android24.getConnection().prepareStatement("SELECT " +
+                    "AttackName, Cost, MinimalLevel" +
+                    " FROM android24.attacks" +
+                    " JOIN" +
+                    " android24.shop ON AttackName = Name" +
+                    " WHERE ForcedRace is null or ForcedRace = ?;");
+            tsStatement = Android24.getConnection().prepareStatement("SELECT " +
+                    "TransformationName,  Cost, MinimalLevel" +
+                    " FROM android24.transformations" +
+                    " JOIN" +
+                    " android24.shop ON TransformationName = Name" +
+                    " WHERE ForcedRace is null or ForcedRace = ?;");
         } catch (SQLException throwables) {
             Android24.logError(throwables);
             throwables.printStackTrace();
         }
     }
 
-    public static MessageEmbed shopView(String type, String item, long userID) {
-        if (item == null) {
-            switch (type) {
-                case "Special Attacks" -> {
-                    return Embeds.attacksShop(userID);
+    public static MessageEmbed shopView(String item) {
+        try {
+            checkType.setString(1, item);
+            checkType.setString(2, item);
+            ResultSet resultSet = checkType.executeQuery();
+            if (!resultSet.next())
+                return Embeds.errorEmbed();
+            switch (resultSet.getString(1)) {
+                case "Attack" -> {
+                    return displayAttack(item);
                 }
-                case "Transformations" -> {
-                    return Embeds.transformationsShop(userID);
+                case "Transformation" -> {
+                    return displayTransformation(item);
+                }
+                default -> {
+                    return Embeds.errorTextEmbed("The requested item doesn't exist...");
                 }
             }
-        } else {
-            switch (type) {
-                case "Special Attacks" -> {
-                    return Embeds.displayAttack(item);
-                }
-                case "Transformations" -> {
-                    return Embeds.displayTransformation(item);
-                }
-            }
+        } catch (SQLException throwables) {
+            Android24.logError(throwables);
+            throwables.printStackTrace();
+            return Embeds.errorEmbed();
         }
-        return Embeds.errorEmbed();
     }
 
-    public static MessageEmbed shopBuy(String item, long userID){
+    public static MessageEmbed tryToBuy(String item, long userID){
         try {
             //Check if attack
             buyAttack.setLong(1, userID);
@@ -198,6 +237,94 @@ join android24.shop on TransformationName = Name
 where UserID = 739532349280354404
 order by Storey
 ;*/
+    }
+
+    public static MessageEmbed displayAttack(String name) {
+        try {
+            return new DisplayAttack(name).getEmbed().build();
+        }catch (NameNotFoundException exception){
+            return Embeds.errorTextEmbed("The requested item doesn't exist...");
+        } catch (SQLException throwables) {
+            Android24.logError(throwables);
+            throwables.printStackTrace();
+            return Embeds.errorEmbed();
+        }
+    }
+
+    public static MessageEmbed displayTransformation(String name){
+        try {
+            return new DisplayTransformation(name).getEmbed().build();
+        }catch (NameNotFoundException exception){
+            return Embeds.errorTextEmbed("The requested item doesn't exist...");
+        } catch (SQLException throwables) {
+            Android24.logError(throwables);
+            throwables.printStackTrace();
+            return Embeds.errorEmbed();
+        }
+    }
+
+    public static MessageEmbed attacksShop(long userID){
+        try {
+            EmbedBuilder asEmbed = new EmbedBuilder();
+            asEmbed.setTitle("Attacks Shop");
+            asEmbed.setDescription("Here you can see the list of all the attacks that you can buy");
+            asStatement.setString(1, Utils.checkRace(userID));
+            ResultSet resultSet = asStatement.executeQuery();
+            while (resultSet.next())
+                asEmbed.addField(resultSet.getString(1), resultSet.getString(2) + "$ Lvl:" + resultSet.getString(3), true);
+            return asEmbed.build();
+        } catch (SQLException throwables) {
+            Android24.logError(throwables);
+            throwables.printStackTrace();
+            return Embeds.errorEmbed();
+        }
+    }
+
+    public static MessageEmbed transformationsShop(long userID){
+        try {
+            EmbedBuilder tsEmbed = new EmbedBuilder();
+            tsEmbed.setTitle("Transformations Shop");
+            tsEmbed.setDescription("Here you can see the list of all the transformations that you can buy");
+            tsStatement.setString(1, Utils.checkRace(userID));
+            ResultSet resultSet = tsStatement.executeQuery();
+            while (resultSet.next())
+                tsEmbed.addField(resultSet.getString(1), resultSet.getString(2) + "$ Lvl:" + resultSet.getString(3), true);
+            return tsEmbed.build();
+        } catch (SQLException throwables) {
+            Android24.logError(throwables);
+            throwables.printStackTrace();
+            return Embeds.errorEmbed();
+        }
+    }
+
+    public static DoublyCircularLinkedList<DisplayAttack> getAttacksShop(long userID){
+        try {
+            DoublyCircularLinkedList<DisplayAttack> attacks = new DoublyCircularLinkedList<>();
+            asStatement.setString(1, Utils.checkRace(userID));
+            ResultSet resultSet = asStatement.executeQuery();
+            while (resultSet.next())
+                attacks.add(new DisplayAttack(resultSet.getString(1)));
+            return attacks;
+        } catch (SQLException | NameNotFoundException throwables) {
+            Android24.logError(throwables);
+            throwables.printStackTrace();
+            return null;
+        }
+    }
+
+    public static DoublyCircularLinkedList<DisplayTransformation> getTransformationsShop(long userID){
+        try {
+            DoublyCircularLinkedList<DisplayTransformation> transformations = new DoublyCircularLinkedList<>();
+            tsStatement.setString(1, Utils.checkRace(userID));
+            ResultSet resultSet = tsStatement.executeQuery();
+            while (resultSet.next())
+                transformations.add(new DisplayTransformation(resultSet.getString(1)));
+            return transformations;
+        } catch (SQLException | NameNotFoundException throwables) {
+            Android24.logError(throwables);
+            throwables.printStackTrace();
+            return null;
+        }
     }
 }
 

@@ -7,7 +7,7 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
 public class Ping extends ListenerAdapter {
     public Ping(){
-        Android24.addCommand(new CommandData("ping", "pong you"));
+        Android24.addCommands(new CommandData("ping", "pong you"));
     }
     String message;
 

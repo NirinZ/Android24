@@ -1,7 +1,6 @@
 package com.SharxNZ;
 
 //Normal JAVA
-import java.io.IOException;
 import java.util.*;
 
 //Discord (JDA/JDA utilities)
@@ -11,17 +10,20 @@ import com.SharxNZ.Commands.*;
 import com.SharxNZ.Commands.GameCommands.*;
 import com.SharxNZ.GameFunctions.GFButtons;
 import com.SharxNZ.GameFunctions.StartGame;
-import com.SharxNZ.GameFunctions.Beginning;
 import com.SharxNZ.GameFunctions.XP;
-import com.SharxNZ.Slash.SlashCommands;
+import com.SharxNZ.Slash.AddingCommands;
+import com.SharxNZ.Slash.SelectMenuEvents;
+import com.SharxNZ.Slash.SlashCommandEvents;
 import com.SharxNZ.Utilities.Embeds;
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
+import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
@@ -36,12 +38,14 @@ import javax.security.auth.login.LoginException;
 public abstract class Android24 {
 
     public static JDA jda;
-    private static CommandListUpdateAction commandListDebug;
-    private static CommandListUpdateAction commandListAll;
     public static String prefix = "!";
     public static float difficulty = 0.4f; // should be 0.3
     public static short xp = 50; // should be 20
-    public static final long debugChannelID = 728653495900569603L;
+    public static final long debugChannelID = 887426748306825217L;
+    public static final long nirin = 739532349280354404L;
+    public static EventWaiter eventWaiter = new EventWaiter();
+    private static CommandListUpdateAction commandListDebug;
+    private static CommandListUpdateAction commandListAll;
     private static final long cacheChannelID = 866689902758068244L;
     private static final BasicDataSource dataSource = new BasicDataSource();
 
@@ -57,7 +61,7 @@ public abstract class Android24 {
 
 
     public static void logError(Exception throwables){
-        jda.getTextChannelById(debugChannelID).sendMessage(throwables.toString()).queue();
+        jda.getTextChannelById(debugChannelID).sendMessage(jda.getUserById(nirin).getAsMention()+"\n"+throwables.toString()).queue();
     }
 
     public static void log(String log){
@@ -74,7 +78,7 @@ public abstract class Android24 {
                 .complete().getEmbeds().get(0).getImage().getUrl());
     }
 
-    public static void addCommand(CommandData commandData){
+    public static void addCommands(CommandData... commandData){
         commandListDebug.addCommands(commandData);
         commandListAll.addCommands(commandData);
     }
@@ -84,11 +88,10 @@ public abstract class Android24 {
         commandListAll.queue();
     }
 
-    public static void main(String[] args) throws LoginException, InterruptedException, SQLException, IOException {
+    public static void main(String[] args) throws LoginException, InterruptedException, SQLException {
 
-        //System.out.println(ASaiyan.getSpeed("45656"));
-
-        //System.exit(9);
+//        System.out.println("12#45#789".substring(3, 5));
+//        System.exit(9);
 
         // Set the data source for the SQL connection
         dataSource.setUrl("jdbc:mysql://159.89.111.155:3306/?user=Android24");
@@ -98,9 +101,8 @@ public abstract class Android24 {
         dataSource.setMaxIdle(3);
         dataSource.setMaxTotal(50);
 
-
+        //!docs JDABuilder#setMemberCachePolicy
         List<GatewayIntent> gatewayIntents = new ArrayList<>();
-
 
         JDABuilder jdaBuilder = JDABuilder.createDefault(System.getenv("Android24Token"))
                 .setStatus(OnlineStatus.DO_NOT_DISTURB)
@@ -115,21 +117,24 @@ public abstract class Android24 {
         commandListDebug = jda.getGuildById(728638053559828581L).updateCommands();
         commandListAll = jda.updateCommands();
 
-        commandListDebug.addCommands(new CommandData("test", "test command"));
+        commandListDebug.addCommands(new CommandData("test", "Test command"));
 
         jda.addEventListener(new Ping());
         jda.addEventListener(new XP());
 //        jda.addEventListener(new Beginning());
         jda.addEventListener(new Marco());
-        jda.addEventListener(new SlashCommands());
+        jda.addEventListener(new SlashCommandEvents());
+        jda.addEventListener(new SelectMenuEvents());
         jda.addEventListener(new PPButtons());
         jda.addEventListener(new ShopButton());
         jda.addEventListener(new GFButtons());
-        Stats.Stats();
+        jda.addEventListener(eventWaiter);
         Level.Level();
         StartGame.StartGame();
-        Embeds.Embeds();
         Shop.Shop();
+        Inventory.start();
+        AddingCommands.AddingCommands();
+
         Scams.Scams();
         //jda.addEventListener(new SlashTest());
 
@@ -149,6 +154,6 @@ public abstract class Android24 {
 
         jda.getTextChannelById(debugChannelID).sendMessage("אני דלוק").queue();
         // jda.getPresence().setStatus(OnlineStatus.DO_NOT_DISTURB);
-        // test 2
+        // Test 2
     }
 }

@@ -1,16 +1,13 @@
 package com.SharxNZ.Buttons;
 
 import com.SharxNZ.Commands.GameCommands.PowerPoints;
-import com.SharxNZ.Commands.GameCommands.Stats;
 import com.SharxNZ.Utilities.Embeds;
-import com.SharxNZ.Utilities.Utils;
 import com.SharxNZ.Utilities.Graphics;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.Button;
 
-import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -56,11 +53,11 @@ public class PPButtons extends ListenerAdapter {
                 if (!Boolean.parseBoolean(args[0]) && Boolean.parseBoolean(args[1])) {
                     buttonClickEvent.deferEdit().queue();
                     buttonClickEvent.getHook().sendFile(Graphics.statsImage(powerPoints), "png.png")
-                            .addEmbeds(Stats.getPowerPointsEmbed(powerPoints, false, true))
+                            .addEmbeds(PowerPoints.getPowerPointsEmbed(powerPoints, false, true))
                             .addActionRows(actionRows).queue();
                     buttonClickEvent.getMessage().delete().queue();
                 } else
-                    buttonClickEvent.editMessageEmbeds().setEmbeds(Stats.getPowerPointsEmbed(powerPoints,
+                    buttonClickEvent.editMessageEmbeds().setEmbeds(PowerPoints.getPowerPointsEmbed(powerPoints,
                             Boolean.parseBoolean(args[0]), Boolean.parseBoolean(args[1]))).queue();
             }
             case "Up" -> {
@@ -70,37 +67,37 @@ public class PPButtons extends ListenerAdapter {
                 if (!Boolean.parseBoolean(args[0]) && Boolean.parseBoolean(args[1])) {
                     buttonClickEvent.deferEdit().queue();
                     buttonClickEvent.getHook().sendFile(Graphics.statsImage(powerPoints), "png.png")
-                            .addEmbeds(Stats.getPowerPointsEmbed(powerPoints, false, true))
+                            .addEmbeds(PowerPoints.getPowerPointsEmbed(powerPoints, false, true))
                             .addActionRows(actionRows).queue();
                     buttonClickEvent.getMessage().delete().queue();
                 } else
-                    buttonClickEvent.editMessageEmbeds().setEmbeds(Stats.getPowerPointsEmbed(powerPoints,
+                    buttonClickEvent.editMessageEmbeds().setEmbeds(PowerPoints.getPowerPointsEmbed(powerPoints,
                             Boolean.parseBoolean(args[0]), Boolean.parseBoolean(args[1]))).queue();
             }
             case "Left" -> {
                 if (save.contains(userID))
                     return;
                 powerPoints.previousValue();
-                buttonClickEvent.editMessageEmbeds().setEmbeds(Stats.getPowerPointsEmbed(powerPoints,
+                buttonClickEvent.editMessageEmbeds().setEmbeds(PowerPoints.getPowerPointsEmbed(powerPoints,
                         Boolean.parseBoolean(args[0]), false)).queue();
             }
             case "Right" -> {
                 if (save.contains(userID))
                     return;
                 powerPoints.nextValue();
-                buttonClickEvent.editMessageEmbeds().setEmbeds(Stats.getPowerPointsEmbed(powerPoints,
+                buttonClickEvent.editMessageEmbeds().setEmbeds(PowerPoints.getPowerPointsEmbed(powerPoints,
                         Boolean.parseBoolean(args[0]), false)).queue();
             }
             case "Save" -> {
                 if (!save.contains(userID)) {
                     save.add(userID);
                     if (Boolean.parseBoolean(args[0]))
-                        buttonClickEvent.deferEdit().setEmbeds(Stats.getPowerPointsEmbed(
+                        buttonClickEvent.deferEdit().setEmbeds(PowerPoints.getPowerPointsEmbed(
                                 powerPoints, true)).queue();
                     else {
                         buttonClickEvent.deferEdit().queue();
                         buttonClickEvent.getHook().sendFile(Graphics.statsImage(powerPoints), "png.png")
-                                .addEmbeds(Stats.getPowerPointsEmbed(powerPoints, true))
+                                .addEmbeds(PowerPoints.getPowerPointsEmbed(powerPoints, true))
                                 .addActionRows(actionRows).queue();
                         buttonClickEvent.getMessage().delete().queue();
                     }
@@ -121,11 +118,11 @@ public class PPButtons extends ListenerAdapter {
                 if (!Boolean.parseBoolean(args[0])) {
                     buttonClickEvent.deferEdit().queue();
                     buttonClickEvent.getHook().sendFile(Graphics.statsImage(powerPoints), "png.png")
-                            .addEmbeds(Stats.getPowerPointsEmbed(powerPoints, false, true))
+                            .addEmbeds(PowerPoints.getPowerPointsEmbed(powerPoints, false, true))
                             .addActionRows(actionRows).queue();
                     buttonClickEvent.getMessage().delete().queue();
                 } else
-                    buttonClickEvent.editMessageEmbeds().setEmbeds(Stats.getPowerPointsEmbed(powerPoints,
+                    buttonClickEvent.editMessageEmbeds().setEmbeds(PowerPoints.getPowerPointsEmbed(powerPoints,
                             Boolean.parseBoolean(args[0]), true)).queue();
             }
         }

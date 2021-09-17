@@ -244,7 +244,7 @@ public abstract class Graphics {
 
     public static byte[] levelImage(String userURL, String guildName, long xp) throws IOException {
 
-        short lvl = Level.calculateLevel(xp);
+        int lvl = Level.calculateLevel(xp);
 
         //Starting
         BufferedImage background = imageFromURL("https://c4.wallpaperflare.com/wallpaper/844/6/554/dragon-ball-dragon-ball-z-nappa-dragon-ball-raditz-dragon-ball-wallpaper-preview.jpg");
@@ -300,7 +300,7 @@ public abstract class Graphics {
         //Draw the numbers
         background2D.setColor(Color.GREEN);
         background2D.setFont(new Font("GROBOLD", Font.BOLD, 25));
-        background2D.drawString(Short.toString(lvl), backgroundWidth/23, backgroundHeight*5/6);
+        background2D.drawString(Integer.toString(lvl), backgroundWidth/23, backgroundHeight*5/6);
         background2D.drawString( Short.toString((short) (lvl+1)) , backgroundWidth*11/12, backgroundHeight*5/6);
 
 

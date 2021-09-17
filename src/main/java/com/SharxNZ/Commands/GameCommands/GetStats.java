@@ -5,6 +5,9 @@ import com.SharxNZ.Android24;
 import com.SharxNZ.Game.Being;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -19,10 +22,10 @@ public class GetStats extends Command {
     private static PreparedStatement raceStats;
 
     public GetStats(){
-        super.name = "getStats";
-        super.aliases = new String[]{"gs"};
-        super.help = "Display you stats";
-        Android24.addCommand(new CommandData(super.name.toLowerCase(), this.help)
+        super.name = "stats";
+        super.aliases = new String[]{"st"};
+        super.help = "Display your stats";
+        Android24.addCommands(new CommandData(super.name.toLowerCase(), this.help)
                 .addOptions(new OptionData(OptionType.BOOLEAN, "display", "display your stats")));
         try {
             raceStats = Android24.getConnection().prepareStatement(
@@ -73,28 +76,25 @@ public class GetStats extends Command {
             return "An error in the execute";
         }
     }
-//    public static Being getStats(String guildID, String userID) throws SQLException {
-//        Statement sql = Android24.getSql();
-//        String query = "SELECT up.*, Level " +
-//                "FROM `"+ guildID +"`.users_power up " +
-//                "join users_data ud " +
-//                "on ud.UserID = up.UserID " +
-//                "where ud.UserID="+ userID +";";
-//        ResultSet resultSet = sql.executeQuery(query);
-//        if (resultSet.next()){
-//            // resultSet.getMetaData().getColumnCount()
-//            return new Being(resultSet.getLong(1),
-//                    resultSet.getString(2),
-//                    resultSet.getShort(3),
-//                    resultSet.getShort(4),
-//                    resultSet.getShort(5),
-//                    resultSet.getShort(6),
-//                    resultSet.getShort(7),
-//                    resultSet.getShort(8)
-//                    resultSet.getShort(9));
-//        }
-//        return new Being();
-//
-//
-//    }
+
+    public static MessageEmbed statsEmbed(User user){
+        Being being = Being.getBeing(user.getIdLong());
+        EmbedBuilder generalEmbed = new EmbedBuilder();
+        generalEmbed.setTitle(user.getName());
+        generalEmbed.setDescription(being.getRace());
+        generalEmbed.addField("Level", being.getLevel()+"", true);
+        generalEmbed.addField("Zeni", being.getZeni()+"$", true);
+        generalEmbed.addField("Power Points", being.getPowerPoints()+"", true);
+        Stats stats = being.getStats();
+        generalEmbed.addField("Health",stats.getHealth()+"",true);
+        generalEmbed.addField("Ki", stats.getKi()+"", true);
+        generalEmbed.addField("Strike Attack", stats.getStrikeAttack()+"", true);
+        generalEmbed.addField("Ki Attack", stats.getKiAttack()+"", true);
+        generalEmbed.addField("Defence", stats.getDefence()+"",true);
+        generalEmbed.addField("Speed", stats.getSpeed()+"",true);
+        generalEmbed.setFooter("The stats of " + user.getAsTag(), user.getAvatarUrl());
+
+        return generalEmbed.build();
+    }
+
 }

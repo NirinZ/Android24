@@ -8,16 +8,18 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 import javax.annotation.Nonnull;
+import javax.naming.NameNotFoundException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class XP extends ListenerAdapter {
 
     // Long = userID | long[0] = xp, long[1] = timestamp
-    public static final HashMap<Long, long[]> xpMap = new HashMap<>();
+    public static final ConcurrentHashMap<Long, long[]> xpMap = new ConcurrentHashMap<>();
     public static final Set<Long> voiceSet = new HashSet<>();
     private final Random rand = new Random();
     private static PreparedStatement getXP;
@@ -53,7 +55,6 @@ public class XP extends ListenerAdapter {
                 long newDate = new Date().getTime();
                 if (newDate - xpMap.get(userID)[1] > 20000) { // If 20 seconds passed //20000
                     xpAndTime[0] = xpMap.get(userID)[0] + giveXP(); // Give random XP from 0 to 20
-                    System.out.println();
                     xpAndTime[1] = newDate;
                     xpMap.replace(userID, xpAndTime);
                     //guildMessage.getChannel().sendMessage("XP UP").queue();
@@ -86,14 +87,12 @@ public class XP extends ListenerAdapter {
                         xpAndTime[0] = xpMap.get(key)[0] + giveXP();
                         xpAndTime[1] = xpMap.get(key)[1];
                         xpMap.replace(key, xpAndTime);
-                        //System.out.println(guildAndUserIds[1] + " got XP from voice");
-                    } else {
+                    } else
                         xpMap.put(key, new long[]{(long) giveXP(), 0});
-                    }
                 }
-            }
+                }
         };
-        timer.scheduleAtFixedRate( timerTask, 0, 120000); // Do the check every 120 seconds //120000
+        timer.scheduleAtFixedRate(timerTask, 0, 120000); // Do the check every 120 seconds //120000
     }
 
     private void updateDatabase() throws SQLException {
@@ -102,43 +101,43 @@ public class XP extends ListenerAdapter {
         TimerTask timerTask = new TimerTask() {
             @Override
             public void run() {
-                HashMap<Long, long[]> tempMap = (HashMap<Long, long[]>) xpMap.clone();
+                //ConcurrentHashMap<Long, long[]> xpMap;
                 long previousXP, totalXP, zeni;
                 int lvlShouldBe, currentLvl, powerPoints;
                 // key = userID
-                for (long userID : tempMap.keySet()) {
+                for (Map.Entry<Long, long[]> entry: xpMap.entrySet()) {
                     try {
-                        getXP.setLong(1, userID);
+                        getXP.setLong(1, entry.getKey());
                         ResultSet resultSet = getXP.executeQuery();
                         if (resultSet.next()) {
                             previousXP = resultSet.getLong(1);
-                            totalXP = tempMap.get(userID)[0] + previousXP;
-                            zeni = tempMap.get(userID)[0];
+                            totalXP = entry.getValue()[0] + previousXP;
+                            zeni = entry.getValue()[0];
                             currentLvl = Level.calculateLevel(previousXP);
                             lvlShouldBe = Level.calculateLevel(totalXP);
                             powerPoints = 4 * (lvlShouldBe - currentLvl);
 
-                            Android24.jda.getTextChannelById(Android24.debugChannelID).sendMessage("Your XP: " + tempMap.get(userID)[0]).queue();
+                            Android24.jda.retrieveUserById(entry.getKey()).queue(user -> Android24.jda.getTextChannelById(Android24.debugChannelID).sendMessage(user.getAsTag() + " gets " + entry.getValue()[0] + " XP").queue());
 
                             updateData.setLong(1, totalXP);
                             updateData.setLong(2, zeni);
                             updateData.setInt(3, powerPoints);
-                            updateData.setLong(4, userID);
+                            updateData.setLong(4, entry.getKey());
                             updateData.executeUpdate();
 
                             resultSet.close();
 
                         } else {
-                            totalXP = zeni = tempMap.get(userID)[0];
+                            totalXP = zeni = entry.getValue()[0];
                             powerPoints = 4 * (Level.calculateLevel(totalXP));
-                            insertUser.setLong(1, userID);
-                            insertUser.setString(2, Android24.jda.retrieveUserById(userID).complete().getAsTag());
+                            insertUser.setLong(1, entry.getKey());
+                            insertUser.setString(2, Android24.jda.retrieveUserById(entry.getKey()).complete().getAsTag());
                             insertUser.setLong(3, totalXP);
                             insertUser.setLong(4, zeni);
                             insertUser.setInt(5, powerPoints);
                             insertUser.executeUpdate();
                         }
-                    } catch (SQLException throwables) {
+                    } catch (Exception throwables) {
                         Android24.logError(throwables);
                         throwables.printStackTrace();
                     }
@@ -146,7 +145,7 @@ public class XP extends ListenerAdapter {
                 xpMap.clear();
             }
         };
-        timer.scheduleAtFixedRate( timerTask, 60000, 60000); // Do the check every 60 seconds //60000
+        timer.scheduleAtFixedRate(timerTask, 60000, 60000); // Do the check every 60 seconds //60000
     }
 }
 

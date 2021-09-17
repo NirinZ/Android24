@@ -6,7 +6,6 @@ import com.SharxNZ.Utilities.Utils;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import net.dv8tion.jda.api.interactions.components.Button;
 
 import java.sql.PreparedStatement;
@@ -25,7 +24,7 @@ public abstract class StartGame {
             ResultSet resultSet = Android24.getConnection().createStatement().executeQuery("SELECT RaceName FROM android24.races;");
             while (resultSet.next())
                 optionData.addChoice(resultSet.getString(1), resultSet.getString(1));
-            Android24.addCommand(new CommandData("start_game", "Let's you start the game and choose your race")
+            Android24.addCommands(new CommandData("start_game", "Let's you start the game and choose your race")
                     .addOptions(optionData));
 
             startGameButton();

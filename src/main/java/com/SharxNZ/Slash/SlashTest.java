@@ -23,7 +23,7 @@ import static net.dv8tion.jda.api.interactions.commands.OptionType.*;
 public class SlashTest extends ListenerAdapter {
     public SlashTest(){
         // Moderation commands with required options
-        Android24.addCommand(
+        Android24.addCommands(
                 new CommandData("ban", "Ban a user from this server. Requires permission to Ban users.")
                         .addOptions(new OptionData(USER, "user", "The user to ban") // USER type allows to include members of the server or other users by id
                                 .setRequired(true)) // This command requires a parameter
@@ -31,18 +31,18 @@ public class SlashTest extends ListenerAdapter {
         );
 
         // Simple reply commands
-        Android24.addCommand(
+        Android24.addCommands(
                 new CommandData("say", "Makes the bot say what you tell it to")
                         .addOptions(new OptionData(STRING, "content", "What the bot should say")
                                 .setRequired(true))
         );
 
         // Commands without any inputs
-        Android24.addCommand(
+        Android24.addCommands(
                 new CommandData("leave", "Make the bot leave the server")
         );
 
-        Android24.addCommand(
+        Android24.addCommands(
                 new CommandData("prune", "Prune messages from this channel")
                         .addOptions(new OptionData(INTEGER, "amount", "How many messages to prune (Default 100)"))
         );

