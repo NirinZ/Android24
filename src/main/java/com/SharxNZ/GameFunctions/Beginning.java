@@ -3,12 +3,13 @@ package com.SharxNZ.GameFunctions;
 import com.SharxNZ.Android24;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.events.guild.GuildLeaveEvent;
+import net.dv8tion.jda.api.exceptions.ContextException;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import org.apache.commons.lang3.exception.ContextedException;
 
 import javax.annotation.Nonnull;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Statement;
 
 public class Beginning extends ListenerAdapter {
 
@@ -25,7 +26,7 @@ public class Beginning extends ListenerAdapter {
     static {
         try {
             join = Android24.getConnection().prepareStatement(
-                    "INSERT INTO `guilds`.`guilds_data` (`GuildID`, `GuildName`, `TransRole`) VALUES (?, ?, ?);");
+                    "INSERT INTO `guilds`.`guilds_data` (`GuildID`, `GuildName`, `TransRole`) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE `GuildName` = ?, `TransRole` = ?;");
         } catch (SQLException throwables) {
             Android24.logError(throwables);
             throwables.printStackTrace();
@@ -34,27 +35,55 @@ public class Beginning extends ListenerAdapter {
 
     @Override
     public void onGuildJoin(@Nonnull GuildJoinEvent guildJoinEvent) {
-        guildJoinEvent.getGuild().createRole().setName("---transformations---").queue(role -> {
+        if (guildJoinEvent.getGuild().getRoles().stream().anyMatch(role -> role.getName().equals("---transformations---"))) {
             try {
                 join.setLong(1, guildJoinEvent.getGuild().getIdLong());
                 join.setString(2, guildJoinEvent.getGuild().getName());
-                join.setLong(3, role.getIdLong());
+                join.setLong(3, guildJoinEvent.getGuild().getRolesByName("---transformations---", true).get(0).getIdLong());
+                join.setString(4, guildJoinEvent.getGuild().getName());
+                join.setLong(5, guildJoinEvent.getGuild().getRolesByName("---transformations---", true).get(0).getIdLong());
                 join.executeUpdate();
 
-                if (guildJoinEvent.getGuild().getOwner().getUser().hasPrivateChannel())
-                    guildJoinEvent.getGuild().getOwner().getUser().openPrivateChannel().queue(privateChannel -> {
-                        privateChannel.sendMessage(joiningMessage).queue();
+                guildJoinEvent.getGuild().retrieveOwner().queue(owner -> {
+                    owner.getUser().openPrivateChannel().queue(privateChannel -> {
+                        privateChannel.sendMessage(joiningMessage).queue(null, throwable -> {
+                            Android24.nirin.openPrivateChannel().queue(nirinChannel -> {
+                                nirinChannel.sendMessage("The owner of " + guildJoinEvent.getGuild().getName() + " have no private channel!" +
+                                        "\nYou need to do things manually...").queue();
+                            });
+                        });
                     });
-                else
-                    Android24.jda.getUserById(Android24.nirin).openPrivateChannel().queue(privateChannel -> {
-                        privateChannel.sendMessage("The owner of " + guildJoinEvent.getGuild().getName() + "have no private channel!" +
-                                "\nYou need to do things manually...").queue();
-                    });
+                });
             } catch (SQLException throwables) {
                 Android24.logError(throwables);
                 throwables.printStackTrace();
             }
-        });
+        } else
+            guildJoinEvent.getGuild().createRole().setName("---transformations---").queue(role -> {
+                try {
+                    join.setLong(1, guildJoinEvent.getGuild().getIdLong());
+                    join.setString(2, guildJoinEvent.getGuild().getName());
+                    join.setLong(3, role.getIdLong());
+                    join.setString(4, guildJoinEvent.getGuild().getName());
+                    join.setLong(5, role.getIdLong());
+                    join.executeUpdate();
+
+                    guildJoinEvent.getGuild().retrieveOwner().queue(owner -> {
+                        owner.getUser().openPrivateChannel().queue(privateChannel -> {
+                            privateChannel.sendMessage(joiningMessage).queue(null, throwable -> {
+                                Android24.nirin.openPrivateChannel().queue(nirinChannel -> {
+                                    nirinChannel.sendMessage("The owner of " + guildJoinEvent.getGuild().getName() + "have no private channel!" +
+                                            "\nYou need to do things manually...").queue();
+                                });
+                            });
+                        });
+                    });
+
+                } catch (SQLException throwables) {
+                    Android24.logError(throwables);
+                    throwables.printStackTrace();
+                }
+            });
         System.out.println("Joined to " + guildJoinEvent.getGuild().getId());
     }
 

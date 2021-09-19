@@ -16,8 +16,6 @@ import com.SharxNZ.GameFunctions.XP;
 import com.SharxNZ.Slash.AddingCommands;
 import com.SharxNZ.Slash.SelectMenuEvents;
 import com.SharxNZ.Slash.SlashCommandEvents;
-import com.SharxNZ.Utilities.Embeds;
-import com.SharxNZ.Utilities.Server;
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
@@ -26,10 +24,11 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
-import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
+import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import org.apache.commons.dbcp2.BasicDataSource;
 
 //SQL
@@ -45,7 +44,8 @@ public abstract class Android24 {
     public static float difficulty = 0.4f; // should be 0.3
     public static short xp = 50; // should be 20
     public static final long debugChannelID = 887426748306825217L;
-    public static final long nirin = 739532349280354404L;
+    private static final long nirinId = 739532349280354404L;
+    public static User nirin;
     public static EventWaiter eventWaiter = new EventWaiter();
     private static CommandListUpdateAction commandListDebug;
     private static CommandListUpdateAction commandListAll;
@@ -62,9 +62,8 @@ public abstract class Android24 {
         }
     }
 
-
     public static void logError(Exception throwables){
-        jda.getTextChannelById(debugChannelID).sendMessage(jda.getUserById(nirin).getAsMention()+"\n"+throwables.toString()).queue();
+        jda.getTextChannelById(debugChannelID).sendMessage(nirin.getAsMention()+"\n"+throwables.toString()).queue();
     }
 
     public static void log(String log){
@@ -79,6 +78,20 @@ public abstract class Android24 {
                 .sendFile(image, "png.png")
                 .setEmbeds(wrapper.setImage("attachment://png.png").build())
                 .complete().getEmbeds().get(0).getImage().getUrl());
+    }
+
+    public static void configureCache(JDABuilder builder) {
+        // Cache members who are in a voice channel
+        MemberCachePolicy policy = MemberCachePolicy.VOICE;
+        // Cache members who are in a voice channel
+        // AND are also online
+        policy = policy.and(MemberCachePolicy.ONLINE);
+        // Cache members who are in a voice channel
+        // AND are also online
+        // OR are the owner of the guild
+        policy = policy.or(MemberCachePolicy.OWNER);
+        //policy.cacheMember(jda.getGuildById(728638053559828581L).retrieveMemberById(nirinId).complete());
+        builder.setMemberCachePolicy(policy);
     }
 
     public static void addCommands(CommandData... commandData){
@@ -113,9 +126,11 @@ public abstract class Android24 {
 
         gatewayIntents.add(GatewayIntent.GUILD_MEMBERS);
         jdaBuilder.enableIntents(gatewayIntents);
+        configureCache(jdaBuilder);
 
         jda = jdaBuilder.build();
         jda.awaitReady();
+        jda.retrieveUserById(nirinId).queue(user -> nirin = user);
 
         commandListDebug = jda.getGuildById(728638053559828581L).updateCommands();
         commandListAll = jda.updateCommands();

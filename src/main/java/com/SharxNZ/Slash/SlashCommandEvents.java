@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.exceptions.ContextException;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.Button;
@@ -160,52 +161,54 @@ public class SlashCommandEvents extends ListenerAdapter {
             case "transform" -> {
                 // Android24.log(guild.modifyRolePositions().selectPosition(0));
                 if (Transformation.checkTransformation(userID, slashCommandEvent.getOption("name").getAsString())) {
-                    try {
-                        if (Being.getBeing(userID).getTransformation() != null && guild.getMemberById(userID).getRoles().stream().anyMatch(role -> role.getName().equals(Being.getBeing(userID).getTransformation())))
-                            guild.removeRoleFromMember(userID,
-                                    guild.getRolesByName(Being.getBeing(userID).getTransformation(), true).get(0)).queue();
+                    guild.retrieveMemberById(userID).queue(member -> {
+                        try {
+                            if (Being.getBeing(userID).getTransformation() != null && member.getRoles().stream().anyMatch(role -> role.getName().equals(Being.getBeing(userID).getTransformation())))
+                                guild.removeRoleFromMember(userID,
+                                        guild.getRolesByName(Being.getBeing(userID).getTransformation(), true).get(0)).queue();
 
-                        Transformation transformation = new Transformation(slashCommandEvent.getOption("name").getAsString());
-                        if (guild.getRoles().stream().anyMatch(role -> role.getName().equals(transformation.getName()))) {
-                            guild.addRoleToMember(userID,
-                                    guild.getRolesByName(transformation.getName(), true).get(0)).queue();
-                            Being.setTransformation(userID, transformation.getName());
-                            //send gif
-                            slashCommandEvent.reply("role added").setEphemeral(true).queue();
-                        } else {
-                            guild.createRole().setName(transformation.getName())
-                                    .setColor(transformation.getColor()).queue(role -> {
+                            Transformation transformation = new Transformation(slashCommandEvent.getOption("name").getAsString());
+                            if (guild.getRoles().stream().anyMatch(role -> role.getName().equals(transformation.getName()))) {
                                 guild.addRoleToMember(userID,
                                         guild.getRolesByName(transformation.getName(), true).get(0)).queue();
                                 Being.setTransformation(userID, transformation.getName());
                                 //send gif
                                 slashCommandEvent.reply("role added").setEphemeral(true).queue();
-
-                                try {
-                                    guild.modifyRolePositions().selectPosition(role).moveTo(
-                                            guild.getRoleById(new Server(guild.getIdLong()).getTransRole()).getPosition() - 1
-                                    ).queue();
-                                } catch (NullPointerException exception) {
-                                    if (guild.getOwner().getUser().hasPrivateChannel())
-                                        guild.getOwner().getUser().openPrivateChannel().queue(privateChannel -> {
-                                            privateChannel.sendMessage("You didn't have a role for the transformations 😱.\n" +
-                                                    "Plz set one to prevent error and for best experience :-)").queue();
+                            } else {
+                                guild.createRole().setName(transformation.getName())
+                                        .setColor(transformation.getColor()).queue(role -> {
+                                    guild.addRoleToMember(userID,
+                                            guild.getRolesByName(transformation.getName(), true).get(0)).queue();
+                                    Being.setTransformation(userID, transformation.getName());
+                                    //send gif
+                                    slashCommandEvent.reply("role added").setEphemeral(true).queue();
+                                    Server server = new Server(guildID);
+                                    try {
+                                        guild.modifyRolePositions().selectPosition(role).moveTo(
+                                                guild.getRoleById(server.getTransRole()).getPosition() - 1).queue();
+                                    } catch (NullPointerException nullPointerException) {
+                                        guild.retrieveOwner().queue(owner -> {
+                                            owner.getUser().openPrivateChannel().queue(privateChannel -> {
+                                                privateChannel.sendMessage("You didn't have a role for the transformations 😱.\n" +
+                                                        "Plz set one to prevent error and for best experience :-)").queue(null, throwable -> {
+                                                    if (server.getLoggingCh() != 0)
+                                                        guild.getTextChannelById(server.getLoggingCh()).sendMessage(
+                                                                owner.getAsMention() +
+                                                                        "\nYou didn't have a role for the transformations 😱.\n" +
+                                                                        "Plz set one to prevent error and for best experience :-)").queue();
+                                                });
+                                            });
                                         });
-                                    else
-                                        guild.getTextChannelById(new Server(guildID).getLoggingCh()).sendMessage(
-                                                guild.getOwner().getUser().getAsMention() +
-                                                        "\nYou didn't have a role for the transformations 😱.\n" +
-                                                        "Plz set one to prevent error and for best experience :-)").queue();
-
-                                }
-                            });
+                                    }
+                                });
+                            }
+                        } catch (NameNotFoundException exception) {
+                            slashCommandEvent.reply("This transformations doesn't exists.").setEphemeral(true).queue();
+                        } catch (SQLException throwables) {
+                            Android24.logError(throwables);
+                            throwables.printStackTrace();
                         }
-                    } catch (NameNotFoundException exception) {
-                        slashCommandEvent.reply("This transformations doesn't exists.").setEphemeral(true).queue();
-                    } catch (SQLException throwables) {
-                        Android24.logError(throwables);
-                        throwables.printStackTrace();
-                    }
+                    });
 
                 } else if (slashCommandEvent.getOption("name").getAsString().equalsIgnoreCase("base")) {
                     if (Being.getBeing(userID).getTransformation() != null) {
