@@ -28,6 +28,7 @@ public class Being {
     protected Stat<Integer> kiAttack = new Stat<>(0);
     protected Stat<Integer> defence = new Stat<>(0);
     protected Stat<Integer> speed = new Stat<>(0);
+    protected String transformation;
     protected boolean inUse;
 
     protected List<Stat<Integer>> powerStats = List.of(health, ki, strikeAttack,
@@ -38,13 +39,16 @@ public class Being {
     protected static PreparedStatement saveBeingStatement;
     protected static PreparedStatement getAttacks;
     protected static PreparedStatement getTransformations;
+    protected static PreparedStatement setTransformation;
 
     static {
         Utils.garbageCollector(beings);
         try {
-            getBeingStatement = Android24.getConnection().prepareStatement(
-                    "SELECT `Race`, `XP`, `Zeni`,`PowerPoints`, `Health`, `Ki`, `StrikeAttack`, `KiAttack`, `Defence`, `Speed`" +
-                            " FROM `android24`.users_data where `UserID` = ?;");
+            getBeingStatement = Android24.getConnection().prepareStatement("""
+                         SELECT `Race`, `XP`, `Zeni`,`PowerPoints`, `Health`, `Ki`, `StrikeAttack`, `KiAttack`,
+                         `Defence`, `Speed`, CurrentTransformation
+                         FROM `android24`.users_data where `UserID` = ?;
+                    """);
             saveBeingStatement = Android24.getConnection().prepareStatement(
                     "UPDATE `android24`.`users_data` SET `PowerPoints` = ?, `Health` = ?, `Ki` = ?, `StrikeAttack` = ?, `KiAttack` = ?, `Defence` = ?, `Speed` =?" +
                             " WHERE `UserID` = ?;");
@@ -66,11 +70,14 @@ public class Being {
                         android24.transformations USING (TransformationAbbreviated)
                         Where UserID = ?;
                     """);
+            setTransformation = Android24.getConnection().prepareStatement("UPDATE `android24`.`users_data` SET `CurrentTransformation` = ? WHERE (`UserID` = ?);");
         } catch (Exception throwables) {
             Android24.logError(throwables);
             throwables.printStackTrace();
         }
     }
+
+    public static void Start(){}
 
     protected Being(long userID) {
         try {
@@ -90,6 +97,7 @@ public class Being {
             this.kiAttack.set(resultSet.getInt(8));
             this.defence.set(resultSet.getInt(9));
             this.speed.set(resultSet.getInt(10));
+            this.transformation = resultSet.getString(11);
 
             this.inUse = true;
             resultSet.close();
@@ -168,6 +176,18 @@ public class Being {
         return transformations;
     }
 
+    public static void setTransformation(long userID, String name){
+        try {
+            setTransformation.setString(1, name);
+            setTransformation.setLong(2, userID);
+            setTransformation.executeUpdate();
+            getBeing(userID).transformation = name;
+        } catch (SQLException throwables) {
+            Android24.logError(throwables);
+            throwables.printStackTrace();
+        }
+    }
+
     public Stats getStats() {
         return new Stats(userID);
     }
@@ -214,6 +234,10 @@ public class Being {
 
     public int getSpeed() {
         return this.speed.get();
+    }
+
+    public String getTransformation(){
+        return transformation;
     }
 
     public boolean getInUse() {

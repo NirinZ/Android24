@@ -8,13 +8,22 @@ import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 
 public interface AddingCommands {
 
-    static void AddingCommands(){
+    static void AddingCommands() {
         Android24.addCommands(
+
+                // server setup
+                new CommandData("server_setup", "Change the server's settings (only person with permissions can do it)")
+                        .addOptions(new OptionData(OptionType.CHANNEL, "cmd_channel", "Set the server's commands channel"))
+                        .addOptions(new OptionData(OptionType.CHANNEL, "wlc_channel", "Set the server's welcome channel"))
+                        .addOptions(new OptionData(OptionType.CHANNEL, "logg_channel", "Set the logging channel"))
+                        .addOptions(new OptionData(OptionType.ROLE, "trans_role", "Set the role to control the transformations (default is ---transformations---)"))
+                        .addOptions(new OptionData(OptionType.BOOLEAN, "allow_trans_gif", "Choose if to allow transformations gifs globally")),
+
                 // Power Points
                 new CommandData("get_power_points", "Display and let you edit your power points")
-                .addOptions(new OptionData(OptionType.BOOLEAN, "display", "display your stats"))
-                .addOptions(new OptionData(OptionType.BOOLEAN, "refresh",
-                        "Refreshes the image for every change. (Might by slow if display is false)")),
+                        .addOptions(new OptionData(OptionType.BOOLEAN, "display", "display your stats"))
+                        .addOptions(new OptionData(OptionType.BOOLEAN, "refresh",
+                                "Refreshes the image for every change. (Might by slow if display is false)")),
                 // Shop
                 new CommandData("shop", "All the operations that you can do in the Shop")
                         .addSubcommands(new SubcommandData("view", "View the items in the Shop")
@@ -37,7 +46,14 @@ public interface AddingCommands {
                                 .setRequired(true))
                         .addOptions(new OptionData(OptionType.STRING, "type", "List or individual")
                                 .addChoice("List", "List")
-                                .addChoice("Individual", "Individual"))
+                                .addChoice("Individual", "Individual")),
+
+                //Transform
+                new CommandData("transform", "Transform to one of your transformations")
+                        .addOptions(new OptionData(OptionType.STRING, "name", "The name of the transformation. (To revert back choose base)")
+                                .setRequired(true))
+                        .addOptions(new OptionData(OptionType.INTEGER, "arg", "An argument (most of the time redundent)"))
+
 
         );
     }

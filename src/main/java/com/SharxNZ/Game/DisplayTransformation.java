@@ -22,7 +22,7 @@ public class DisplayTransformation extends Transformation{
             getDisplayTransformation = Android24.getConnection().prepareStatement("""
                     SELECT
                         TransformationName, TransformationAbbreviated, AttackPowerUp,
-                        DefencePowerUp, SpeedPowerUp, KiConsumption, SoloTransformation,
+                        DefencePowerUp, SpeedPowerUp, KiConsumption, SoloTransformation, Color,
                         ForcedRace, Cost, MinimalLevel, Description, Gif
                     FROM
                         android24.transformations
@@ -46,12 +46,12 @@ public class DisplayTransformation extends Transformation{
             throw new NameNotFoundException("The name of the Transformation does not exists");
         setTransformation(resultSet.getString(1), resultSet.getString(2), resultSet.getInt(3),
                 resultSet.getInt(4), resultSet.getInt(5), resultSet.getInt(6),
-                resultSet.getBoolean(7));
-        forcedRace = resultSet.getString(8);
-        cost = resultSet.getInt(9);
-        minimalLevel = resultSet.getInt(10);
-        description = resultSet.getString(11);
-        gif = resultSet.getString(12);
+                resultSet.getBoolean(7), resultSet.getInt(8));
+        forcedRace = resultSet.getString(9);
+        cost = resultSet.getInt(10);
+        minimalLevel = resultSet.getInt(11);
+        description = resultSet.getString(12);
+        gif = resultSet.getString(13);
     }
 
     public EmbedBuilder getEmbed() {

@@ -2,6 +2,7 @@ package com.SharxNZ.Commands;
 
 import com.SharxNZ.Android24;
 import com.SharxNZ.Utilities.Graphics;
+import com.SharxNZ.Utilities.Server;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -20,7 +21,9 @@ public class Marco extends ListenerAdapter {
             if (message.equals("marco")) {
 
                 m.getChannel().sendTyping().queue();
-                m.getJDA().getRestPing().queue( (ping) -> {m.getChannel().sendMessage("polo " + ping + "ms / " + m.getJDA().getGatewayPing() + "ms").queue();});
+                m.getJDA().getRestPing().queue((ping) -> {
+                    m.getChannel().sendMessage("polo " + ping + "ms / " + m.getJDA().getGatewayPing() + "ms").queue();
+                });
 
                 System.out.println();
 
@@ -30,8 +33,7 @@ public class Marco extends ListenerAdapter {
 //                    e.printStackTrace();
 //                }
 
-            }
-            else if (message.equals("-i ")){
+            } else if (message.equals("-i ")) {
                 EmbedBuilder info = new EmbedBuilder();
                 info.setTitle("Your Info 🐱‍💻 <:24:729000135362609204>");
                 info.setDescription("Your power level is over 9,000!");
@@ -50,20 +52,23 @@ public class Marco extends ListenerAdapter {
         }
     }
 
-    public void onGuildMemberJoin(GuildMemberJoinEvent guildMemberJoinEvent){
+    public void onGuildMemberJoin(GuildMemberJoinEvent guildMemberJoinEvent) {
         System.out.println("Joined");
-        if(!guildMemberJoinEvent.getGuild().getTextChannelsByName("『👋』welcome", true).isEmpty()) {
-            guildMemberJoinEvent.getGuild().getTextChannelsByName("『👋』welcome", true).get(0).sendMessage(guildMemberJoinEvent.getMember().getAsMention() + " Joined he is cool!").queue();
+        Server server = new Server(guildMemberJoinEvent.getGuild().getIdLong());
+        if (server.getWelcomeCh() != 0) {
             try {
-                guildMemberJoinEvent.getGuild().getTextChannelsByName("『👋』welcome", true).get(0).sendFile(Graphics.welcomeImage(guildMemberJoinEvent), "welcome.jpg").queue();
+                guildMemberJoinEvent.getGuild().getTextChannelById(server.getWelcomeCh()).sendMessage(guildMemberJoinEvent.getMember().getAsMention() + " Joined he is cool!").queue();
+                guildMemberJoinEvent.getGuild().getTextChannelById(server.getWelcomeCh()).sendFile(Graphics.welcomeImage(guildMemberJoinEvent), "welcome.jpg").queue();
             } catch (IOException e) {
                 e.printStackTrace();
+            } catch (NullPointerException ignored){
+
             }
         }
-        guildMemberJoinEvent.getMember().getUser().openPrivateChannel().queue(privateChannel -> {privateChannel.sendMessage("Welcome to my amazing server!").queue();});
+        guildMemberJoinEvent.getMember().getUser().openPrivateChannel().queue(privateChannel -> {
+            privateChannel.sendMessage("Welcome to my amazing server!").queue();
+        });
     }
-
-
 
 
 }

@@ -6,11 +6,11 @@ import com.SharxNZ.Commands.GameCommands.*;
 import com.SharxNZ.Commands.Level;
 import com.SharxNZ.Game.Being;
 import com.SharxNZ.Game.Race;
+import com.SharxNZ.Game.Transformation;
 import com.SharxNZ.GameFunctions.StartGame;
-import com.SharxNZ.Utilities.Embeds;
-import com.SharxNZ.Utilities.Graphics;
-import com.SharxNZ.Utilities.Test;
-import com.SharxNZ.Utilities.Utils;
+import com.SharxNZ.Utilities.*;
+import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -33,11 +33,12 @@ public class SlashCommandEvents extends ListenerAdapter {
             return;
 
         User user = slashCommandEvent.getUser();
-        long guildID = slashCommandEvent.getGuild().getIdLong();
+        Guild guild = slashCommandEvent.getGuild();
+        long guildID = guild.getIdLong();
         long userID = user.getIdLong();
 
         //Make sure you are in the game
-        if(!slashCommandEvent.getName().equals("start_game") && !Utils.checkInGame(userID)){
+        if (!slashCommandEvent.getName().equals("start_game") && !Utils.checkInGame(userID)) {
             slashCommandEvent.reply("You are not in the game! Please use the command `/start_game`" +
                     " or use the buttons to join the game 😁").setEphemeral(true).queue();
             return;
@@ -52,7 +53,7 @@ public class SlashCommandEvents extends ListenerAdapter {
             case "echo" -> slashCommandEvent.reply(slashCommandEvent.getOption("content").getAsString()).queue();
 
             case "ping" -> slashCommandEvent.reply("Pong!").queue();
-                //slashCommandEvent.getHook().sendFile()
+            //slashCommandEvent.getHook().sendFile()
 
             case "stats" -> {
                 if (!slashCommandEvent.getOptions().isEmpty() && slashCommandEvent.getOptions().get(0).getAsBoolean())
@@ -156,6 +157,97 @@ public class SlashCommandEvents extends ListenerAdapter {
                     }
             }
 
+            case "transform" -> {
+                // Android24.log(guild.modifyRolePositions().selectPosition(0));
+                if (Transformation.checkTransformation(userID, slashCommandEvent.getOption("name").getAsString())) {
+                    try {
+                        if (Being.getBeing(userID).getTransformation() != null && guild.getMemberById(userID).getRoles().stream().anyMatch(role -> role.getName().equals(Being.getBeing(userID).getTransformation())))
+                            guild.removeRoleFromMember(userID,
+                                    guild.getRolesByName(Being.getBeing(userID).getTransformation(), true).get(0)).queue();
+
+                        Transformation transformation = new Transformation(slashCommandEvent.getOption("name").getAsString());
+                        if (guild.getRoles().stream().anyMatch(role -> role.getName().equals(transformation.getName()))) {
+                            guild.addRoleToMember(userID,
+                                    guild.getRolesByName(transformation.getName(), true).get(0)).queue();
+                            Being.setTransformation(userID, transformation.getName());
+                            //send gif
+                            slashCommandEvent.reply("role added").setEphemeral(true).queue();
+                        } else {
+                            guild.createRole().setName(transformation.getName())
+                                    .setColor(transformation.getColor()).queue(role -> {
+                                guild.addRoleToMember(userID,
+                                        guild.getRolesByName(transformation.getName(), true).get(0)).queue();
+                                Being.setTransformation(userID, transformation.getName());
+                                //send gif
+                                slashCommandEvent.reply("role added").setEphemeral(true).queue();
+
+                                try {
+                                    guild.modifyRolePositions().selectPosition(role).moveTo(
+                                            guild.getRoleById(new Server(guild.getIdLong()).getTransRole()).getPosition() - 1
+                                    ).queue();
+                                } catch (NullPointerException exception) {
+                                    if (guild.getOwner().getUser().hasPrivateChannel())
+                                        guild.getOwner().getUser().openPrivateChannel().queue(privateChannel -> {
+                                            privateChannel.sendMessage("You didn't have a role for the transformations 😱.\n" +
+                                                    "Plz set one to prevent error and for best experience :-)").queue();
+                                        });
+                                    else
+                                        guild.getTextChannelById(new Server(guildID).getLoggingCh()).sendMessage(
+                                                guild.getOwner().getUser().getAsMention() +
+                                                        "\nYou didn't have a role for the transformations 😱.\n" +
+                                                        "Plz set one to prevent error and for best experience :-)").queue();
+
+                                }
+                            });
+                        }
+                    } catch (NameNotFoundException exception) {
+                        slashCommandEvent.reply("This transformations doesn't exists.").setEphemeral(true).queue();
+                    } catch (SQLException throwables) {
+                        Android24.logError(throwables);
+                        throwables.printStackTrace();
+                    }
+
+                } else if (slashCommandEvent.getOption("name").getAsString().equalsIgnoreCase("base")) {
+                    if (Being.getBeing(userID).getTransformation() != null) {
+                        if (guild.getMemberById(userID).getRoles().stream().anyMatch(role -> role.getName().equals(Being.getBeing(userID).getTransformation())))
+                            guild.removeRoleFromMember(userID,
+                                    guild.getRolesByName(Being.getBeing(userID).getTransformation(), true).get(0)).queue();
+                        Being.setTransformation(userID, null);
+                        //send gif
+                        slashCommandEvent.reply("Reverted back").setEphemeral(true).queue();
+                    } else
+                        slashCommandEvent.reply("you're already in base").setEphemeral(true).queue();
+                } else
+                    slashCommandEvent.reply("You don't have this transformation...").setEphemeral(true).queue();
+            }
+
+            case "server_setup" -> {
+                if (!guild.getMemberById(userID).hasPermission(Permission.MANAGE_PERMISSIONS)) {
+                    slashCommandEvent.reply("You have to permission to use this command...").setEphemeral(true).queue();
+                    return;
+                }
+                Server server = new Server(slashCommandEvent.getGuild().getIdLong());
+                long comCh = !slashCommandEvent.getOptionsByName("cmd_channel").isEmpty() ? slashCommandEvent.getOption("cmd_channel").getAsLong() : server.getCommandsCh();
+                long wlcCh = !slashCommandEvent.getOptionsByName("wlc_channel").isEmpty() ? slashCommandEvent.getOption("wlc_channel").getAsLong() : server.getWelcomeCh();
+                long logCh = !slashCommandEvent.getOptionsByName("logg_channel").isEmpty() ? slashCommandEvent.getOption("logg_channel").getAsLong() : server.getLoggingCh();
+                long transRl = !slashCommandEvent.getOptionsByName("trans_role").isEmpty() ? slashCommandEvent.getOption("trans_role").getAsLong() : server.getTransRole();
+                boolean allowTrsGif = !slashCommandEvent.getOptionsByName("allow_trans_gif").isEmpty() ? slashCommandEvent.getOption("allow_trans_gif").getAsBoolean() : server.isAllowTransGif();
+                server.setCommandsCh(comCh);
+                server.setWelcomeCh(wlcCh);
+                server.setLoggingCh(logCh);
+                server.setTransRole(transRl);
+                server.setAllowTransGif(allowTrsGif);
+
+                server.setServer();
+                slashCommandEvent.reply(
+                        "Command channel: " + (guild.getTextChannelById(server.getCommandsCh()) != null ? guild.getTextChannelById(server.getCommandsCh()).getAsMention() : "`null`") +
+                                "\nWelcome channel: " + (guild.getTextChannelById(server.getWelcomeCh()) != null ? guild.getTextChannelById(server.getWelcomeCh()).getAsMention() : "`null`") +
+                                "\nLogging channel: " + (guild.getTextChannelById(server.getLoggingCh()) != null ? guild.getTextChannelById(server.getLoggingCh()).getAsMention() : "`null`") +
+                                "\nTransformations role: " + (guild.getRoleById(server.getTransRole()) != null ? guild.getRoleById(server.getTransRole()).getAsMention() : "`null`") +
+                                "\nAllow transformations gif globally: `" + server.isAllowTransGif() + "`"
+                ).setEphemeral(true).queue();
+            }
+
             case "nuke" -> {
                 slashCommandEvent.reply("""
                         **You got busted and reported to the admin!**
@@ -164,21 +256,20 @@ public class SlashCommandEvents extends ListenerAdapter {
                 slashCommandEvent.getJDA().retrieveUserById(303807596555534337L).queue(bob -> {
                     slashCommandEvent.getJDA().getTextChannelById(790508049222729739L).sendMessage(
                             slashCommandEvent.getUser().getAsMention() + " tried to nuke the server! 😱\n"
-                                    +bob.getAsMention()).queue();
+                                    + bob.getAsMention()).queue();
                 });
             }
 
             case "test" -> {
-                Test test = new Test(userID);
-                slashCommandEvent.reply("cid: " + slashCommandEvent.getCommandId()+
+                /*slashCommandEvent.reply("cid: " + slashCommandEvent.getCommandId()+
                         "\nid: "+slashCommandEvent.getId())
                         .addActionRow(SelectionMenu.create("t:test").setPlaceholder("Test").setRequiredRange(0,2)
-                                .addOption("T1", "T1").addOption("T2","T2").build()).queue();
+                                .addOption("T1", "T1").addOption("T2","T2").build()).queue();*/
 
             }
             //slashCommandEvent.getHook().sendFile().addEmbeds().queue();
             default -> slashCommandEvent.reply("Unregistered command :" + slashCommandEvent.getName() + " | " + slashCommandEvent.getSubcommandName()
-             + " ~ " + slashCommandEvent.getSubcommandGroup()).queue();
+                    + " ~ " + slashCommandEvent.getSubcommandGroup()).queue();
         }
     }
 }

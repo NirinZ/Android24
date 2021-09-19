@@ -3,20 +3,38 @@ package com.SharxNZ.Game;
 import com.SharxNZ.Android24;
 
 import javax.naming.NameNotFoundException;
+import java.awt.*;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class Transformation extends Ability{
+public class Transformation extends Ability {
 
     protected boolean soloTransformation;
+    protected Color color;
 
     private static PreparedStatement getTransformation;
+    private static PreparedStatement checkTransformation;
 
     static {
         try {
             getTransformation = Android24.getConnection().prepareStatement(
                     "SELECT * FROM android24.transformations where TransformationName = ? or TransformationAbbreviated = ?;");
+            checkTransformation = Android24.getConnection().prepareStatement("""
+                    SELECT
+                        IF(? IN (SELECT
+                                    UserID
+                                FROM
+                                    android24.users_transformations
+                                        JOIN
+                                    android24.transformations USING (TransformationAbbreviated)
+                                WHERE
+                                    (TransformationName = ?
+                                        OR TransformationAbbreviated = ?)
+                                        AND UserID = ?),
+                            TRUE,
+                            FALSE) AS 'Result'
+                    """);
         } catch (SQLException throwables) {
             Android24.logError(throwables);
             throwables.printStackTrace();
@@ -36,12 +54,14 @@ public class Transformation extends Ability{
         speedPowerUp = resultSet.getInt(5);
         kiConsumption = resultSet.getInt(6);
         soloTransformation = resultSet.getBoolean(7);
+        color = new Color(resultSet.getInt(8));
     }
 
     // Because I have to call the super constructor on the first line...
-    protected Transformation(){}
+    protected Transformation() {
+    }
 
-    protected void setTransformation(String name, String abbreviated, int attackPowerUp, int defencePowerUp, int speedPowerUp, int kiConsumption, boolean soloTransformation) {
+    protected void setTransformation(String name, String abbreviated, int attackPowerUp, int defencePowerUp, int speedPowerUp, int kiConsumption, boolean soloTransformation, int color) {
         this.name = name;
         this.abbreviated = abbreviated;
         this.attackPowerUp = attackPowerUp;
@@ -49,6 +69,27 @@ public class Transformation extends Ability{
         this.speedPowerUp = speedPowerUp;
         this.kiConsumption = kiConsumption;
         this.soloTransformation = soloTransformation;
+        this.color = new Color(color );
+    }
+
+    public static boolean checkTransformation(long userID, String transName) {
+        try {
+            checkTransformation.setLong(1, userID);
+            checkTransformation.setString(2, transName);
+            checkTransformation.setString(3, transName);
+            checkTransformation.setLong(4, userID);
+            ResultSet resultSet = checkTransformation.executeQuery();
+            while (resultSet.next())
+                if (resultSet.getBoolean(1)) {
+                    resultSet.close();
+                    return true;
+                }
+            resultSet.close();
+        } catch (SQLException throwables) {
+            Android24.logError(throwables);
+            throwables.printStackTrace();
+        }
+        return false;
     }
 
     public boolean isSoloTransformation() {
@@ -57,5 +98,13 @@ public class Transformation extends Ability{
 
     public void setSoloTransformation(boolean soloTransformation) {
         this.soloTransformation = soloTransformation;
+    }
+
+    public Color getColor() {
+        return color;
+    }
+
+    public void setColor(Color color) {
+        this.color = color;
     }
 }

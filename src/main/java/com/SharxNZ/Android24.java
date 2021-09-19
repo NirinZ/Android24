@@ -8,6 +8,8 @@ import com.SharxNZ.Buttons.PPButtons;
 import com.SharxNZ.Buttons.ShopButton;
 import com.SharxNZ.Commands.*;
 import com.SharxNZ.Commands.GameCommands.*;
+import com.SharxNZ.Game.Being;
+import com.SharxNZ.GameFunctions.Beginning;
 import com.SharxNZ.GameFunctions.GFButtons;
 import com.SharxNZ.GameFunctions.StartGame;
 import com.SharxNZ.GameFunctions.XP;
@@ -15,6 +17,7 @@ import com.SharxNZ.Slash.AddingCommands;
 import com.SharxNZ.Slash.SelectMenuEvents;
 import com.SharxNZ.Slash.SlashCommandEvents;
 import com.SharxNZ.Utilities.Embeds;
+import com.SharxNZ.Utilities.Server;
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
@@ -121,7 +124,7 @@ public abstract class Android24 {
 
         jda.addEventListener(new Ping());
         jda.addEventListener(new XP());
-//        jda.addEventListener(new Beginning());
+        jda.addEventListener(new Beginning());
         jda.addEventListener(new Marco());
         jda.addEventListener(new SlashCommandEvents());
         jda.addEventListener(new SelectMenuEvents());
@@ -134,7 +137,7 @@ public abstract class Android24 {
         Shop.Shop();
         Inventory.start();
         AddingCommands.AddingCommands();
-
+        Being.Start();
         Scams.Scams();
         //jda.addEventListener(new SlashTest());
 
@@ -151,7 +154,6 @@ public abstract class Android24 {
 
         // commandListUpdateAction = jda.updateCommands();
         queueCommands();
-
         jda.getTextChannelById(debugChannelID).sendMessage("אני דלוק").queue();
         // jda.getPresence().setStatus(OnlineStatus.DO_NOT_DISTURB);
         // Test 2
