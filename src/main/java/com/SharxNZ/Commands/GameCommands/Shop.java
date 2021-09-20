@@ -18,122 +18,123 @@ import java.sql.SQLException;
 
 public abstract class Shop {
 
-    private static PreparedStatement buyAttack;
-    private static PreparedStatement buyTransformation;
-    private static PreparedStatement checkType;
-    public static PreparedStatement asStatement;
-    public static PreparedStatement tsStatement;
-
-    public static void Shop(){
-        try {
-            checkType = Android24.getConnection().prepareStatement("""
-                    SELECT
-                        IF(? IN (SELECT
-                                    Name
-                                FROM
-                                    android24.attacks
-                                        JOIN
-                                    android24.shop ON Name = AttackName
-                                    UNION
-                                    SELECT
+    private static String buyAttackSql = """
+            SELECT
+                IF('Already owned' NOT IN (SELECT
+                            'Already owned' AS 'Check if exist'
+                        FROM
+                            android24.users_attacks
+                        WHERE
+                            UserID = ?
+                                AND AttackAbbreviated = (SELECT
                                     AttackAbbreviated
                                 FROM
                                     android24.attacks
-                                        JOIN
-                                    android24.shop ON Name = AttackName),
-                            'Attack',
-                            IF(? IN (SELECT
-                                    Name
-                                FROM
-                                    android24.transformations
-                                        JOIN
-                                    android24.shop ON Name = TransformationName
-                                    UNION
-                                    SELECT
+                                WHERE
+                                    AttackAbbreviated = ?
+                                        OR AttackName = ?)),
+                    IF(ForcedRace IS NULL OR Race = ForcedRace,
+                        IF(POWER(XP, ?) >= MinimalLevel,
+                            IF(Zeni >= Cost, 'Ok', 'Under budget'),
+                            'Under Level'),
+                        'Race Limited'),
+                    'Already owned') AS Result
+            FROM
+                android24.users_data AS u,
+                android24.shop AS s
+                    JOIN
+                android24.attacks AS a ON a.AttackName = s.Name
+            WHERE
+                UserID = ?
+                    AND (AttackName = ?
+                    OR AttackAbbreviated = ?);
+            """;
+    private static String buyTransformationSql = """
+            SELECT
+                IF('Already owned' NOT IN (SELECT
+                            'Already owned' AS 'Check if exist'
+                        FROM
+                            android24.users_transformations
+                        WHERE
+                            UserID = ?
+                                AND TransformationAbbreviated = (SELECT
                                     TransformationAbbreviated
                                 FROM
                                     android24.transformations
-                                        JOIN
-                                    android24.shop ON Name = TransformationName), 'Transformation', Null)) AS 'Type'
-                    """);
-            buyAttack = Android24.getConnection().prepareStatement("SELECT \n" +
-                    "    IF('Already owned' NOT IN (SELECT \n" +
-                    "                'Already owned' AS 'Check if exist'\n" +
-                    "            FROM\n" +
-                    "                android24.users_attacks\n" +
-                    "            WHERE\n" +
-                    "                UserID = ?\n" +
-                    "                    AND AttackAbbreviated = (SELECT \n" +
-                    "                        AttackAbbreviated\n" +
-                    "                    FROM\n" +
-                    "                        android24.attacks\n" +
-                    "                    WHERE\n" +
-                    "                        AttackAbbreviated = ?\n" +
-                    "                            OR AttackName = ?)),\n" +
-                    "        IF(ForcedRace IS NULL OR Race = ForcedRace,\n" +
-                    "            IF(POWER(XP, "+Android24.difficulty+") >= MinimalLevel,\n" +
-                    "                IF(Zeni >= Cost, 'Ok', 'Under budget'),\n" +
-                    "                'Under Level'),\n" +
-                    "            'Race Limited'),\n" +
-                    "        'Already owned') AS Result\n" +
-                    "FROM\n" +
-                    "    android24.users_data AS u,\n" +
-                    "    android24.shop AS s\n" +
-                    "        JOIN\n" +
-                    "    android24.attacks AS a ON a.AttackName = s.Name\n" +
-                    "WHERE\n" +
-                    "    UserID = ?\n" +
-                    "        AND (AttackName = ?\n" +
-                    "        OR AttackAbbreviated = ?);");
-            buyTransformation = Android24.getConnection().prepareStatement("SELECT \n" +
-                    "    IF('Already owned' NOT IN (SELECT \n" +
-                    "                'Already owned' AS 'Check if exist'\n" +
-                    "            FROM\n" +
-                    "                android24.users_transformations\n" +
-                    "            WHERE\n" +
-                    "                UserID = ?\n" +
-                    "                    AND TransformationAbbreviated = (SELECT \n" +
-                    "                        TransformationAbbreviated\n" +
-                    "                    FROM\n" +
-                    "                        android24.transformations\n" +
-                    "                    WHERE\n" +
-                    "                        TransformationAbbreviated = ?\n" +
-                    "                            OR TransformationName = ?)),\n" +
-                    "        IF(ForcedRace IS NULL OR Race = ForcedRace,\n" +
-                    "            IF(POWER(XP, "+Android24.difficulty+") >= MinimalLevel,\n" +
-                    "                IF(Zeni >= Cost, 'Ok', 'Under budget'),\n" +
-                    "                'Under Level'),\n" +
-                    "            'Race Limited'),\n" +
-                    "        'Already owned') AS Result\n" +
-                    "FROM\n" +
-                    "    android24.users_data AS u,\n" +
-                    "    android24.shop AS s\n" +
-                    "        JOIN\n" +
-                    "    android24.transformations AS a ON a.TransformationName = s.Name\n" +
-                    "WHERE\n" +
-                    "    UserID = ?\n" +
-                    "        AND (TransformationName = ?\n" +
-                    "        OR TransformationAbbreviated = ?);");
-            asStatement = Android24.getConnection().prepareStatement("SELECT " +
-                    "AttackName, Cost, MinimalLevel" +
-                    " FROM android24.attacks" +
-                    " JOIN" +
-                    " android24.shop ON AttackName = Name" +
-                    " WHERE ForcedRace is null or ForcedRace = ?;");
-            tsStatement = Android24.getConnection().prepareStatement("SELECT " +
-                    "TransformationName,  Cost, MinimalLevel" +
-                    " FROM android24.transformations" +
-                    " JOIN" +
-                    " android24.shop ON TransformationName = Name" +
-                    " WHERE ForcedRace is null or ForcedRace = ?;");
-        } catch (SQLException throwables) {
-            Android24.logError(throwables);
-            throwables.printStackTrace();
-        }
-    }
+                                WHERE
+                                    TransformationAbbreviated = ?
+                                        OR TransformationName = ?)),
+                    IF(ForcedRace IS NULL OR Race = ForcedRace,
+                        IF(POWER(XP, ?) >= MinimalLevel,
+                            IF(Zeni >= Cost, 'Ok', 'Under budget'),
+                            'Under Level'),
+                        'Race Limited'),
+                    'Already owned') AS Result
+            FROM
+                android24.users_data AS u,
+                android24.shop AS s
+                    JOIN
+                android24.transformations AS a ON a.TransformationName = s.Name
+            WHERE
+                UserID = ?
+                    AND (TransformationName = ?
+                    OR TransformationAbbreviated = ?);
+            """;
+    private static String checkTypeSql = """
+            SELECT
+                IF(? IN (SELECT
+                            Name
+                        FROM
+                            android24.attacks
+                                JOIN
+                            android24.shop ON Name = AttackName
+                            UNION
+                            SELECT
+                            AttackAbbreviated
+                        FROM
+                            android24.attacks
+                                JOIN
+                            android24.shop ON Name = AttackName),
+                    'Attack',
+                    IF(? IN (SELECT
+                            Name
+                        FROM
+                            android24.transformations
+                                JOIN
+                            android24.shop ON Name = TransformationName
+                            UNION
+                            SELECT
+                            TransformationAbbreviated
+                        FROM
+                            android24.transformations
+                                JOIN
+                            android24.shop ON Name = TransformationName), 'Transformation', Null)) AS 'Type'
+            """;
+    public static String asStatementSql = """
+            SELECT
+                AttackName, Cost, MinimalLevel
+            FROM
+                android24.attacks
+                    JOIN
+                android24.shop ON AttackName = Name
+            WHERE
+                ForcedRace IS NULL OR ForcedRace = ?;
+            """;
+    public static String tsStatementSql = """
+            SELECT
+                TransformationName, Cost, MinimalLevel
+            FROM
+                android24.transformations
+                    JOIN
+                android24.shop ON TransformationName = Name
+            WHERE
+                ForcedRace IS NULL OR ForcedRace = ?;
+            """;
 
     public static MessageEmbed shopView(String item) {
         try {
+            PreparedStatement checkType = Android24.getConnection().prepareStatement(checkTypeSql);
+
             checkType.setString(1, item);
             checkType.setString(2, item);
             ResultSet resultSet = checkType.executeQuery();
@@ -157,37 +158,45 @@ public abstract class Shop {
         }
     }
 
-    public static MessageEmbed tryToBuy(String item, long userID){
+    public static MessageEmbed tryToBuy(String item, long userID) {
         try {
+            PreparedStatement buyAttack = Android24.getConnection().prepareStatement(buyAttackSql);
             //Check if attack
             buyAttack.setLong(1, userID);
             buyAttack.setString(2, item);
             buyAttack.setString(3, item);
-            buyAttack.setLong(4, userID);
-            buyAttack.setString(5, item);
+            buyAttack.setDouble(4, Android24.difficulty);
+            buyAttack.setLong(5, userID);
             buyAttack.setString(6, item);
+            buyAttack.setString(7, item);
             ResultSet resultSet = buyAttack.executeQuery();
-            if(resultSet.next()){
-                if(resultSet.getString(1).equals("Ok")){
+            if (resultSet.next()) {
+                if (resultSet.getString(1).equals("Ok")) {
+                    buyAttack.close();
                     return purchase("Attack", item, userID);
                 } else
                     return Embeds.errorTextEmbed(resultSet.getString(1));
-            }else{
+            } else {
+                PreparedStatement buyTransformation = Android24.getConnection().prepareStatement(buyTransformationSql);
                 //Check if transformations
-                buyTransformation.setLong(1, userID);
-                buyTransformation.setString(2, item);
-                buyTransformation.setString(3, item);
-                buyTransformation.setLong(4, userID);
-                buyTransformation.setString(5, item);
-                buyTransformation.setString(6, item);
+                buyAttack.setLong(1, userID);
+                buyAttack.setString(2, item);
+                buyAttack.setString(3, item);
+                buyAttack.setDouble(4, Android24.difficulty);
+                buyAttack.setLong(5, userID);
+                buyAttack.setString(6, item);
+                buyAttack.setString(7, item);
                 resultSet = buyTransformation.executeQuery();
-                if(resultSet.next()){
-                    if(resultSet.getString(1).equals("Ok") /* && Check structure */ )
+                if (resultSet.next()) {
+                    if (resultSet.getString(1).equals("Ok") /* && Check structure */) {
+                        buyAttack.close();
+                        buyTransformation.close();
                         return purchase("Transformation", item, userID);
-                     else
+                    } else
                         return Embeds.errorTextEmbed(resultSet.getString(1));
-                }
-                else{
+                } else {
+                    buyAttack.close();
+                    buyTransformation.close();
                     return Embeds.errorTextEmbed("The requested item doesn't exist...");
                 }
             }
@@ -200,7 +209,7 @@ public abstract class Shop {
         }
     }
 
-    private static MessageEmbed purchase(String type, String item, long userID){
+    private static MessageEmbed purchase(String type, String item, long userID) {
         String purchaseSql = "INSERT INTO android24.users_#s (UserID, $Abbreviated) " +
                 "VALUES (?, (select $Abbreviated from android24.#s where $Abbreviated = ? or $Name = ?));";
         PreparedSql purchaseP = new PreparedSql();
@@ -242,7 +251,7 @@ order by Storey
     public static MessageEmbed displayAttack(String name) {
         try {
             return new DisplayAttack(name).getEmbed().build();
-        }catch (NameNotFoundException exception){
+        } catch (NameNotFoundException exception) {
             return Embeds.errorTextEmbed("The requested item doesn't exist...");
         } catch (SQLException throwables) {
             Android24.logError(throwables);
@@ -251,10 +260,10 @@ order by Storey
         }
     }
 
-    public static MessageEmbed displayTransformation(String name){
+    public static MessageEmbed displayTransformation(String name) {
         try {
             return new DisplayTransformation(name).getEmbed().build();
-        }catch (NameNotFoundException exception){
+        } catch (NameNotFoundException exception) {
             return Embeds.errorTextEmbed("The requested item doesn't exist...");
         } catch (SQLException throwables) {
             Android24.logError(throwables);
@@ -263,8 +272,10 @@ order by Storey
         }
     }
 
-    public static MessageEmbed attacksShop(long userID){
+    public static MessageEmbed attacksShop(long userID) {
         try {
+            PreparedStatement asStatement = Android24.getConnection().prepareStatement(asStatementSql);
+
             EmbedBuilder asEmbed = new EmbedBuilder();
             asEmbed.setTitle("Attacks Shop");
             asEmbed.setDescription("Here you can see the list of all the attacks that you can buy");
@@ -272,6 +283,7 @@ order by Storey
             ResultSet resultSet = asStatement.executeQuery();
             while (resultSet.next())
                 asEmbed.addField(resultSet.getString(1), resultSet.getString(2) + "$ Lvl:" + resultSet.getString(3), true);
+            asStatement.close();
             return asEmbed.build();
         } catch (SQLException throwables) {
             Android24.logError(throwables);
@@ -280,8 +292,10 @@ order by Storey
         }
     }
 
-    public static MessageEmbed transformationsShop(long userID){
+    public static MessageEmbed transformationsShop(long userID) {
         try {
+            PreparedStatement tsStatement = Android24.getConnection().prepareStatement(tsStatementSql);
+
             EmbedBuilder tsEmbed = new EmbedBuilder();
             tsEmbed.setTitle("Transformations Shop");
             tsEmbed.setDescription("Here you can see the list of all the transformations that you can buy");
@@ -289,6 +303,7 @@ order by Storey
             ResultSet resultSet = tsStatement.executeQuery();
             while (resultSet.next())
                 tsEmbed.addField(resultSet.getString(1), resultSet.getString(2) + "$ Lvl:" + resultSet.getString(3), true);
+            tsStatement.close();
             return tsEmbed.build();
         } catch (SQLException throwables) {
             Android24.logError(throwables);
@@ -297,13 +312,16 @@ order by Storey
         }
     }
 
-    public static DoublyCircularLinkedList<DisplayAttack> getAttacksShop(long userID){
+    public static DoublyCircularLinkedList<DisplayAttack> getAttacksShop(long userID) {
         try {
+            PreparedStatement asStatement = Android24.getConnection().prepareStatement(asStatementSql);
+
             DoublyCircularLinkedList<DisplayAttack> attacks = new DoublyCircularLinkedList<>();
             asStatement.setString(1, Utils.checkRace(userID));
             ResultSet resultSet = asStatement.executeQuery();
             while (resultSet.next())
                 attacks.add(new DisplayAttack(resultSet.getString(1)));
+            asStatement.close();
             return attacks;
         } catch (SQLException | NameNotFoundException throwables) {
             Android24.logError(throwables);
@@ -312,13 +330,16 @@ order by Storey
         }
     }
 
-    public static DoublyCircularLinkedList<DisplayTransformation> getTransformationsShop(long userID){
+    public static DoublyCircularLinkedList<DisplayTransformation> getTransformationsShop(long userID) {
         try {
+            PreparedStatement tsStatement = Android24.getConnection().prepareStatement(tsStatementSql);
+
             DoublyCircularLinkedList<DisplayTransformation> transformations = new DoublyCircularLinkedList<>();
             tsStatement.setString(1, Utils.checkRace(userID));
             ResultSet resultSet = tsStatement.executeQuery();
             while (resultSet.next())
                 transformations.add(new DisplayTransformation(resultSet.getString(1)));
+            tsStatement.close();
             return transformations;
         } catch (SQLException | NameNotFoundException throwables) {
             Android24.logError(throwables);

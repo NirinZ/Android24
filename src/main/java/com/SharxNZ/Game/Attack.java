@@ -7,7 +7,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public abstract class Attack extends Ability{
+public abstract class Attack extends Ability {
 
     enum ATTACK_TYPE {
         Strike, Ki;
@@ -16,24 +16,18 @@ public abstract class Attack extends Ability{
     protected boolean counter;
     protected ATTACK_TYPE attackType;
 
-    private static PreparedStatement getAttack;
-
-    static {
-        try {
-            getAttack = Android24.getConnection().prepareStatement(
-                    "SELECT * FROM android24.attacks where AttackName = ? or AttackAbbreviated = ?;");
-        } catch (SQLException throwables) {
-            Android24.logError(throwables);
-            throwables.printStackTrace();
-        }
-    }
 
     public Attack(String name) throws SQLException, NameNotFoundException {
+        PreparedStatement getAttack = Android24.getConnection().prepareStatement(
+                "SELECT * FROM android24.attacks where AttackName = ? or AttackAbbreviated = ?;");
+
         getAttack.setString(1, name);
         getAttack.setString(2, name);
         ResultSet resultSet = getAttack.executeQuery();
-        if (!resultSet.next())
+        if (!resultSet.next()) {
+            getAttack.close();
             throw new NameNotFoundException("The name of the attack does not exists");
+        }
         this.name = resultSet.getString(1);
         abbreviated = resultSet.getString(2);
         attackPowerUp = resultSet.getInt(3);
@@ -42,10 +36,12 @@ public abstract class Attack extends Ability{
         kiConsumption = resultSet.getInt(6);
         counter = resultSet.getBoolean(7);
         attackType = ATTACK_TYPE.valueOf(resultSet.getString(8));
+        getAttack.close();
     }
 
     // Because I have to call the super constructor on the first line...
-    protected Attack(){}
+    protected Attack() {
+    }
 
     protected void setAttack(String name, String abbreviated, int attackPowerUp, int defencePowerUp, int speedPowerUp, int kiConsumption, boolean counter, ATTACK_TYPE attackType) {
         this.name = name;

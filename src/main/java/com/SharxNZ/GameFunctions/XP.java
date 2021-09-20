@@ -22,25 +22,13 @@ public class XP extends ListenerAdapter {
     public static final ConcurrentHashMap<Long, long[]> xpMap = new ConcurrentHashMap<>();
     public static final Set<Long> voiceSet = new HashSet<>();
     private final Random rand = new Random();
-    private static PreparedStatement getXP;
-    private static PreparedStatement updateData;
-    private static PreparedStatement insertUser;
 
     public XP() throws SQLException {
-        getXP = Android24.getConnection().prepareStatement(
-                "SELECT XP FROM `android24`.users_data where UserID = ?;");
-        updateData = Android24.getConnection().prepareStatement(
-                "UPDATE `android24`.`users_data` SET `XP` = ?, `Zeni` = `Zeni` + ?," +
-                        " `PowerPoints` = `PowerPoints` + ? WHERE `UserID` = ?;");
-        insertUser = Android24.getConnection().prepareStatement(
-                "INSERT INTO `android24`.`users_data` (`UserID`, `UserName`, `XP`, `Zeni`, `PowerPoints`)" +
-                        " VALUES (?, ?, ?, ?, ?);"
-        );
         updateDatabase();
         voiceXP();
     }
 
-    private short giveXP(){
+    private short giveXP() {
         return (short) rand.nextInt(Android24.xp + 1);
     }
 
@@ -48,7 +36,7 @@ public class XP extends ListenerAdapter {
     public void onGuildMessageReceived(@Nonnull GuildMessageReceivedEvent guildMessage) {
         if (!guildMessage.getAuthor().isBot()) { //If not bot
             long[] xpAndTime = new long[2];
-            
+
             //userID
             long userID = guildMessage.getAuthor().getIdLong();
             if (xpMap.containsKey(userID)) { // If exists in the database
@@ -66,7 +54,7 @@ public class XP extends ListenerAdapter {
     }
 
     @Override
-    public void onGuildVoiceJoin(@Nonnull GuildVoiceJoinEvent guildVoiceJoin){
+    public void onGuildVoiceJoin(@Nonnull GuildVoiceJoinEvent guildVoiceJoin) {
         voiceSet.add(guildVoiceJoin.getMember().getIdLong());
     }
 
@@ -75,7 +63,7 @@ public class XP extends ListenerAdapter {
         voiceSet.remove(guildVoiceLeaveEvent.getMember().getIdLong());
     }
 
-    private void voiceXP(){
+    private void voiceXP() {
         Timer timer = new Timer();
         long[] xpAndTime = new long[2];
         TimerTask timerTask = new TimerTask() {
@@ -90,12 +78,21 @@ public class XP extends ListenerAdapter {
                     } else
                         xpMap.put(key, new long[]{(long) giveXP(), 0});
                 }
-                }
+            }
         };
         timer.scheduleAtFixedRate(timerTask, 0, 120000); // Do the check every 120 seconds //120000
     }
 
     private void updateDatabase() throws SQLException {
+        PreparedStatement getXP = Android24.getConnection().prepareStatement(
+                "SELECT XP FROM `android24`.users_data where UserID = ?;");
+        PreparedStatement updateData = Android24.getConnection().prepareStatement(
+                "UPDATE `android24`.`users_data` SET `XP` = ?, `Zeni` = `Zeni` + ?," +
+                        " `PowerPoints` = `PowerPoints` + ? WHERE `UserID` = ?;");
+        PreparedStatement insertUser = Android24.getConnection().prepareStatement(
+                "INSERT INTO `android24`.`users_data` (`UserID`, `UserName`, `XP`, `Zeni`, `PowerPoints`)" +
+                        " VALUES (?, ?, ?, ?, ?);");
+
         final Statement sqlStatement = Android24.getConnection().createStatement();
         Timer timer = new Timer();
         TimerTask timerTask = new TimerTask() {
@@ -105,7 +102,7 @@ public class XP extends ListenerAdapter {
                 long previousXP, totalXP, zeni;
                 int lvlShouldBe, currentLvl, powerPoints;
                 // key = userID
-                for (Map.Entry<Long, long[]> entry: xpMap.entrySet()) {
+                for (Map.Entry<Long, long[]> entry : xpMap.entrySet()) {
                     try {
                         getXP.setLong(1, entry.getKey());
                         ResultSet resultSet = getXP.executeQuery();
@@ -125,8 +122,6 @@ public class XP extends ListenerAdapter {
                             updateData.setLong(4, entry.getKey());
                             updateData.executeUpdate();
 
-                            resultSet.close();
-
                         } else {
                             totalXP = zeni = entry.getValue()[0];
                             powerPoints = 4 * (Level.calculateLevel(totalXP));
@@ -137,6 +132,7 @@ public class XP extends ListenerAdapter {
                             insertUser.setInt(5, powerPoints);
                             insertUser.executeUpdate();
                         }
+                        resultSet.close();
                     } catch (Exception throwables) {
                         Android24.logError(throwables);
                         throwables.printStackTrace();

@@ -10,28 +10,23 @@ import java.sql.SQLException;
 
 public class RefreshNames extends Command {
 
-    private static PreparedStatement getNames;
-    private static PreparedStatement setNames;
-    private static PreparedStatement getSNames;
-    private static PreparedStatement setSNames;
 
     public RefreshNames() throws SQLException {
         super.name = "Refresh name";
         super.aliases = new String[]{"rn", "RN"};
         super.arguments = "[n\\s]";
         super.help = "Refresh all the names in the DataBase. (n - users names, s - servers names)";
-        getNames = Android24.getConnection().prepareStatement("SELECT UserID FROM `android24`.users_data limit ?, 10;");
-        setNames = Android24.getConnection().prepareStatement("UPDATE `android24`.`users_data` SET `UserName` = ? WHERE `UserID` = ?;");
-        getSNames = Android24.getConnection().prepareStatement("SELECT GuildID FROM guilds.guilds_data limit ?, 10;");
-        setSNames = Android24.getConnection().prepareStatement("UPDATE guilds.`guilds_data` SET `GuildName` = ? WHERE `GuildID` = ?;");
-
-
     }
 
     @Override
     protected void execute(CommandEvent commandEvent) {
         try {
-            if(commandEvent.getArgs().isEmpty() || commandEvent.getArgs().equalsIgnoreCase("n")) {
+            PreparedStatement getNames = Android24.getConnection().prepareStatement("SELECT UserID FROM `android24`.users_data limit ?, 10;");
+            PreparedStatement setNames = Android24.getConnection().prepareStatement("UPDATE `android24`.`users_data` SET `UserName` = ? WHERE `UserID` = ?;");
+            PreparedStatement getSNames = Android24.getConnection().prepareStatement("SELECT GuildID FROM guilds.guilds_data limit ?, 10;");
+            PreparedStatement setSNames = Android24.getConnection().prepareStatement("UPDATE guilds.`guilds_data` SET `GuildName` = ? WHERE `GuildID` = ?;");
+
+            if (commandEvent.getArgs().isEmpty() || commandEvent.getArgs().equalsIgnoreCase("n")) {
                 int limit = 0;
                 int check;
                 do {
@@ -61,8 +56,9 @@ public class RefreshNames extends Command {
                         break;
                     }
                 } while (check == 0);
-            }
-            else if(commandEvent.getArgs().equalsIgnoreCase("s")){
+                getNames.close();
+                setNames.close();
+            } else if (commandEvent.getArgs().equalsIgnoreCase("s")) {
                 int limit = 0;
                 int check;
                 do {
@@ -78,7 +74,7 @@ public class RefreshNames extends Command {
                                 setSNames.executeUpdate();
                                 check--;
                             } catch (SQLException throwables) {
-                                System.out.println("Inner try "+Android24.jda.getGuildById(id).getName());
+                                System.out.println("Inner try " + Android24.jda.getGuildById(id).getName());
                                 Android24.logError(throwables);
                                 throwables.printStackTrace();
                             }
@@ -90,6 +86,8 @@ public class RefreshNames extends Command {
                     limit += 10;
                     result.close();
                 } while (check == 0);
+                getSNames.close();
+                setSNames.close();
             }
         } catch (SQLException throwables) {
             System.out.println("Outer try");

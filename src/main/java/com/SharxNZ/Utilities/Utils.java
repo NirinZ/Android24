@@ -1,4 +1,5 @@
 package com.SharxNZ.Utilities;
+
 import com.SharxNZ.Commands.GameCommands.PowerPoints;
 import com.SharxNZ.Android24;
 import com.SharxNZ.Game.Being;
@@ -12,24 +13,15 @@ import java.util.TimerTask;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-public abstract class Utils{
+public abstract class Utils {
 
-    private static PreparedStatement inGameStatement;
 
-    static {
+    public static String checkRace(long userID) {
         try {
-            inGameStatement = Android24.getConnection().prepareStatement(
-                    "SELECT `Race` FROM `android24`.`users_data` WHERE `UserID` = ?;");
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
-    }
-
-
-    public static String checkRace(long userID){
-        try {
-            ResultSet resultSet = Android24.getConnection().createStatement().executeQuery(
-                    "select Race from android24.users_data where userID = "+ userID);
+            PreparedStatement statement = Android24.getConnection().prepareStatement(
+                    "select Race from android24.users_data where userID = ?;");
+            statement.setLong(1, userID);
+            ResultSet resultSet = statement.executeQuery();
             if (resultSet.next())
                 return resultSet.getString(1);
             else
@@ -41,11 +33,14 @@ public abstract class Utils{
         }
     }
 
-    public static boolean checkInGame(long userID){
+    public static boolean checkInGame(long userID) {
         try {
+            PreparedStatement inGameStatement = Android24.getConnection().prepareStatement(
+                    "SELECT `Race` FROM `android24`.`users_data` WHERE `UserID` = ?;");
+
             inGameStatement.setLong(1, userID);
             ResultSet resultSet = inGameStatement.executeQuery();
-            if(resultSet.next())
+            if (resultSet.next())
                 return resultSet.getString(1) != null;
             else
                 return false;
@@ -56,8 +51,8 @@ public abstract class Utils{
         }
     }
 
-    public static <T> boolean inUse(T instance){
-        switch (instance.getClass().getSimpleName()){
+    public static <T> boolean inUse(T instance) {
+        switch (instance.getClass().getSimpleName()) {
             case "Being":
                 Being being = (Being) instance;
                 return being.getInUse();
@@ -87,7 +82,7 @@ public abstract class Utils{
         }
     }
 
-    public static <T1, T2> void garbageCollector(HashMap<T1, T2> hashMap){
+    public static <T1, T2> void garbageCollector(HashMap<T1, T2> hashMap) {
         Lock lock = new ReentrantLock();
         Timer timer = new Timer();
         final int[] i = {0};
@@ -95,13 +90,12 @@ public abstract class Utils{
         TimerTask timerTask = new TimerTask() {
             @Override
             public void run() {
-                for(T1 key : tempMap.keySet()){
+                for (T1 key : tempMap.keySet()) {
                     lock.lock();
-                    if(inUse(tempMap.get(key))) {
+                    if (inUse(tempMap.get(key))) {
                         setInUse(tempMap.get(key));
                         System.out.println(" === Prolonged === ");
-                    }
-                    else {
+                    } else {
                         tempMap.remove(key);
                         System.out.println(" === deleted === ");
                     }

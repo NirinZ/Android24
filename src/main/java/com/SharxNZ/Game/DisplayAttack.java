@@ -17,11 +17,9 @@ public class DisplayAttack extends Attack {
     protected String description;
     protected String gif;
 
-    private static PreparedStatement getDisplayAttack;
 
-    static {
-        try {
-            getDisplayAttack = Android24.getConnection().prepareStatement("""
+    public DisplayAttack(String name) throws SQLException, NameNotFoundException {
+        PreparedStatement getDisplayAttack = Android24.getConnection().prepareStatement("""
                     SELECT
                         AttackName, AttackAbbreviated, AttackPowerUp,
                         DefencePowerUp, SpeedPowerUp, KiConsumption, Counter,
@@ -34,14 +32,7 @@ public class DisplayAttack extends Attack {
                         AttackName = ?
                             OR AttackAbbreviated = ?;
                     """);
-        } catch (SQLException throwables) {
-            Android24.logError(throwables);
-            throwables.printStackTrace();
-        }
-    }
 
-
-    public DisplayAttack(String name) throws SQLException, NameNotFoundException {
         getDisplayAttack.setString(1, name);
         getDisplayAttack.setString(2, name);
         ResultSet resultSet = getDisplayAttack.executeQuery();
@@ -55,6 +46,7 @@ public class DisplayAttack extends Attack {
         minimalLevel = resultSet.getInt(11);
         description = resultSet.getString(12);
         gif = resultSet.getString(13);
+        getDisplayAttack.close();
     }
 
     public EmbedBuilder getEmbed() {

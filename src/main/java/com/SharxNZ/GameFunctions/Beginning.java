@@ -13,7 +13,6 @@ import java.sql.SQLException;
 
 public class Beginning extends ListenerAdapter {
 
-    private static PreparedStatement join;
     private static String joiningMessage = """
             Thanks for inviting my to your server!
             There are some stuff that you should take care of before we start.
@@ -23,20 +22,13 @@ public class Beginning extends ListenerAdapter {
                BTW, you can choose other role to be set the transformations role positions, just use the `/server_setup` 😁
             """;
 
-    static {
-        try {
-            join = Android24.getConnection().prepareStatement(
-                    "INSERT INTO `guilds`.`guilds_data` (`GuildID`, `GuildName`, `TransRole`) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE `GuildName` = ?, `TransRole` = ?;");
-        } catch (SQLException throwables) {
-            Android24.logError(throwables);
-            throwables.printStackTrace();
-        }
-    }
-
     @Override
     public void onGuildJoin(@Nonnull GuildJoinEvent guildJoinEvent) {
         if (guildJoinEvent.getGuild().getRoles().stream().anyMatch(role -> role.getName().equals("---transformations---"))) {
             try {
+                PreparedStatement join = Android24.getConnection().prepareStatement(
+                        "INSERT INTO `guilds`.`guilds_data` (`GuildID`, `GuildName`, `TransRole`) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE `GuildName` = ?, `TransRole` = ?;");
+
                 join.setLong(1, guildJoinEvent.getGuild().getIdLong());
                 join.setString(2, guildJoinEvent.getGuild().getName());
                 join.setLong(3, guildJoinEvent.getGuild().getRolesByName("---transformations---", true).get(0).getIdLong());
@@ -61,6 +53,9 @@ public class Beginning extends ListenerAdapter {
         } else
             guildJoinEvent.getGuild().createRole().setName("---transformations---").queue(role -> {
                 try {
+                    PreparedStatement join = Android24.getConnection().prepareStatement(
+                            "INSERT INTO `guilds`.`guilds_data` (`GuildID`, `GuildName`, `TransRole`) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE `GuildName` = ?, `TransRole` = ?;");
+
                     join.setLong(1, guildJoinEvent.getGuild().getIdLong());
                     join.setString(2, guildJoinEvent.getGuild().getName());
                     join.setLong(3, role.getIdLong());

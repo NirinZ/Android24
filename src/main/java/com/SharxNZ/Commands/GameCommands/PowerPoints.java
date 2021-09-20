@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
 
 import java.awt.*;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
@@ -218,6 +219,8 @@ public void previousValue(){
     @Override
     public void save(){
         try {
+            PreparedStatement saveBeingStatement = Android24.getConnection().prepareStatement(saveBeingStatementSql);
+
             saveBeingStatement.setInt(1, getPowerPoints());
             saveBeingStatement.setInt(2, getHealth());
             saveBeingStatement.setInt(3, getKi());

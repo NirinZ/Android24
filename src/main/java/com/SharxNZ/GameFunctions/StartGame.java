@@ -15,9 +15,6 @@ import java.sql.SQLException;
 
 public abstract class StartGame {
 
-    private static PreparedStatement setRace;
-    private static PreparedStatement insertUser;
-
     public static void StartGame() {
         try {
             OptionData optionData = new OptionData(OptionType.STRING, "race", "choose the race you want to play").setRequired(true);
@@ -28,14 +25,8 @@ public abstract class StartGame {
                     .addOptions(optionData));
 
             startGameButton();
-            setRace = Android24.getConnection().prepareStatement(
-                    "UPDATE `android24`.`users_data` SET `Race` = ? WHERE (`UserID` = ?);");
-            insertUser = Android24.getConnection().prepareStatement(
-                    "INSERT INTO `android24`.`users_data` (`UserID`, `UserName`, `Race`)" +
-                            " VALUES (?, ?, ?);"
-            );
 
-        } catch (Exception throwables) {
+        } catch (SQLException throwables) {
             Android24.logError(throwables);
             throwables.printStackTrace();
         }
@@ -51,6 +42,11 @@ public abstract class StartGame {
 
     public static String startGame(long userID, Race race){
         try {
+            PreparedStatement setRace = Android24.getConnection().prepareStatement(
+                    "UPDATE `android24`.`users_data` SET `Race` = ? WHERE (`UserID` = ?);");
+            PreparedStatement insertUser = Android24.getConnection().prepareStatement(
+                    "INSERT INTO `android24`.`users_data` (`UserID`, `UserName`, `Race`)" +
+                            " VALUES (?, ?, ?);");
             // Setting it in th SQL
             if (Utils.checkInGame(userID))
                 return "You're already in the game";
@@ -59,6 +55,7 @@ public abstract class StartGame {
                 setRace.setString(1, race.toString());
                 setRace.setLong(2, userID);
                 setRace.executeUpdate();
+                setRace.close();
             }
             //Creating a whole mew user
             else {
@@ -68,6 +65,7 @@ public abstract class StartGame {
                     try {
                         insertUser.setString(2, user.getAsTag());
                         insertUser.executeUpdate();
+                        insertUser.close();
                     } catch (SQLException throwables) {
                         throwables.printStackTrace();
                         Android24.logError(throwables);

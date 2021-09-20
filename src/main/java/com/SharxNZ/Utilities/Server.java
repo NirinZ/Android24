@@ -4,6 +4,7 @@ import com.SharxNZ.Android24;
 
 import javax.management.relation.Role;
 import javax.naming.NameNotFoundException;
+import java.lang.annotation.Annotation;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -18,42 +19,35 @@ public class Server {
     private long transRole;
     private boolean allowTransGif;
 
-    private static PreparedStatement create;
-    private static PreparedStatement set;
-
-    static {
-        try {
-            create = Android24.getConnection().prepareStatement(
-                    "SELECT CommandsCh, WelcomeCh, LoggingCh,TransRole, AllowTransGif FROM guilds.guilds_data WHERE GuildID = ?;");
-            set = Android24.getConnection().prepareStatement(
-                        "UPDATE guilds.guilds_data SET CommandsCh = ?, WelcomeCh = ?, LoggingCh = ?,TransRole = ?, AllowTransGif = ? WHERE GuildID = ?;");
-
-        } catch (SQLException throwables) {
-            Android24.logError(throwables);
-            throwables.printStackTrace();
-        }
-    }
 
     public Server(long guildID) {
         try {
+            PreparedStatement create = Android24.getConnection().prepareStatement(
+                    "SELECT CommandsCh, WelcomeCh, LoggingCh,TransRole, AllowTransGif FROM guilds.guilds_data WHERE GuildID = ?;");
+
             create.setLong(1, guildID);
             ResultSet resultSet = create.executeQuery();
-            if (!resultSet.next())
+            if (!resultSet.next()) {
+                create.close();
                 throw new NameNotFoundException("The guild name has not found");
+            }
             this.guildID = guildID;
             commandsCh = resultSet.getLong(1);
             welcomeCh = resultSet.getLong(2);
             loggingCh = resultSet.getLong(3);
             transRole = resultSet.getLong(4);
             allowTransGif = resultSet.getBoolean(5);
+            create.close();
         } catch (SQLException | NameNotFoundException throwables) {
             Android24.logError(throwables);
             throwables.printStackTrace();
         }
     }
 
-    public void setServer(){
+    public void setServer() {
         try {
+            PreparedStatement set = Android24.getConnection().prepareStatement(
+                    "UPDATE guilds.guilds_data SET CommandsCh = ?, WelcomeCh = ?, LoggingCh = ?,TransRole = ?, AllowTransGif = ? WHERE GuildID = ?;");
             set.setLong(1, commandsCh);
             set.setLong(2, welcomeCh);
             set.setLong(3, loggingCh);
@@ -94,6 +88,7 @@ public class Server {
     public void setGuildID(long guildID) {
         this.guildID = guildID;
     }
+
     public void setCommandsCh(long commandsCh) {
         this.commandsCh = commandsCh;
     }
@@ -115,7 +110,7 @@ public class Server {
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         StringBuilder string = new StringBuilder();
         string.append("Command Channel: ").append(commandsCh);
         return string.toString();

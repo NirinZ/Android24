@@ -104,16 +104,30 @@ public abstract class Android24 {
         commandListAll.queue();
     }
 
+    /**
+     * Improvements:
+     * ניתן לשפר ביצועים אם אני אעשה אבדוק אם אני יכול לעשות get במקום retrieve.
+     * כל מה שאני צריך לעשות זה להחליף את כל הקוד בפונציות שמקבלות את ה- user/ member ולעשות:
+     *if(getUser()!= null){
+     *     function(user)
+     *} else{
+     *     retrieveUser.queue(user -> function(user))
+     *}
+     * */
+
     public static void main(String[] args) throws LoginException, InterruptedException, SQLException {
 
-//        System.out.println("12#45#789".substring(3, 5));
-//        System.exit(9);
+        Random r = new Random();
+
+        System.out.println(r.nextInt());
+        System.exit(9);
+
 
         // Set the data source for the SQL connection
         dataSource.setUrl("jdbc:mysql://159.89.111.155:3306/?user=Android24");
         dataSource.setUsername("Android24");
         dataSource.setPassword(System.getenv("MySQLPass"));
-        dataSource.setMinIdle(1);
+        dataSource.setMinIdle(3);
         dataSource.setMaxIdle(3);
         dataSource.setMaxTotal(50);
 
@@ -149,10 +163,8 @@ public abstract class Android24 {
         jda.addEventListener(eventWaiter);
         Level.Level();
         StartGame.StartGame();
-        Shop.Shop();
         Inventory.start();
         AddingCommands.AddingCommands();
-        Being.Start();
         Scams.Scams();
         //jda.addEventListener(new SlashTest());
 

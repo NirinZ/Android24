@@ -12,42 +12,35 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.concurrent.atomic.AtomicReference;
 
-public abstract class Level{
+public abstract class Level {
 
-    private static PreparedStatement levelStatement;
+    public static void Level() {
+        Android24.addCommands(new CommandData("level", "Returns your level")
+                .addOptions(new OptionData(OptionType.BOOLEAN, "display", "display your level")));
 
-    public static void Level(){
-        try {
-            levelStatement = Android24.getConnection().prepareStatement(
-                        "SELECT XP FROM `android24`.users_data where UserID = ?;");
-            Android24.addCommands(new CommandData("level", "Returns your level")
-                    .addOptions(new OptionData(OptionType.BOOLEAN, "display", "display your level")));
-        } catch (Exception throwables) {
-            Android24.logError(throwables);
-            throwables.printStackTrace();
-        }
     }
 
     //super.category = new Category("XP");
 
 
-    public static int calculateLevel(long xp){
+    public static int calculateLevel(long xp) {
         return (int) Math.floor(Math.pow(xp, Android24.difficulty));
     }
 
 
-    public static byte[] returnLevel(long guildID, long userID, String userURL){
+    public static byte[] returnLevel(long guildID, long userID, String userURL) {
         try {
+            PreparedStatement levelStatement = Android24.getConnection().prepareStatement(
+                    "SELECT XP FROM `android24`.users_data where UserID = ?;");
             levelStatement.setLong(1, userID);
             ResultSet resultSet = levelStatement.executeQuery();
 
-            if(resultSet.next()) {
+            if (resultSet.next()) {
                 String guildName = Android24.jda.getGuildById(guildID).getName();
                 long xp = resultSet.getLong(1);
-                resultSet.close();
+                levelStatement.close();
                 return Graphics.levelImage(userURL, guildName, xp);
-            }
-            else return null;
+            } else return null;
         } catch (Exception throwables) {
             Android24.logError(throwables);
             throwables.printStackTrace();
@@ -55,7 +48,7 @@ public abstract class Level{
         }
     }
 
-    public static MessageEmbed returnLevelEmbed(long guildID, long userID, String userURL){
+    public static MessageEmbed returnLevelEmbed(long guildID, long userID, String userURL) {
         AtomicReference<String> imageUrl = new AtomicReference<>();
         Android24.getImageUrl(Level.returnLevel(guildID, userID, userURL), imageUrl);
         return new EmbedBuilder().setImage(imageUrl.get()).build();

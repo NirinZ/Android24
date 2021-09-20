@@ -28,64 +28,56 @@ public class Being {
     protected Stat<Integer> kiAttack = new Stat<>(0);
     protected Stat<Integer> defence = new Stat<>(0);
     protected Stat<Integer> speed = new Stat<>(0);
-    protected String transformation;
+    protected String currentTrans;
     protected boolean inUse;
 
     protected List<Stat<Integer>> powerStats = List.of(health, ki, strikeAttack,
             kiAttack, defence, speed);
 
     private static final HashMap<Long, Being> beings = new HashMap<>();
-    protected static PreparedStatement getBeingStatement;
-    protected static PreparedStatement saveBeingStatement;
-    protected static PreparedStatement getAttacks;
-    protected static PreparedStatement getTransformations;
-    protected static PreparedStatement setTransformation;
+
+    protected static String saveBeingStatementSql = """
+            UPDATE `android24`.`users_data` SET `PowerPoints` = ?, `Health` = ?, `Ki` = ?, `StrikeAttack` = ?, `KiAttack` = ?,
+            `Defence` = ?, `Speed` = ? WHERE `UserID` = ?
+            """;
+
+    protected static String getAttacksSql = """
+            SELECT
+                AttackName
+            FROM
+                android24.users_attacks
+                    JOIN
+                android24.attacks USING (AttackAbbreviated)
+                Where UserID = ?;
+            """;
+    protected static String getTransformationsSql = """
+            SELECT
+                TransformationName
+            FROM
+                android24.users_transformations
+                    JOIN
+                android24.transformations USING (TransformationAbbreviated)
+                Where UserID = ?;
+            """;
 
     static {
         Utils.garbageCollector(beings);
+    }
+
+    protected Being(long userID) {
         try {
-            getBeingStatement = Android24.getConnection().prepareStatement("""
+            PreparedStatement getBeingStatement = Android24.getConnection().prepareStatement("""
                          SELECT `Race`, `XP`, `Zeni`,`PowerPoints`, `Health`, `Ki`, `StrikeAttack`, `KiAttack`,
                          `Defence`, `Speed`, CurrentTransformation
                          FROM `android24`.users_data where `UserID` = ?;
                     """);
-            saveBeingStatement = Android24.getConnection().prepareStatement(
-                    "UPDATE `android24`.`users_data` SET `PowerPoints` = ?, `Health` = ?, `Ki` = ?, `StrikeAttack` = ?, `KiAttack` = ?, `Defence` = ?, `Speed` =?" +
-                            " WHERE `UserID` = ?;");
-            getAttacks = Android24.getConnection().prepareStatement("""
-                    SELECT
-                        AttackName
-                    FROM
-                        android24.users_attacks
-                            JOIN
-                        android24.attacks USING (AttackAbbreviated)
-                        Where UserID = ?;
-                    """);
-            getTransformations = Android24.getConnection().prepareStatement("""
-                    SELECT
-                        TransformationName
-                    FROM
-                        android24.users_transformations
-                            JOIN
-                        android24.transformations USING (TransformationAbbreviated)
-                        Where UserID = ?;
-                    """);
-            setTransformation = Android24.getConnection().prepareStatement("UPDATE `android24`.`users_data` SET `CurrentTransformation` = ? WHERE (`UserID` = ?);");
-        } catch (Exception throwables) {
-            Android24.logError(throwables);
-            throwables.printStackTrace();
-        }
-    }
 
-    public static void Start(){}
-
-    protected Being(long userID) {
-        try {
             getBeingStatement.setLong(1, userID);
             ResultSet resultSet = getBeingStatement.executeQuery();
             this.userID = userID;
-            if (!resultSet.next())
+            if (!resultSet.next()) {
                 return;
+            }
             // resultSet.getMetaData().getColumnCount()
             this.race = resultSet.getString(1);
             this.level.set(Level.calculateLevel(resultSet.getInt(2)));
@@ -97,10 +89,10 @@ public class Being {
             this.kiAttack.set(resultSet.getInt(8));
             this.defence.set(resultSet.getInt(9));
             this.speed.set(resultSet.getInt(10));
-            this.transformation = resultSet.getString(11);
+            this.currentTrans = resultSet.getString(11);
 
             this.inUse = true;
-            resultSet.close();
+            getBeingStatement.close();
         } catch (SQLException throwables) {
             Android24.logError(throwables);
             throwables.printStackTrace();
@@ -121,6 +113,8 @@ public class Being {
 
     public void save() {
         try {
+            PreparedStatement saveBeingStatement = Android24.getConnection().prepareStatement(saveBeingStatementSql);
+
             saveBeingStatement.setInt(1, getPowerPoints());
             saveBeingStatement.setInt(2, getHealth());
             saveBeingStatement.setInt(3, getKi());
@@ -130,6 +124,7 @@ public class Being {
             saveBeingStatement.setInt(7, getSpeed());
             saveBeingStatement.setLong(8, userID);
             saveBeingStatement.executeUpdate();
+            saveBeingStatement.close();
         } catch (SQLException throwables) {
             Android24.logError(throwables);
             throwables.printStackTrace();
@@ -137,51 +132,58 @@ public class Being {
     }
 
     public DoublyCircularLinkedList<DisplayAttack> getDisplayAttacks() throws SQLException, NameNotFoundException {
+        PreparedStatement getAttacks = Android24.getConnection().prepareStatement(getAttacksSql);
         DoublyCircularLinkedList<DisplayAttack> attacks = new DoublyCircularLinkedList<>();
         getAttacks.setLong(1, userID);
         ResultSet resultSet = getAttacks.executeQuery();
         while (resultSet.next())
             attacks.add(new DisplayAttack(resultSet.getString(1)));
-        resultSet.close();
+        getAttacks.close();
         return attacks;
     }
 
     public DoublyCircularLinkedList<DisplayTransformation> getDisplayTransformations() throws SQLException, NameNotFoundException {
+        PreparedStatement getTransformations = Android24.getConnection().prepareStatement(getTransformationsSql);
         DoublyCircularLinkedList<DisplayTransformation> transformations = new DoublyCircularLinkedList<>();
         getTransformations.setLong(1, userID);
         ResultSet resultSet = getTransformations.executeQuery();
         while (resultSet.next())
             transformations.add(new DisplayTransformation(resultSet.getString(1)));
-        resultSet.close();
+        getTransformations.close();
         return transformations;
     }
 
     public static DoublyCircularLinkedList<DisplayAttack> getDisplayAttacks(long userID) throws SQLException, NameNotFoundException {
+        PreparedStatement getAttacks = Android24.getConnection().prepareStatement(getAttacksSql);
         DoublyCircularLinkedList<DisplayAttack> attacks = new DoublyCircularLinkedList<>();
         getAttacks.setLong(1, userID);
         ResultSet resultSet = getAttacks.executeQuery();
         while (resultSet.next())
             attacks.add(new DisplayAttack(resultSet.getString(1)));
-        resultSet.close();
+        getAttacks.close();
         return attacks;
     }
 
     public static DoublyCircularLinkedList<DisplayTransformation> getDisplayTransformations(long userID) throws SQLException, NameNotFoundException {
+        PreparedStatement getTransformations = Android24.getConnection().prepareStatement(getTransformationsSql);
         DoublyCircularLinkedList<DisplayTransformation> transformations = new DoublyCircularLinkedList<>();
         getTransformations.setLong(1, userID);
         ResultSet resultSet = getTransformations.executeQuery();
         while (resultSet.next())
             transformations.add(new DisplayTransformation(resultSet.getString(1)));
-        resultSet.close();
+        getTransformations.close();
         return transformations;
     }
 
-    public static void setTransformation(long userID, String name){
+    public static void setTransformation(long userID, String name) {
         try {
+            PreparedStatement setTransformation = Android24.getConnection().prepareStatement("UPDATE `android24`.`users_data` SET `CurrentTransformation` = ? WHERE (`UserID` = ?);");
+
             setTransformation.setString(1, name);
             setTransformation.setLong(2, userID);
             setTransformation.executeUpdate();
-            getBeing(userID).transformation = name;
+            getBeing(userID).currentTrans = name;
+            setTransformation.close();
         } catch (SQLException throwables) {
             Android24.logError(throwables);
             throwables.printStackTrace();
@@ -236,8 +238,8 @@ public class Being {
         return this.speed.get();
     }
 
-    public String getTransformation(){
-        return transformation;
+    public String getCurrentTrans() {
+        return currentTrans;
     }
 
     public boolean getInUse() {

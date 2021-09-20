@@ -15,11 +15,10 @@ public class DisplayTransformation extends Transformation{
     protected String description;
     protected String gif;
 
-    private static PreparedStatement getDisplayTransformation;
 
-    static {
-        try {
-            getDisplayTransformation = Android24.getConnection().prepareStatement("""
+
+    public DisplayTransformation(String name) throws SQLException, NameNotFoundException {
+        PreparedStatement getDisplayTransformation = Android24.getConnection().prepareStatement("""
                     SELECT
                         TransformationName, TransformationAbbreviated, AttackPowerUp,
                         DefencePowerUp, SpeedPowerUp, KiConsumption, SoloTransformation, Color,
@@ -32,13 +31,7 @@ public class DisplayTransformation extends Transformation{
                         TransformationName = ?
                             OR TransformationAbbreviated = ?;
                     """);
-        } catch (SQLException throwables) {
-            Android24.logError(throwables);
-            throwables.printStackTrace();
-        }
-    }
 
-    public DisplayTransformation(String name) throws SQLException, NameNotFoundException {
         getDisplayTransformation.setString(1, name);
         getDisplayTransformation.setString(2, name);
         ResultSet resultSet = getDisplayTransformation.executeQuery();
@@ -52,6 +45,7 @@ public class DisplayTransformation extends Transformation{
         minimalLevel = resultSet.getInt(11);
         description = resultSet.getString(12);
         gif = resultSet.getString(13);
+        getDisplayTransformation.close();
     }
 
     public EmbedBuilder getEmbed() {

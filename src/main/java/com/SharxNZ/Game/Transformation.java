@@ -13,35 +13,11 @@ public class Transformation extends Ability {
     protected boolean soloTransformation;
     protected Color color;
 
-    private static PreparedStatement getTransformation;
-    private static PreparedStatement checkTransformation;
-
-    static {
-        try {
-            getTransformation = Android24.getConnection().prepareStatement(
-                    "SELECT * FROM android24.transformations where TransformationName = ? or TransformationAbbreviated = ?;");
-            checkTransformation = Android24.getConnection().prepareStatement("""
-                    SELECT
-                        IF(? IN (SELECT
-                                    UserID
-                                FROM
-                                    android24.users_transformations
-                                        JOIN
-                                    android24.transformations USING (TransformationAbbreviated)
-                                WHERE
-                                    (TransformationName = ?
-                                        OR TransformationAbbreviated = ?)
-                                        AND UserID = ?),
-                            TRUE,
-                            FALSE) AS 'Result'
-                    """);
-        } catch (SQLException throwables) {
-            Android24.logError(throwables);
-            throwables.printStackTrace();
-        }
-    }
 
     public Transformation(String name) throws SQLException, NameNotFoundException {
+        PreparedStatement getTransformation = Android24.getConnection().prepareStatement(
+                "SELECT * FROM android24.transformations where TransformationName = ? or TransformationAbbreviated = ?;");
+
         getTransformation.setString(1, name);
         getTransformation.setString(2, name);
         ResultSet resultSet = getTransformation.executeQuery();
@@ -55,6 +31,7 @@ public class Transformation extends Ability {
         kiConsumption = resultSet.getInt(6);
         soloTransformation = resultSet.getBoolean(7);
         color = new Color(resultSet.getInt(8));
+        getTransformation.close();
     }
 
     // Because I have to call the super constructor on the first line...
@@ -69,11 +46,26 @@ public class Transformation extends Ability {
         this.speedPowerUp = speedPowerUp;
         this.kiConsumption = kiConsumption;
         this.soloTransformation = soloTransformation;
-        this.color = new Color(color );
+        this.color = new Color(color);
     }
 
     public static boolean checkTransformation(long userID, String transName) {
         try {
+            PreparedStatement checkTransformation = Android24.getConnection().prepareStatement("""
+                    SELECT
+                        IF(? IN (SELECT
+                                    UserID
+                                FROM
+                                    android24.users_transformations
+                                        JOIN
+                                    android24.transformations USING (TransformationAbbreviated)
+                                WHERE
+                                    (TransformationName = ?
+                                        OR TransformationAbbreviated = ?)
+                                        AND UserID = ?),
+                            TRUE,
+                            FALSE) AS 'Result'
+                    """);
             checkTransformation.setLong(1, userID);
             checkTransformation.setString(2, transName);
             checkTransformation.setString(3, transName);
@@ -81,10 +73,10 @@ public class Transformation extends Ability {
             ResultSet resultSet = checkTransformation.executeQuery();
             while (resultSet.next())
                 if (resultSet.getBoolean(1)) {
-                    resultSet.close();
+                    checkTransformation.close();
                     return true;
                 }
-            resultSet.close();
+            checkTransformation.close();
         } catch (SQLException throwables) {
             Android24.logError(throwables);
             throwables.printStackTrace();
