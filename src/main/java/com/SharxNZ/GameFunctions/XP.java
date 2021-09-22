@@ -9,11 +9,9 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 import javax.annotation.Nonnull;
 import javax.naming.NameNotFoundException;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.*;
+import java.util.Date;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class XP extends ListenerAdapter {
@@ -83,65 +81,71 @@ public class XP extends ListenerAdapter {
         timer.scheduleAtFixedRate(timerTask, 0, 120000); // Do the check every 120 seconds //120000
     }
 
-    private void updateDatabase() throws SQLException {
-        PreparedStatement getXP = Android24.getConnection().prepareStatement(
-                "SELECT XP FROM `android24`.users_data where UserID = ?;");
-        PreparedStatement updateData = Android24.getConnection().prepareStatement(
-                "UPDATE `android24`.`users_data` SET `XP` = ?, `Zeni` = `Zeni` + ?," +
-                        " `PowerPoints` = `PowerPoints` + ? WHERE `UserID` = ?;");
-        PreparedStatement insertUser = Android24.getConnection().prepareStatement(
-                "INSERT INTO `android24`.`users_data` (`UserID`, `UserName`, `XP`, `Zeni`, `PowerPoints`)" +
-                        " VALUES (?, ?, ?, ?, ?);");
-
-        final Statement sqlStatement = Android24.getConnection().createStatement();
+    private void updateDatabase() {
         Timer timer = new Timer();
         TimerTask timerTask = new TimerTask() {
             @Override
             public void run() {
-                //ConcurrentHashMap<Long, long[]> xpMap;
-                long previousXP, totalXP, zeni;
-                int lvlShouldBe, currentLvl, powerPoints;
-                // key = userID
-                for (Map.Entry<Long, long[]> entry : xpMap.entrySet()) {
-                    try {
-                        getXP.setLong(1, entry.getKey());
-                        ResultSet resultSet = getXP.executeQuery();
-                        if (resultSet.next()) {
-                            previousXP = resultSet.getLong(1);
-                            totalXP = entry.getValue()[0] + previousXP;
-                            zeni = entry.getValue()[0];
-                            currentLvl = Level.calculateLevel(previousXP);
-                            lvlShouldBe = Level.calculateLevel(totalXP);
-                            powerPoints = 4 * (lvlShouldBe - currentLvl);
+                try (
+                        Connection con = Android24.getConnection();
+                        PreparedStatement getXP = con.prepareStatement(
+                                "SELECT XP FROM `android24`.users_data where UserID = ?;");
+                        PreparedStatement updateData = con.prepareStatement(
+                                "UPDATE `android24`.`users_data` SET `XP` = ?, `Zeni` = `Zeni` + ?," +
+                                        " `PowerPoints` = `PowerPoints` + ? WHERE `UserID` = ?;");
+                        PreparedStatement insertUser = con.prepareStatement(
+                                "INSERT INTO `android24`.`users_data` (`UserID`, `UserName`, `XP`, `Zeni`, `PowerPoints`)" +
+                                        " VALUES (?, ?, ?, ?, ?);");
+                ) {
+                    //ConcurrentHashMap<Long, long[]> xpMap;
+                    long previousXP, totalXP, zeni;
+                    int lvlShouldBe, currentLvl, powerPoints;
+                    // key = userID
+                    for (Map.Entry<Long, long[]> entry : xpMap.entrySet()) {
+                        try {
+                            getXP.setLong(1, entry.getKey());
+                            ResultSet resultSet = getXP.executeQuery();
+                            if (resultSet.next()) {
+                                previousXP = resultSet.getLong(1);
+                                totalXP = entry.getValue()[0] + previousXP;
+                                zeni = entry.getValue()[0];
+                                currentLvl = Level.calculateLevel(previousXP);
+                                lvlShouldBe = Level.calculateLevel(totalXP);
+                                powerPoints = 4 * (lvlShouldBe - currentLvl);
 
-                            Android24.jda.retrieveUserById(entry.getKey()).queue(user -> Android24.jda.getTextChannelById(Android24.debugChannelID).sendMessage(user.getAsTag() + " gets " + entry.getValue()[0] + " XP").queue());
+                                Android24.jda.retrieveUserById(entry.getKey()).queue(user -> Android24.jda.getTextChannelById(Android24.debugChannelID).sendMessage(user.getAsTag() + " gets " + entry.getValue()[0] + " XP").queue());
 
-                            updateData.setLong(1, totalXP);
-                            updateData.setLong(2, zeni);
-                            updateData.setInt(3, powerPoints);
-                            updateData.setLong(4, entry.getKey());
-                            updateData.executeUpdate();
+                                updateData.setLong(1, totalXP);
+                                updateData.setLong(2, zeni);
+                                updateData.setInt(3, powerPoints);
+                                updateData.setLong(4, entry.getKey());
+                                updateData.executeUpdate();
 
-                        } else {
-                            totalXP = zeni = entry.getValue()[0];
-                            powerPoints = 4 * (Level.calculateLevel(totalXP));
-                            insertUser.setLong(1, entry.getKey());
-                            insertUser.setString(2, Android24.jda.retrieveUserById(entry.getKey()).complete().getAsTag());
-                            insertUser.setLong(3, totalXP);
-                            insertUser.setLong(4, zeni);
-                            insertUser.setInt(5, powerPoints);
-                            insertUser.executeUpdate();
+                            } else {
+                                totalXP = zeni = entry.getValue()[0];
+                                powerPoints = 4 * (Level.calculateLevel(totalXP));
+                                insertUser.setLong(1, entry.getKey());
+                                insertUser.setString(2, Android24.jda.retrieveUserById(entry.getKey()).complete().getAsTag());
+                                insertUser.setLong(3, totalXP);
+                                insertUser.setLong(4, zeni);
+                                insertUser.setInt(5, powerPoints);
+                                insertUser.executeUpdate();
+                            }
+                            resultSet.close();
+                        } catch (Exception throwables) {
+                            Android24.logError(throwables);
+                            throwables.printStackTrace();
                         }
-                        resultSet.close();
-                    } catch (Exception throwables) {
-                        Android24.logError(throwables);
-                        throwables.printStackTrace();
                     }
+                    xpMap.clear();
+                } catch (SQLException throwables) {
+                    Android24.logError(throwables);
+                    throwables.printStackTrace();
                 }
-                xpMap.clear();
             }
         };
         timer.scheduleAtFixedRate(timerTask, 60000, 60000); // Do the check every 60 seconds //60000
+
     }
 }
 

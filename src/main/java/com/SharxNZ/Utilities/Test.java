@@ -1,9 +1,7 @@
 package com.SharxNZ.Utilities;
 
-import com.SharxNZ.Commands.GameCommands.Stats;
-
-public class Test extends Stats {
-    public Test(long userID){
-        super(userID);
+public class Test{
+    public Test(){
+        System.out.println("im the coolest cool in the world");
     }
 }

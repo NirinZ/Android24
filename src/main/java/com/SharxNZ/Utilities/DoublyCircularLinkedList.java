@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 
 class DoublyNode<T> {
 
-    private T data ;
+    private T data;
 
     private DoublyNode<T> next;
 
@@ -90,6 +90,7 @@ class DoublyNode<T> {
             return false;
         return true;
     }
+
     @Override
 
     public String toString() {
@@ -98,11 +99,12 @@ class DoublyNode<T> {
 
 }
 
-public class DoublyCircularLinkedList<T> implements Iterator<T>,Iterable<T> {
+public class DoublyCircularLinkedList<T> implements Iterator<T>, Iterable<T> {
     private DoublyNode<T> currentNode;
     private int size = 0;
     private DoublyNode<T> firstNode;
     private int num = 1;
+
     /**
      * Add element
      *
@@ -144,9 +146,9 @@ public class DoublyCircularLinkedList<T> implements Iterator<T>,Iterable<T> {
             return false;
         }
         // Delete first element
-        if(this.firstNode.getData().equals(data)) {
+        if (this.firstNode.getData().equals(data)) {
             DoublyNode<T> lastNode = getLastNode(this.firstNode);
-            this.firstNode =this.firstNode.getNext();
+            this.firstNode = this.firstNode.getNext();
             this.firstNode.setPrevious(lastNode);
             lastNode.setNext(this.firstNode);
             resetIteratorPointer();
@@ -154,18 +156,17 @@ public class DoublyCircularLinkedList<T> implements Iterator<T>,Iterable<T> {
             return true;
         }
         DoublyNode<T> pointerNode = this.firstNode;
-        DoublyNode<T> previousNode=null;
-        while (pointerNode.getData()!=null) {
-            if(pointerNode.getData().equals(data)) {
-                DoublyNode<T> nextNode=pointerNode.getNext();
+        DoublyNode<T> previousNode = null;
+        while (pointerNode.getData() != null) {
+            if (pointerNode.getData().equals(data)) {
+                DoublyNode<T> nextNode = pointerNode.getNext();
                 nextNode.setPrevious(previousNode);
                 previousNode.setNext(nextNode);
                 size--;
                 return true;
-            }
-            else {
-                previousNode=pointerNode;
-                pointerNode=pointerNode.getNext();
+            } else {
+                previousNode = pointerNode;
+                pointerNode = pointerNode.getNext();
 
             }
         }
@@ -183,8 +184,8 @@ public class DoublyCircularLinkedList<T> implements Iterator<T>,Iterable<T> {
         }
     }
 
-    private void fixList(DoublyNode<T> node){
-        if(node.getNext() == null)
+    private void fixList(DoublyNode<T> node) {
+        if (node.getNext() == null)
             node.setNext(firstNode);
         else
             fixList(node.getNext());
@@ -197,24 +198,25 @@ public class DoublyCircularLinkedList<T> implements Iterator<T>,Iterable<T> {
             return null;
         }
     }
+
     /**
-     *  counter should be greater than or equal to 1 and less than and equal to size.
+     * counter should be greater than or equal to 1 and less than and equal to size.
+     *
      * @param position
      * @return
      */
-    private DoublyNode<T> getNode(int position){
-        if(position <1 ) {
+    private DoublyNode<T> getNode(int position) {
+        if (position < 1) {
             return null;
         }
-        int counter=1;
-        DoublyNode<T> pointerNode=this.firstNode;
-        while(counter <=position) {
-            if(counter == position) {
+        int counter = 1;
+        DoublyNode<T> pointerNode = this.firstNode;
+        while (counter <= position) {
+            if (counter == position) {
                 return pointerNode;
-            }
-            else {
+            } else {
                 counter++;
-                pointerNode=pointerNode.getNext();
+                pointerNode = pointerNode.getNext();
             }
         }
         return null;
@@ -226,7 +228,7 @@ public class DoublyCircularLinkedList<T> implements Iterator<T>,Iterable<T> {
 
     @Override
     public String toString() {
-        if(this.firstNode ==null) {
+        if (this.firstNode == null) {
             return "[]";
         }
         String represent = "[" + this.firstNode.toString() + ",";
@@ -272,56 +274,57 @@ public class DoublyCircularLinkedList<T> implements Iterator<T>,Iterable<T> {
 
     @Override
     public boolean hasNext() {
-        if(currentNode == null){
-            fixList(firstNode);
+        if (currentNode == null) {
+            if (firstNode != null)
+                fixList(firstNode);
             return false;
-        }
-        else
+        } else
             return true;
     }
 
-    public T get(){
+    public T get() {
         return currentNode.getData();
     }
 
     @Override
-    public T next(){
+    public T next() {
         T data = currentNode.getData();
-        num = num == size ? 1 : num+1;
+        num = num == size ? 1 : num + 1;
         currentNode = currentNode.getNext();
         return data;
     }
 
     public T nextGet() {
         currentNode = currentNode.getNext();
-        num = num == size ? 1 : num+1;
+        num = num == size ? 1 : num + 1;
         return currentNode.getData();
     }
 
-    public T previousGet(){
+    public T previousGet() {
         currentNode = currentNode.getPrevious();
-        num = num == 1 ? size : num-1;
+        num = num == 1 ? size : num - 1;
         return currentNode.getData();
     }
 
-    public boolean isLast(){
+    public boolean isLast() {
         return this.num() == this.size();
     }
 
     @Override
     public Iterator<T> iterator() {
-        getLastNode(firstNode).setNext(null);
+        if (firstNode != null)
+            getLastNode(firstNode).setNext(null);
         return this;
     }
 
-    public MessageEmbed getCurrentEmbed(User user){
-            if (currentNode.getData() instanceof Ability)
-                return ((Ability) currentNode.getData()).getEmbed().setFooter(user.getName() + "    num: " + this.num() + "/" + this.size(), user.getAvatarUrl()).build();
-            else
-                throw new UnsupportedClassVersionError("The supported classes are classes that extends Ability");
+    public MessageEmbed getCurrentEmbed(User user) {
+        if (currentNode.getData() instanceof Ability)
+            return ((Ability) currentNode.getData()).getEmbed().setFooter(user.getName() + "    num: " + this.num() + "/" + this.size(), user.getAvatarUrl()).build();
+        else
+            throw new UnsupportedClassVersionError("The supported classes are classes that extends Ability");
     }
 
-    public MessageEmbed startScrollingEvent(User user, String id){
+    public MessageEmbed startScrollingEvent(User user, String id) {
         scrollingEvent(user, id);
         return getCurrentEmbed(user);
     }
@@ -329,9 +332,9 @@ public class DoublyCircularLinkedList<T> implements Iterator<T>,Iterable<T> {
     private void scrollingEvent(User user, String id) {
         Android24.eventWaiter.waitForEvent(ButtonClickEvent.class, bce -> bce.getComponentId().startsWith("sce#")
                 && bce.getComponentId().endsWith(id) && bce.getUser().equals(user), bce -> {
-            if(bce.getComponentId().split("#")[1].equals("buy"))
+            if (bce.getComponentId().split("#")[1].equals("buy")) {
                 bce.replyEmbeds(Shop.tryToBuy(((Ability) currentNode.getData()).getName(), user.getIdLong())).setEphemeral(true).queue();
-            else {
+            } else {
                 switch (bce.getComponentId().split("#")[1]) {
                     case "right" -> nextGet();
                     case "left" -> previousGet();
@@ -339,14 +342,15 @@ public class DoublyCircularLinkedList<T> implements Iterator<T>,Iterable<T> {
                 bce.editMessageEmbeds(getCurrentEmbed(user)).queue();
             }
             scrollingEvent(user, id);
-        }, 2, TimeUnit.MINUTES, ()->{});
+        }, 2, TimeUnit.MINUTES, () -> {
+        });
     }
 
     public void resetIteratorPointer() {
-        currentNode =this.firstNode;
+        currentNode = this.firstNode;
     }
 
-    public int num(){
+    public int num() {
         return num;
     }
 }

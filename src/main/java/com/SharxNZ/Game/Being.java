@@ -8,10 +8,7 @@ import com.SharxNZ.Utilities.Stat;
 import com.SharxNZ.Utilities.Utils;
 
 import javax.naming.NameNotFoundException;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.HashMap;
 import java.util.List;
 
@@ -65,12 +62,13 @@ public class Being {
     }
 
     protected Being(long userID) {
-        try {
-            PreparedStatement getBeingStatement = Android24.getConnection().prepareStatement("""
-                         SELECT `Race`, `XP`, `Zeni`,`PowerPoints`, `Health`, `Ki`, `StrikeAttack`, `KiAttack`,
-                         `Defence`, `Speed`, CurrentTransformation
-                         FROM `android24`.users_data where `UserID` = ?;
-                    """);
+        try
+                (Connection con = Android24.getConnection();
+                 PreparedStatement getBeingStatement = con.prepareStatement("""
+                              SELECT `Race`, `XP`, `Zeni`,`PowerPoints`, `Health`, `Ki`, `StrikeAttack`, `KiAttack`,
+                              `Defence`, `Speed`, CurrentTransformation
+                              FROM `android24`.users_data where `UserID` = ?;
+                         """)) {
 
             getBeingStatement.setLong(1, userID);
             ResultSet resultSet = getBeingStatement.executeQuery();
@@ -92,7 +90,6 @@ public class Being {
             this.currentTrans = resultSet.getString(11);
 
             this.inUse = true;
-            getBeingStatement.close();
         } catch (SQLException throwables) {
             Android24.logError(throwables);
             throwables.printStackTrace();
@@ -112,8 +109,10 @@ public class Being {
     }
 
     public void save() {
-        try {
-            PreparedStatement saveBeingStatement = Android24.getConnection().prepareStatement(saveBeingStatementSql);
+        try (
+                Connection con = Android24.getConnection();
+                PreparedStatement saveBeingStatement = con.prepareStatement(saveBeingStatementSql)
+        ) {
 
             saveBeingStatement.setInt(1, getPowerPoints());
             saveBeingStatement.setInt(2, getHealth());
@@ -124,7 +123,7 @@ public class Being {
             saveBeingStatement.setInt(7, getSpeed());
             saveBeingStatement.setLong(8, userID);
             saveBeingStatement.executeUpdate();
-            saveBeingStatement.close();
+
         } catch (SQLException throwables) {
             Android24.logError(throwables);
             throwables.printStackTrace();
@@ -132,58 +131,75 @@ public class Being {
     }
 
     public DoublyCircularLinkedList<DisplayAttack> getDisplayAttacks() throws SQLException, NameNotFoundException {
-        PreparedStatement getAttacks = Android24.getConnection().prepareStatement(getAttacksSql);
-        DoublyCircularLinkedList<DisplayAttack> attacks = new DoublyCircularLinkedList<>();
-        getAttacks.setLong(1, userID);
-        ResultSet resultSet = getAttacks.executeQuery();
-        while (resultSet.next())
-            attacks.add(new DisplayAttack(resultSet.getString(1)));
-        getAttacks.close();
-        return attacks;
+        try (
+                Connection con = Android24.getConnection();
+                PreparedStatement getAttacks = con.prepareStatement(getAttacksSql)
+        ) {
+            DoublyCircularLinkedList<DisplayAttack> attacks = new DoublyCircularLinkedList<>();
+            getAttacks.setLong(1, userID);
+            ResultSet resultSet = getAttacks.executeQuery();
+            while (resultSet.next())
+                attacks.add(new DisplayAttack(resultSet.getString(1)));
+            getAttacks.close();
+            return attacks;
+        }
     }
 
     public DoublyCircularLinkedList<DisplayTransformation> getDisplayTransformations() throws SQLException, NameNotFoundException {
-        PreparedStatement getTransformations = Android24.getConnection().prepareStatement(getTransformationsSql);
-        DoublyCircularLinkedList<DisplayTransformation> transformations = new DoublyCircularLinkedList<>();
-        getTransformations.setLong(1, userID);
-        ResultSet resultSet = getTransformations.executeQuery();
-        while (resultSet.next())
-            transformations.add(new DisplayTransformation(resultSet.getString(1)));
-        getTransformations.close();
-        return transformations;
+        try (
+                Connection con = Android24.getConnection();
+                PreparedStatement getTransformations = con.prepareStatement(getTransformationsSql)
+        ) {
+            DoublyCircularLinkedList<DisplayTransformation> transformations = new DoublyCircularLinkedList<>();
+            getTransformations.setLong(1, userID);
+            ResultSet resultSet = getTransformations.executeQuery();
+            while (resultSet.next())
+                transformations.add(new DisplayTransformation(resultSet.getString(1)));
+            getTransformations.close();
+            return transformations;
+        }
     }
 
     public static DoublyCircularLinkedList<DisplayAttack> getDisplayAttacks(long userID) throws SQLException, NameNotFoundException {
-        PreparedStatement getAttacks = Android24.getConnection().prepareStatement(getAttacksSql);
-        DoublyCircularLinkedList<DisplayAttack> attacks = new DoublyCircularLinkedList<>();
-        getAttacks.setLong(1, userID);
-        ResultSet resultSet = getAttacks.executeQuery();
-        while (resultSet.next())
-            attacks.add(new DisplayAttack(resultSet.getString(1)));
-        getAttacks.close();
-        return attacks;
+        try (
+                Connection con = Android24.getConnection();
+                PreparedStatement getAttacks = con.prepareStatement(getAttacksSql)
+        ) {
+            DoublyCircularLinkedList<DisplayAttack> attacks = new DoublyCircularLinkedList<>();
+            getAttacks.setLong(1, userID);
+            ResultSet resultSet = getAttacks.executeQuery();
+            while (resultSet.next())
+                attacks.add(new DisplayAttack(resultSet.getString(1)));
+            getAttacks.close();
+            return attacks;
+        }
     }
 
     public static DoublyCircularLinkedList<DisplayTransformation> getDisplayTransformations(long userID) throws SQLException, NameNotFoundException {
-        PreparedStatement getTransformations = Android24.getConnection().prepareStatement(getTransformationsSql);
-        DoublyCircularLinkedList<DisplayTransformation> transformations = new DoublyCircularLinkedList<>();
-        getTransformations.setLong(1, userID);
-        ResultSet resultSet = getTransformations.executeQuery();
-        while (resultSet.next())
-            transformations.add(new DisplayTransformation(resultSet.getString(1)));
-        getTransformations.close();
-        return transformations;
+        try (
+                Connection con = Android24.getConnection();
+                PreparedStatement getTransformations = con.prepareStatement(getTransformationsSql)
+        ) {
+            DoublyCircularLinkedList<DisplayTransformation> transformations = new DoublyCircularLinkedList<>();
+            getTransformations.setLong(1, userID);
+            ResultSet resultSet = getTransformations.executeQuery();
+            while (resultSet.next())
+                transformations.add(new DisplayTransformation(resultSet.getString(1)));
+            getTransformations.close();
+            return transformations;
+        }
     }
 
     public static void setTransformation(long userID, String name) {
-        try {
-            PreparedStatement setTransformation = Android24.getConnection().prepareStatement("UPDATE `android24`.`users_data` SET `CurrentTransformation` = ? WHERE (`UserID` = ?);");
+        try (
+                Connection con = Android24.getConnection();
+                PreparedStatement setTransformation = con.prepareStatement("UPDATE `android24`.`users_data` SET `CurrentTransformation` = ? WHERE (`UserID` = ?);")
+        ) {
 
             setTransformation.setString(1, name);
             setTransformation.setLong(2, userID);
             setTransformation.executeUpdate();
             getBeing(userID).currentTrans = name;
-            setTransformation.close();
         } catch (SQLException throwables) {
             Android24.logError(throwables);
             throwables.printStackTrace();
@@ -248,14 +264,6 @@ public class Being {
 
     public void setInUse(boolean inUse) {
         this.inUse = inUse;
-    }
-
-
-    static void setBeing(String guidID, String userID, String type) throws SQLException {
-        Statement sqlStatement = Android24.getConnection().createStatement();
-        String query = "INSERT INTO `" + guidID + "`.`users_power` (`UserID`, `Type`) VALUES ('" + userID + "', '" + type + "');";
-        sqlStatement.execute(query);
-        sqlStatement.close();
     }
 
 }

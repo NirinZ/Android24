@@ -15,6 +15,7 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
 import javax.naming.NameNotFoundException;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -46,9 +47,11 @@ public class GetStats extends Command {
                         ASaiyan.getSpeed(commandEvent.getGuild().getId(), commandEvent.getAuthor().getId())
                 };*/
         long[] stats = new long[6];
-        try {
-            PreparedStatement raceStats = Android24.getConnection().prepareStatement(
-                    "SELECT * FROM android24.races WHERE RaceName = ?;");
+        try (
+                Connection con = Android24.getConnection();
+                PreparedStatement raceStats = con.prepareStatement(
+                        "SELECT * FROM android24.races WHERE RaceName = ?;")
+        ) {
 
             raceStats.setString(1, being.getRace());
             ResultSet resultSet = raceStats.executeQuery();
@@ -101,7 +104,7 @@ public class GetStats extends Command {
             generalEmbed.setFooter("The stats of " + user.getAsTag(), user.getAvatarUrl());
 
             return generalEmbed.build();
-        } catch (SQLException | NameNotFoundException throwables) {
+        } catch (NameNotFoundException throwables) {
             Android24.logError(throwables);
             throwables.printStackTrace();
             return Embeds.errorEmbed();

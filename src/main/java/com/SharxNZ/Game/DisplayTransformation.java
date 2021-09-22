@@ -4,6 +4,7 @@ import com.SharxNZ.Android24;
 import net.dv8tion.jda.api.EmbedBuilder;
 
 import javax.naming.NameNotFoundException;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -18,34 +19,37 @@ public class DisplayTransformation extends Transformation{
 
 
     public DisplayTransformation(String name) throws SQLException, NameNotFoundException {
-        PreparedStatement getDisplayTransformation = Android24.getConnection().prepareStatement("""
-                    SELECT
-                        TransformationName, TransformationAbbreviated, AttackPowerUp,
-                        DefencePowerUp, SpeedPowerUp, KiConsumption, SoloTransformation, Color,
-                        ForcedRace, Cost, MinimalLevel, Description, Gif
-                    FROM
-                        android24.transformations
-                            JOIN
-                        android24.shop ON TransformationName = Name
-                    WHERE
-                        TransformationName = ?
-                            OR TransformationAbbreviated = ?;
-                    """);
+        try (
+                Connection con = Android24.getConnection();
+                PreparedStatement getDisplayTransformation = con.prepareStatement("""
+                        SELECT
+                            TransformationName, TransformationAbbreviated, AttackPowerUp,
+                            DefencePowerUp, SpeedPowerUp, KiConsumption, SoloTransformation, Color,
+                            ForcedRace, Cost, MinimalLevel, Description, Gif
+                        FROM
+                            android24.transformations
+                                JOIN
+                            android24.shop ON TransformationName = Name
+                        WHERE
+                            TransformationName = ?
+                                OR TransformationAbbreviated = ?;
+                        """)
+        ) {
 
-        getDisplayTransformation.setString(1, name);
-        getDisplayTransformation.setString(2, name);
-        ResultSet resultSet = getDisplayTransformation.executeQuery();
-        if (!resultSet.next())
-            throw new NameNotFoundException("The name of the Transformation does not exists");
-        setTransformation(resultSet.getString(1), resultSet.getString(2), resultSet.getInt(3),
-                resultSet.getInt(4), resultSet.getInt(5), resultSet.getInt(6),
-                resultSet.getBoolean(7), resultSet.getInt(8));
-        forcedRace = resultSet.getString(9);
-        cost = resultSet.getInt(10);
-        minimalLevel = resultSet.getInt(11);
-        description = resultSet.getString(12);
-        gif = resultSet.getString(13);
-        getDisplayTransformation.close();
+            getDisplayTransformation.setString(1, name);
+            getDisplayTransformation.setString(2, name);
+            ResultSet resultSet = getDisplayTransformation.executeQuery();
+            if (!resultSet.next())
+                throw new NameNotFoundException("The name of the Transformation does not exists");
+            setTransformation(resultSet.getString(1), resultSet.getString(2), resultSet.getInt(3),
+                    resultSet.getInt(4), resultSet.getInt(5), resultSet.getInt(6),
+                    resultSet.getBoolean(7), resultSet.getInt(8));
+            forcedRace = resultSet.getString(9);
+            cost = resultSet.getInt(10);
+            minimalLevel = resultSet.getInt(11);
+            description = resultSet.getString(12);
+            gif = resultSet.getString(13);
+        }
     }
 
     public EmbedBuilder getEmbed() {

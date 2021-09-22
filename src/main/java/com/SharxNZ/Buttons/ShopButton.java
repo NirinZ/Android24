@@ -8,9 +8,10 @@ public class ShopButton extends ListenerAdapter {
 
     @Override
     public void onButtonClick(ButtonClickEvent buttonClickEvent) {
-        if(buttonClickEvent.getComponentId().startsWith("shop#"))
-            buttonClickEvent.replyEmbeds(Shop.tryToBuy(buttonClickEvent.getComponentId()
-                    .substring(5), buttonClickEvent.getUser().getIdLong()))
-                    .setEphemeral(true).queue();
+        if(buttonClickEvent.getComponentId().startsWith("shop#")) {
+            buttonClickEvent.deferReply(true).queue();
+            buttonClickEvent.getHook().sendMessageEmbeds(Shop.tryToBuy(buttonClickEvent.getComponentId()
+                    .substring(5), buttonClickEvent.getUser().getIdLong())).queue();
+        }
     }
 }

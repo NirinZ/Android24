@@ -4,6 +4,7 @@ import com.SharxNZ.Android24;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -11,7 +12,7 @@ import java.sql.SQLException;
 public class RefreshNames extends Command {
 
 
-    public RefreshNames() throws SQLException {
+    public RefreshNames() {
         super.name = "Refresh name";
         super.aliases = new String[]{"rn", "RN"};
         super.arguments = "[n\\s]";
@@ -20,11 +21,13 @@ public class RefreshNames extends Command {
 
     @Override
     protected void execute(CommandEvent commandEvent) {
-        try {
-            PreparedStatement getNames = Android24.getConnection().prepareStatement("SELECT UserID FROM `android24`.users_data limit ?, 10;");
-            PreparedStatement setNames = Android24.getConnection().prepareStatement("UPDATE `android24`.`users_data` SET `UserName` = ? WHERE `UserID` = ?;");
-            PreparedStatement getSNames = Android24.getConnection().prepareStatement("SELECT GuildID FROM guilds.guilds_data limit ?, 10;");
-            PreparedStatement setSNames = Android24.getConnection().prepareStatement("UPDATE guilds.`guilds_data` SET `GuildName` = ? WHERE `GuildID` = ?;");
+        try (
+                Connection con = Android24.getConnection();
+                PreparedStatement getNames = con.prepareStatement("SELECT UserID FROM `android24`.users_data limit ?, 10;");
+                PreparedStatement setNames = con.prepareStatement("UPDATE `android24`.`users_data` SET `UserName` = ? WHERE `UserID` = ?;");
+                PreparedStatement getSNames = con.prepareStatement("SELECT GuildID FROM guilds.guilds_data limit ?, 10;");
+                PreparedStatement setSNames = con.prepareStatement("UPDATE guilds.`guilds_data` SET `GuildName` = ? WHERE `GuildID` = ?;")
+        ){
 
             if (commandEvent.getArgs().isEmpty() || commandEvent.getArgs().equalsIgnoreCase("n")) {
                 int limit = 0;
@@ -89,7 +92,7 @@ public class RefreshNames extends Command {
                 getSNames.close();
                 setSNames.close();
             }
-        } catch (SQLException throwables) {
+        } catch (SQLException | NullPointerException throwables) {
             System.out.println("Outer try");
             Android24.logError(throwables);
             throwables.printStackTrace();

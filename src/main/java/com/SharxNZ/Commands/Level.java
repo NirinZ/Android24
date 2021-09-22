@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.concurrent.atomic.AtomicReference;
@@ -29,9 +30,12 @@ public abstract class Level {
 
 
     public static byte[] returnLevel(long guildID, long userID, String userURL) {
-        try {
-            PreparedStatement levelStatement = Android24.getConnection().prepareStatement(
-                    "SELECT XP FROM `android24`.users_data where UserID = ?;");
+        try (
+                Connection con = Android24.getConnection();
+                PreparedStatement levelStatement = con.prepareStatement(
+                        "SELECT XP FROM `android24`.users_data where UserID = ?;")
+        ) {
+
             levelStatement.setLong(1, userID);
             ResultSet resultSet = levelStatement.executeQuery();
 

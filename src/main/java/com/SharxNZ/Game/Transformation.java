@@ -4,6 +4,7 @@ import com.SharxNZ.Android24;
 
 import javax.naming.NameNotFoundException;
 import java.awt.*;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -14,24 +15,34 @@ public class Transformation extends Ability {
     protected Color color;
 
 
-    public Transformation(String name) throws SQLException, NameNotFoundException {
-        PreparedStatement getTransformation = Android24.getConnection().prepareStatement(
-                "SELECT * FROM android24.transformations where TransformationName = ? or TransformationAbbreviated = ?;");
+    public Transformation(String name) throws NameNotFoundException {
+        if (name == null)
+            return;
 
-        getTransformation.setString(1, name);
-        getTransformation.setString(2, name);
-        ResultSet resultSet = getTransformation.executeQuery();
-        if (!resultSet.next())
-            throw new NameNotFoundException("The name of the transformation does not exists");
-        this.name = resultSet.getString(1);
-        abbreviated = resultSet.getString(2);
-        attackPowerUp = resultSet.getInt(3);
-        defencePowerUp = resultSet.getInt(4);
-        speedPowerUp = resultSet.getInt(5);
-        kiConsumption = resultSet.getInt(6);
-        soloTransformation = resultSet.getBoolean(7);
-        color = new Color(resultSet.getInt(8));
-        getTransformation.close();
+        try (
+                Connection con = Android24.getConnection();
+                PreparedStatement getTransformation = con.prepareStatement(
+                        "SELECT * FROM android24.transformations where TransformationName = ? or TransformationAbbreviated = ?;")
+        ) {
+
+            getTransformation.setString(1, name);
+            getTransformation.setString(2, name);
+            ResultSet resultSet = getTransformation.executeQuery();
+            if (!resultSet.next())
+                throw new NameNotFoundException("The name of the transformation does not exists");
+            this.name = resultSet.getString(1);
+            abbreviated = resultSet.getString(2);
+            attackPowerUp = resultSet.getInt(3);
+            defencePowerUp = resultSet.getInt(4);
+            speedPowerUp = resultSet.getInt(5);
+            kiConsumption = resultSet.getInt(6);
+            soloTransformation = resultSet.getBoolean(7);
+            color = new Color(resultSet.getInt(8));
+            getTransformation.close();
+        } catch (SQLException throwables) {
+            Android24.logError(throwables);
+            throwables.printStackTrace();
+        }
     }
 
     // Because I have to call the super constructor on the first line...
@@ -50,22 +61,24 @@ public class Transformation extends Ability {
     }
 
     public static boolean checkTransformation(long userID, String transName) {
-        try {
-            PreparedStatement checkTransformation = Android24.getConnection().prepareStatement("""
-                    SELECT
-                        IF(? IN (SELECT
-                                    UserID
-                                FROM
-                                    android24.users_transformations
-                                        JOIN
-                                    android24.transformations USING (TransformationAbbreviated)
-                                WHERE
-                                    (TransformationName = ?
-                                        OR TransformationAbbreviated = ?)
-                                        AND UserID = ?),
-                            TRUE,
-                            FALSE) AS 'Result'
-                    """);
+        try (
+                Connection con = Android24.getConnection();
+                PreparedStatement checkTransformation = con.prepareStatement("""
+                        SELECT
+                            IF(? IN (SELECT
+                                        UserID
+                                    FROM
+                                        android24.users_transformations
+                                            JOIN
+                                        android24.transformations USING (TransformationAbbreviated)
+                                    WHERE
+                                        (TransformationName = ?
+                                            OR TransformationAbbreviated = ?)
+                                            AND UserID = ?),
+                                TRUE,
+                                FALSE) AS 'Result'
+                        """)
+        ) {
             checkTransformation.setLong(1, userID);
             checkTransformation.setString(2, transName);
             checkTransformation.setString(3, transName);

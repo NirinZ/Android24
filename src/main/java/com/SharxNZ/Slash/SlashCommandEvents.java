@@ -9,19 +9,25 @@ import com.SharxNZ.Game.Race;
 import com.SharxNZ.Game.Transformation;
 import com.SharxNZ.GameFunctions.StartGame;
 import com.SharxNZ.Utilities.*;
+import javafx.util.Pair;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.Button;
 
 import javax.naming.NameNotFoundException;
 import java.sql.SQLException;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 public class SlashCommandEvents extends ListenerAdapter {
 
@@ -46,7 +52,7 @@ public class SlashCommandEvents extends ListenerAdapter {
         switch (slashCommandEvent.getName()) {
             case "start_game" -> {
                 slashCommandEvent.reply(StartGame.startGame(userID,
-                        Race.valueOf(slashCommandEvent.getOption("race").getAsString())))
+                                Race.valueOf(slashCommandEvent.getOption("race").getAsString())))
                         .setEphemeral(true).queue();
             }
             case "echo" -> slashCommandEvent.reply(slashCommandEvent.getOption("content").getAsString()).queue();
@@ -124,14 +130,14 @@ public class SlashCommandEvents extends ListenerAdapter {
                         }
                     else
                         switch (slashCommandEvent.getOption("of").getAsString()) {
-                            case "Special Attacks" -> slashCommandEvent.replyEmbeds(Shop.getAttacksShop(userID).startScrollingEvent(user, slashCommandEvent.getId())).setEphemeral(true)
-                                    .addActionRows(shpButtons).queue();
-                            case "Transformations" -> slashCommandEvent.replyEmbeds(Shop.getTransformationsShop(userID).startScrollingEvent(user, slashCommandEvent.getId())).setEphemeral(true)
-                                    .addActionRows(shpButtons).queue();
+                            case "Special Attacks" -> slashCommandEvent.replyEmbeds(Shop.getAttacksShop(userID).startScrollingEvent(user, slashCommandEvent.getId()))
+                                    .addActionRows(shpButtons).setEphemeral(true).queue();
+                            case "Transformations" -> slashCommandEvent.replyEmbeds(Shop.getTransformationsShop(userID).startScrollingEvent(user, slashCommandEvent.getId()))
+                                    .addActionRows(shpButtons).setEphemeral(true).queue();
                         }
                 } else if (slashCommandEvent.getSubcommandName().equals("buy"))
                     slashCommandEvent.replyEmbeds(Shop.shopView(slashCommandEvent.getOption("item").getAsString()))
-                            .setEphemeral(true).addActionRow(Button.success("shop#" + slashCommandEvent.getOption("item").getAsString(), "Buy 💵")).queue();
+                            .addActionRow(Button.success("shop#" + slashCommandEvent.getOption("item").getAsString(), "Buy 💵")).setEphemeral(true).queue();
             }
 
             case "inventory" -> {
@@ -157,66 +163,95 @@ public class SlashCommandEvents extends ListenerAdapter {
             }
 
             case "transform" -> {
-                // Android24.log(guild.modifyRolePositions().selectPosition(0));
+                // If the user owns the transformation
+                Being being = Being.getBeing(userID);
+                Transformation currentT = null;
+                try {
+                    currentT = new Transformation(being.getCurrentTrans());
+                } catch (NameNotFoundException ignored) {
+
+                }
                 if (Transformation.checkTransformation(userID, slashCommandEvent.getOption("name").getAsString())) {
+                    Transformation finalCurrentT = currentT;
                     guild.retrieveMemberById(userID).queue(member -> { //הצעה לשיפור - ראה Android24
                         try {
-                            if (Being.getBeing(userID).getCurrentTrans() != null && member.getRoles().stream().anyMatch(role -> role.getName().equals(Being.getBeing(userID).getCurrentTrans())))
-                                guild.removeRoleFromMember(userID,
-                                        guild.getRolesByName(Being.getBeing(userID).getCurrentTrans(), true).get(0)).queue();
-
                             Transformation transformation = new Transformation(slashCommandEvent.getOption("name").getAsString());
+
+                            if (transformation.getName().equals(finalCurrentT.getName())) {
+                                Pair<String, Integer> pair = Gifs.getTransGif(finalCurrentT.getAbbreviated(), transformation.getAbbreviated());
+                                if (pair == null)
+                                    slashCommandEvent.reply("not gifs available for power up...").setEphemeral(true).queue();
+                                else
+                                    slashCommandEvent.reply(pair.getKey())
+                                            .queue(interactionHook -> interactionHook.deleteOriginal().queueAfter(pair.getValue() * 3, TimeUnit.SECONDS));
+                                return;
+                            }
+
+                            if (being.getCurrentTrans() != null && member.getRoles().stream().anyMatch(role -> role.getName().equals(being.getCurrentTrans())))
+                                guild.removeRoleFromMember(userID,
+                                        guild.getRolesByName(being.getCurrentTrans(), true).get(0)).queue();
+
                             if (guild.getRoles().stream().anyMatch(role -> role.getName().equals(transformation.getName()))) {
                                 guild.addRoleToMember(userID,
                                         guild.getRolesByName(transformation.getName(), true).get(0)).queue();
+                                Pair<String, Integer> pair = Gifs.getTransGif(finalCurrentT.getAbbreviated(), transformation.getAbbreviated());
                                 Being.setTransformation(userID, transformation.getName());
-                                //send gif
-                                slashCommandEvent.reply("role added").setEphemeral(true).queue();
+                                if (pair == null)
+                                    slashCommandEvent.reply("role added").setEphemeral(true).queue();
+                                else
+                                    slashCommandEvent.reply(pair.getKey())
+                                            .queue(interactionHook -> interactionHook.deleteOriginal().queueAfter(pair.getValue() * 3, TimeUnit.SECONDS));
+
                             } else {
                                 guild.createRole().setName(transformation.getName())
                                         .setColor(transformation.getColor()).queue(role -> {
-                                    guild.addRoleToMember(userID,
-                                            guild.getRolesByName(transformation.getName(), true).get(0)).queue();
-                                    Being.setTransformation(userID, transformation.getName());
-                                    //send gif
-                                    slashCommandEvent.reply("role added").setEphemeral(true).queue();
-                                    Server server = new Server(guildID);
-                                    try {
-                                        guild.modifyRolePositions().selectPosition(role).moveTo(
-                                                guild.getRoleById(server.getTransRole()).getPosition() - 1).queue();
-                                    } catch (NullPointerException nullPointerException) {
-                                        guild.retrieveOwner().queue(owner -> {
-                                            owner.getUser().openPrivateChannel().queue(privateChannel -> {
-                                                privateChannel.sendMessage("You didn't have a role for the transformations 😱.\n" +
-                                                        "Plz set one to prevent error and for best experience :-)").queue(null, throwable -> {
-                                                    if (server.getLoggingCh() != 0)
-                                                        guild.getTextChannelById(server.getLoggingCh()).sendMessage(
-                                                                owner.getAsMention() +
+                                            guild.addRoleToMember(userID,
+                                                    guild.getRolesByName(transformation.getName(), true).get(0)).queue();
+                                            Pair<String, Integer> pair = Gifs.getTransGif(finalCurrentT.getAbbreviated(), transformation.getAbbreviated());
+                                            Being.setTransformation(userID, transformation.getName());
+                                            if (pair == null)
+                                                slashCommandEvent.reply("role added").setEphemeral(true).queue();
+                                            else
+                                                slashCommandEvent.reply(pair.getKey()).setEphemeral(true).queue();
+                                            Server server = new Server(guildID);
+                                            try {
+                                                guild.modifyRolePositions().selectPosition(role).moveTo(
+                                                        guild.getRoleById(server.getTransRole()).getPosition() - 1).queue();
+                                            } catch (NullPointerException nullPointerException) {
+                                                guild.retrieveOwner().queue(owner -> {
+                                                    owner.getUser().openPrivateChannel().queue(privateChannel -> {
+                                                        privateChannel.sendMessage("You didn't have a role for the transformations 😱.\n" +
+                                                                "Plz set one to prevent error and for best experience :-)").queue(null, throwable -> {
+                                                            TextChannel textChannel = guild.getTextChannelById(server.getLoggingCh());
+                                                            if (textChannel != null)
+                                                                textChannel.sendMessage(owner.getAsMention() +
                                                                         "\nYou didn't have a role for the transformations 😱.\n" +
                                                                         "Plz set one to prevent error and for best experience :-)").queue();
+                                                        });
+                                                    });
                                                 });
-                                            });
+                                            }
                                         });
-                                    }
-                                });
                             }
                         } catch (NameNotFoundException exception) {
                             slashCommandEvent.reply("This transformations doesn't exists.").setEphemeral(true).queue();
-                        } catch (SQLException throwables) {
-                            Android24.logError(throwables);
-                            throwables.printStackTrace();
                         }
                     });
 
                 } else if (slashCommandEvent.getOption("name").getAsString().equalsIgnoreCase("base")) {
-                    if (Being.getBeing(userID).getCurrentTrans() != null) {
+                    if (being.getCurrentTrans() != null) {
+                        Transformation finalCurrentT1 = currentT;
                         guild.retrieveMemberById(userID).queue(member -> {
-                            if (guild.getMemberById(userID).getRoles().stream().anyMatch(role -> role.getName().equals(Being.getBeing(userID).getCurrentTrans())))
+                            if (member.getRoles().stream().anyMatch(role -> role.getName().equals(being.getCurrentTrans())))
                                 guild.removeRoleFromMember(userID,
-                                        guild.getRolesByName(Being.getBeing(userID).getCurrentTrans(), true).get(0)).queue();
+                                        guild.getRolesByName(being.getCurrentTrans(), true).get(0)).queue();
+                            Pair<String, Integer> pair = Gifs.getTransGif(finalCurrentT1.getAbbreviated(), null);
                             Being.setTransformation(userID, null);
-                            //send gif
-                            slashCommandEvent.reply("Reverted back").setEphemeral(true).queue();
+                            if (pair == null)
+                                slashCommandEvent.reply("You have reverted back").setEphemeral(true).queue();
+                            else
+                                slashCommandEvent.reply(pair.getKey())
+                                        .queue(interactionHook -> interactionHook.deleteOriginal().queueAfter(pair.getValue() * 3, TimeUnit.SECONDS));
                         });
                     } else
                         slashCommandEvent.reply("you're already in base").setEphemeral(true).queue();
@@ -266,10 +301,12 @@ public class SlashCommandEvents extends ListenerAdapter {
             }
 
             case "test" -> {
-                /*slashCommandEvent.reply("cid: " + slashCommandEvent.getCommandId()+
-                        "\nid: "+slashCommandEvent.getId())
-                        .addActionRow(SelectionMenu.create("t:test").setPlaceholder("Test").setRequiredRange(0,2)
-                                .addOption("T1", "T1").addOption("T2","T2").build()).queue();*/
+                Android24.getConnection();
+                Android24.getConnection();
+                Android24.getConnection();
+                Android24.getConnection();
+                Android24.getConnection();
+                slashCommandEvent.reply("r").queue();
 
             }
             //slashCommandEvent.getHook().sendFile().addEmbeds().queue();

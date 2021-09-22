@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.apache.commons.lang3.exception.ContextedException;
 
 import javax.annotation.Nonnull;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
@@ -25,9 +26,11 @@ public class Beginning extends ListenerAdapter {
     @Override
     public void onGuildJoin(@Nonnull GuildJoinEvent guildJoinEvent) {
         if (guildJoinEvent.getGuild().getRoles().stream().anyMatch(role -> role.getName().equals("---transformations---"))) {
-            try {
-                PreparedStatement join = Android24.getConnection().prepareStatement(
-                        "INSERT INTO `guilds`.`guilds_data` (`GuildID`, `GuildName`, `TransRole`) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE `GuildName` = ?, `TransRole` = ?;");
+            try (
+                    Connection con = Android24.getConnection();
+                    PreparedStatement join = con.prepareStatement(
+                            "INSERT INTO `guilds`.`guilds_data` (`GuildID`, `GuildName`, `TransRole`) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE `GuildName` = ?, `TransRole` = ?;")
+            ) {
 
                 join.setLong(1, guildJoinEvent.getGuild().getIdLong());
                 join.setString(2, guildJoinEvent.getGuild().getName());
@@ -52,9 +55,11 @@ public class Beginning extends ListenerAdapter {
             }
         } else
             guildJoinEvent.getGuild().createRole().setName("---transformations---").queue(role -> {
-                try {
-                    PreparedStatement join = Android24.getConnection().prepareStatement(
-                            "INSERT INTO `guilds`.`guilds_data` (`GuildID`, `GuildName`, `TransRole`) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE `GuildName` = ?, `TransRole` = ?;");
+                try (
+                        Connection con = Android24.getConnection();
+                        PreparedStatement join = con.prepareStatement(
+                                "INSERT INTO `guilds`.`guilds_data` (`GuildID`, `GuildName`, `TransRole`) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE `GuildName` = ?, `TransRole` = ?;")
+                ) {
 
                     join.setLong(1, guildJoinEvent.getGuild().getIdLong());
                     join.setString(2, guildJoinEvent.getGuild().getName());

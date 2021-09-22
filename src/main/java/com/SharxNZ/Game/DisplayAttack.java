@@ -5,9 +5,11 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 
 import javax.naming.NameNotFoundException;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 public class DisplayAttack extends Attack {
 
@@ -19,34 +21,38 @@ public class DisplayAttack extends Attack {
 
 
     public DisplayAttack(String name) throws SQLException, NameNotFoundException {
-        PreparedStatement getDisplayAttack = Android24.getConnection().prepareStatement("""
-                    SELECT
-                        AttackName, AttackAbbreviated, AttackPowerUp,
-                        DefencePowerUp, SpeedPowerUp, KiConsumption, Counter,
-                        AttackType, ForcedRace, Cost, MinimalLevel, Description, Gif
-                    FROM
-                        android24.attacks
-                            JOIN
-                        android24.shop ON AttackName = Name
-                    WHERE
-                        AttackName = ?
-                            OR AttackAbbreviated = ?;
-                    """);
 
-        getDisplayAttack.setString(1, name);
-        getDisplayAttack.setString(2, name);
-        ResultSet resultSet = getDisplayAttack.executeQuery();
-        if (!resultSet.next())
-            throw new NameNotFoundException("The name of the attack does not exists");
-        setAttack(resultSet.getString(1), resultSet.getString(2), resultSet.getInt(3),
-                resultSet.getInt(4), resultSet.getInt(5), resultSet.getInt(6),
-                resultSet.getBoolean(7), ATTACK_TYPE.valueOf(resultSet.getString(8)));
-        forcedRace = resultSet.getString(9);
-        cost = resultSet.getInt(10);
-        minimalLevel = resultSet.getInt(11);
-        description = resultSet.getString(12);
-        gif = resultSet.getString(13);
-        getDisplayAttack.close();
+        try (
+                Connection con = Android24.getConnection();
+                PreparedStatement getDisplayAttack = con.prepareStatement("""
+                        SELECT
+                            AttackName, AttackAbbreviated, AttackPowerUp,
+                            DefencePowerUp, SpeedPowerUp, KiConsumption, Counter,
+                            AttackType, ForcedRace, Cost, MinimalLevel, Description, Gif
+                        FROM
+                            android24.attacks
+                                JOIN
+                            android24.shop ON AttackName = Name
+                        WHERE
+                            AttackName = ?
+                                OR AttackAbbreviated = ?;
+                        """);
+        ) {
+
+            getDisplayAttack.setString(1, name);
+            getDisplayAttack.setString(2, name);
+            ResultSet resultSet = getDisplayAttack.executeQuery();
+            if (!resultSet.next())
+                throw new NameNotFoundException("The name of the attack does not exists");
+            setAttack(resultSet.getString(1), resultSet.getString(2), resultSet.getInt(3),
+                    resultSet.getInt(4), resultSet.getInt(5), resultSet.getInt(6),
+                    resultSet.getBoolean(7), ATTACK_TYPE.valueOf(resultSet.getString(8)));
+            forcedRace = resultSet.getString(9);
+            cost = resultSet.getInt(10);
+            minimalLevel = resultSet.getInt(11);
+            description = resultSet.getString(12);
+            gif = resultSet.getString(13);
+        }
     }
 
     public EmbedBuilder getEmbed() {

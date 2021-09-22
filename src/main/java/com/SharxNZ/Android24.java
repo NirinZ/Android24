@@ -1,14 +1,14 @@
 package com.SharxNZ;
 
 //Normal JAVA
-import java.util.*;
 
 //Discord (JDA/JDA utilities)
 import com.SharxNZ.Buttons.PPButtons;
 import com.SharxNZ.Buttons.ShopButton;
 import com.SharxNZ.Commands.*;
-import com.SharxNZ.Commands.GameCommands.*;
-import com.SharxNZ.Game.Being;
+import com.SharxNZ.Commands.GameCommands.GetStats;
+import com.SharxNZ.Commands.GameCommands.Inventory;
+import com.SharxNZ.Commands.GameCommands.StartGameCommand;
 import com.SharxNZ.GameFunctions.Beginning;
 import com.SharxNZ.GameFunctions.GFButtons;
 import com.SharxNZ.GameFunctions.StartGame;
@@ -19,6 +19,7 @@ import com.SharxNZ.Slash.SlashCommandEvents;
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
+import com.zaxxer.hikari.HikariDataSource;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -29,13 +30,15 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
-import org.apache.commons.dbcp2.BasicDataSource;
 
 //SQL
-import java.sql.*;
+import javax.security.auth.login.LoginException;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
-import javax.security.auth.login.LoginException;
+
 
 public abstract class Android24 {
 
@@ -50,7 +53,7 @@ public abstract class Android24 {
     private static CommandListUpdateAction commandListDebug;
     private static CommandListUpdateAction commandListAll;
     private static final long cacheChannelID = 866689902758068244L;
-    private static final BasicDataSource dataSource = new BasicDataSource();
+    private static final HikariDataSource dataSource = new HikariDataSource();
 
     public static Connection getConnection() {
         try {
@@ -117,19 +120,18 @@ public abstract class Android24 {
 
     public static void main(String[] args) throws LoginException, InterruptedException, SQLException {
 
-        Random r = new Random();
+//        System.out.println();
 
-        System.out.println(r.nextInt());
-        System.exit(9);
+//        System.exit(9);
 
-
-        // Set the data source for the SQL connection
-        dataSource.setUrl("jdbc:mysql://159.89.111.155:3306/?user=Android24");
+        // Set the database
+        dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
+        dataSource.setJdbcUrl("jdbc:mysql://159.89.111.155:3306/?user=Android24");
         dataSource.setUsername("Android24");
         dataSource.setPassword(System.getenv("MySQLPass"));
-        dataSource.setMinIdle(3);
-        dataSource.setMaxIdle(3);
-        dataSource.setMaxTotal(50);
+        dataSource.setMinimumIdle(6);
+
+
 
         //!docs JDABuilder#setMemberCachePolicy
         List<GatewayIntent> gatewayIntents = new ArrayList<>();

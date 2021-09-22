@@ -16,9 +16,11 @@ public class Stats extends Being {
 
     public Stats(long userID) {
         super(userID);
-        try {
-            PreparedStatement raceStats = Android24.getConnection().prepareStatement(
-                    "SELECT * FROM android24.races WHERE RaceName = ?;");
+        try (
+                Connection con = Android24.getConnection();
+                PreparedStatement raceStats = con.prepareStatement(
+                        "SELECT * FROM android24.races WHERE RaceName = ?;")
+        ) {
 
             raceStats.setString(1, super.getRace());
             ResultSet resultSet = raceStats.executeQuery();
@@ -40,7 +42,6 @@ public class Stats extends Being {
                 this.defence.set(((super.getDefence() + resultSet.getShort(6)) * super.getLevel()) * transformation.getDefencePowerUp());
                 this.speed.set(((super.getSpeed() + resultSet.getShort(7)) * super.getLevel()) * transformation.getSpeedPowerUp());
             }
-            raceStats.close();
         } catch (Exception throwables) {
             logError(throwables);
             throwables.printStackTrace();

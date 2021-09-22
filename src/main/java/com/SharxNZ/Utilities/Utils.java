@@ -4,6 +4,7 @@ import com.SharxNZ.Commands.GameCommands.PowerPoints;
 import com.SharxNZ.Android24;
 import com.SharxNZ.Game.Being;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -17,9 +18,11 @@ public abstract class Utils {
 
 
     public static String checkRace(long userID) {
-        try {
-            PreparedStatement statement = Android24.getConnection().prepareStatement(
-                    "select Race from android24.users_data where userID = ?;");
+        try (
+                Connection con = Android24.getConnection();
+                PreparedStatement statement = con.prepareStatement(
+                        "select Race from android24.users_data where userID = ?;")
+        ) {
             statement.setLong(1, userID);
             ResultSet resultSet = statement.executeQuery();
             if (resultSet.next())
@@ -34,9 +37,11 @@ public abstract class Utils {
     }
 
     public static boolean checkInGame(long userID) {
-        try {
-            PreparedStatement inGameStatement = Android24.getConnection().prepareStatement(
-                    "SELECT `Race` FROM `android24`.`users_data` WHERE `UserID` = ?;");
+        try (
+                Connection con = Android24.getConnection();
+                PreparedStatement inGameStatement = con.prepareStatement(
+                        "SELECT `Race` FROM `android24`.`users_data` WHERE `UserID` = ?;")
+        ) {
 
             inGameStatement.setLong(1, userID);
             ResultSet resultSet = inGameStatement.executeQuery();

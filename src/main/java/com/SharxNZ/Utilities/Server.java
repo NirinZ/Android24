@@ -5,6 +5,7 @@ import com.SharxNZ.Android24;
 import javax.management.relation.Role;
 import javax.naming.NameNotFoundException;
 import java.lang.annotation.Annotation;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -21,9 +22,11 @@ public class Server {
 
 
     public Server(long guildID) {
-        try {
-            PreparedStatement create = Android24.getConnection().prepareStatement(
-                    "SELECT CommandsCh, WelcomeCh, LoggingCh,TransRole, AllowTransGif FROM guilds.guilds_data WHERE GuildID = ?;");
+        try (
+                Connection con = Android24.getConnection();
+                PreparedStatement create = con.prepareStatement(
+                        "SELECT CommandsCh, WelcomeCh, LoggingCh,TransRole, AllowTransGif FROM guilds.guilds_data WHERE GuildID = ?;")
+        ) {
 
             create.setLong(1, guildID);
             ResultSet resultSet = create.executeQuery();
@@ -37,7 +40,6 @@ public class Server {
             loggingCh = resultSet.getLong(3);
             transRole = resultSet.getLong(4);
             allowTransGif = resultSet.getBoolean(5);
-            create.close();
         } catch (SQLException | NameNotFoundException throwables) {
             Android24.logError(throwables);
             throwables.printStackTrace();
@@ -45,9 +47,11 @@ public class Server {
     }
 
     public void setServer() {
-        try {
-            PreparedStatement set = Android24.getConnection().prepareStatement(
-                    "UPDATE guilds.guilds_data SET CommandsCh = ?, WelcomeCh = ?, LoggingCh = ?,TransRole = ?, AllowTransGif = ? WHERE GuildID = ?;");
+        try (
+                Connection con = Android24.getConnection();
+                PreparedStatement set = con.prepareStatement(
+                        "UPDATE guilds.guilds_data SET CommandsCh = ?, WelcomeCh = ?, LoggingCh = ?,TransRole = ?, AllowTransGif = ? WHERE GuildID = ?;")
+        ) {
             set.setLong(1, commandsCh);
             set.setLong(2, welcomeCh);
             set.setLong(3, loggingCh);

@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
 
 import javax.naming.NameNotFoundException;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -132,9 +133,10 @@ public abstract class Shop {
             """;
 
     public static MessageEmbed shopView(String item) {
-        try {
-            PreparedStatement checkType = Android24.getConnection().prepareStatement(checkTypeSql);
-
+        try (
+                Connection con = Android24.getConnection();
+                PreparedStatement checkType = con.prepareStatement(checkTypeSql)
+        ) {
             checkType.setString(1, item);
             checkType.setString(2, item);
             ResultSet resultSet = checkType.executeQuery();
@@ -159,8 +161,10 @@ public abstract class Shop {
     }
 
     public static MessageEmbed tryToBuy(String item, long userID) {
-        try {
-            PreparedStatement buyAttack = Android24.getConnection().prepareStatement(buyAttackSql);
+        try (
+                Connection con = Android24.getConnection();
+                PreparedStatement buyAttack = con.prepareStatement(buyAttackSql)
+        ) {
             //Check if attack
             buyAttack.setLong(1, userID);
             buyAttack.setString(2, item);
@@ -177,15 +181,15 @@ public abstract class Shop {
                 } else
                     return Embeds.errorTextEmbed(resultSet.getString(1));
             } else {
-                PreparedStatement buyTransformation = Android24.getConnection().prepareStatement(buyTransformationSql);
+                PreparedStatement buyTransformation = con.prepareStatement(buyTransformationSql);
                 //Check if transformations
-                buyAttack.setLong(1, userID);
-                buyAttack.setString(2, item);
-                buyAttack.setString(3, item);
-                buyAttack.setDouble(4, Android24.difficulty);
-                buyAttack.setLong(5, userID);
-                buyAttack.setString(6, item);
-                buyAttack.setString(7, item);
+                buyTransformation.setLong(1, userID);
+                buyTransformation.setString(2, item);
+                buyTransformation.setString(3, item);
+                buyTransformation.setDouble(4, Android24.difficulty);
+                buyTransformation.setLong(5, userID);
+                buyTransformation.setString(6, item);
+                buyTransformation.setString(7, item);
                 resultSet = buyTransformation.executeQuery();
                 if (resultSet.next()) {
                     if (resultSet.getString(1).equals("Ok") /* && Check structure */) {
@@ -229,9 +233,9 @@ public abstract class Shop {
         subtractMoney.stringChange(item);
         subtractMoney.stringChange(Long.toString(userID));
 
-        try {
-            Android24.getConnection().createStatement().executeUpdate(subtractMoney.toString());
-            Android24.getConnection().createStatement().executeUpdate(purchaseP.toString());
+        try (Connection con = Android24.getConnection()) {
+            con.prepareStatement(subtractMoney.toString()).executeUpdate();
+            con.prepareStatement(purchaseP.toString()).executeUpdate();
             return Embeds.successTextEmbed("The item has been purchased successfully!");
         } catch (SQLException throwables) {
             Android24.logError(throwables);
@@ -273,8 +277,10 @@ order by Storey
     }
 
     public static MessageEmbed attacksShop(long userID) {
-        try {
-            PreparedStatement asStatement = Android24.getConnection().prepareStatement(asStatementSql);
+        try (
+                Connection con = Android24.getConnection();
+                PreparedStatement asStatement = con.prepareStatement(asStatementSql)
+        ) {
 
             EmbedBuilder asEmbed = new EmbedBuilder();
             asEmbed.setTitle("Attacks Shop");
@@ -293,8 +299,10 @@ order by Storey
     }
 
     public static MessageEmbed transformationsShop(long userID) {
-        try {
-            PreparedStatement tsStatement = Android24.getConnection().prepareStatement(tsStatementSql);
+        try (
+                Connection con = Android24.getConnection();
+                PreparedStatement tsStatement = con.prepareStatement(tsStatementSql)
+        ) {
 
             EmbedBuilder tsEmbed = new EmbedBuilder();
             tsEmbed.setTitle("Transformations Shop");
@@ -313,8 +321,10 @@ order by Storey
     }
 
     public static DoublyCircularLinkedList<DisplayAttack> getAttacksShop(long userID) {
-        try {
-            PreparedStatement asStatement = Android24.getConnection().prepareStatement(asStatementSql);
+        try (
+                Connection con = Android24.getConnection();
+                PreparedStatement asStatement = con.prepareStatement(asStatementSql)
+        ) {
 
             DoublyCircularLinkedList<DisplayAttack> attacks = new DoublyCircularLinkedList<>();
             asStatement.setString(1, Utils.checkRace(userID));
@@ -331,8 +341,10 @@ order by Storey
     }
 
     public static DoublyCircularLinkedList<DisplayTransformation> getTransformationsShop(long userID) {
-        try {
-            PreparedStatement tsStatement = Android24.getConnection().prepareStatement(tsStatementSql);
+        try (
+                Connection con = Android24.getConnection();
+                PreparedStatement tsStatement = con.prepareStatement(tsStatementSql)
+        ) {
 
             DoublyCircularLinkedList<DisplayTransformation> transformations = new DoublyCircularLinkedList<>();
             tsStatement.setString(1, Utils.checkRace(userID));
