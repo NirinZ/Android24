@@ -15,8 +15,8 @@ public class Transformation extends Ability {
     protected Color color;
 
 
-    public Transformation(String name) throws NameNotFoundException {
-        if (name == null)
+    public Transformation(String name) throws NameNotFoundException, SQLException {
+        if (name == null || name.equals("base"))
             return;
 
         try (
@@ -38,10 +38,6 @@ public class Transformation extends Ability {
             kiConsumption = resultSet.getInt(6);
             soloTransformation = resultSet.getBoolean(7);
             color = new Color(resultSet.getInt(8));
-            getTransformation.close();
-        } catch (SQLException throwables) {
-            Android24.logError(throwables);
-            throwables.printStackTrace();
         }
     }
 

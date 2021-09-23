@@ -20,11 +20,6 @@ public class StartGameCommand extends Command {
 
     @Override
     protected void execute(CommandEvent commandEvent) {
-        Race race;
-        if(!commandEvent.getArgs().equals(""))
-            race = Race.valueOf(commandEvent.getArgs());
-        else
-            race = Race.Saiyan;
-        commandEvent.reply(StartGame.startGame(commandEvent.getAuthor().getIdLong(), race));
+        commandEvent.reply("use the `/start_game`");
     }
 }

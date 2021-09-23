@@ -104,7 +104,7 @@ public class GetStats extends Command {
             generalEmbed.setFooter("The stats of " + user.getAsTag(), user.getAvatarUrl());
 
             return generalEmbed.build();
-        } catch (NameNotFoundException throwables) {
+        } catch (NameNotFoundException | SQLException throwables) {
             Android24.logError(throwables);
             throwables.printStackTrace();
             return Embeds.errorEmbed();

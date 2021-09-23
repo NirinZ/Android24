@@ -11,9 +11,9 @@ public class GFButtons extends ListenerAdapter {
         String command = buttonClickEvent.getComponentId();
         long userID = buttonClickEvent.getUser().getIdLong();
 
-        switch (command) {
-            case "saiyan" -> buttonClickEvent.reply(StartGame.startGame(userID, Race.Saiyan)).setEphemeral(true).queue();
-            case "frieza" -> buttonClickEvent.reply(StartGame.startGame(userID, Race.Frieza)).setEphemeral(true).queue();
-        }
+//        switch (command) {
+//            case "saiyan" -> buttonClickEvent.reply(StartGame.startGame(userID, Race.Saiyan)).setEphemeral(true).queue();
+//            case "frieza" -> buttonClickEvent.reply(StartGame.startGame(userID, Race.Frieza)).setEphemeral(true).queue();
+//        }
     }
 }

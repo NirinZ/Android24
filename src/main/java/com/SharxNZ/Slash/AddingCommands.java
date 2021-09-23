@@ -52,9 +52,16 @@ public interface AddingCommands {
                 new CommandData("transform", "Transform to one of your transformations")
                         .addOptions(new OptionData(OptionType.STRING, "name", "The name of the transformation. (To revert back choose base)")
                                 .setRequired(true))
-                        .addOptions(new OptionData(OptionType.INTEGER, "arg", "An argument (most of the time redundent)"))
+                        .addOptions(new OptionData(OptionType.INTEGER, "arg", "An argument (most of the time redundent)")),
 
-
+                //Add gifs
+                new CommandData("add_gif", "Allowing you to add gifs to the bot!")
+                        .addSubcommands(new SubcommandData("transformation", "Adding a transformation gif")
+                            .addOptions(new OptionData(OptionType.STRING, "race", "The race that in the transformation").setRequired(true))
+                            .addOptions(new OptionData(OptionType.STRING, "from", "The current state of the person in the gif. (Can be base)").setRequired(true))
+                            .addOptions(new OptionData(OptionType.STRING, "to", "The state which the person is transforming to. (Can be base)").setRequired(true))
+                            .addOptions(new OptionData(OptionType.STRING, "link", "The link for the gif.").setRequired(true))
+                        )
         );
     }
 }

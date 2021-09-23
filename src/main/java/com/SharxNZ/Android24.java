@@ -9,6 +9,7 @@ import com.SharxNZ.Commands.*;
 import com.SharxNZ.Commands.GameCommands.GetStats;
 import com.SharxNZ.Commands.GameCommands.Inventory;
 import com.SharxNZ.Commands.GameCommands.StartGameCommand;
+import com.SharxNZ.Commands.ModeretionCommands.refreshRoles;
 import com.SharxNZ.GameFunctions.Beginning;
 import com.SharxNZ.GameFunctions.GFButtons;
 import com.SharxNZ.GameFunctions.StartGame;
@@ -16,6 +17,8 @@ import com.SharxNZ.GameFunctions.XP;
 import com.SharxNZ.Slash.AddingCommands;
 import com.SharxNZ.Slash.SelectMenuEvents;
 import com.SharxNZ.Slash.SlashCommandEvents;
+import com.SharxNZ.Utilities.Gif;
+import com.drew.imaging.ImageProcessingException;
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
@@ -33,6 +36,7 @@ import net.dv8tion.jda.api.utils.MemberCachePolicy;
 
 //SQL
 import javax.security.auth.login.LoginException;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -118,11 +122,14 @@ public abstract class Android24 {
      *}
      * */
 
-    public static void main(String[] args) throws LoginException, InterruptedException, SQLException {
+    public static void main(String[] args) throws LoginException, InterruptedException, SQLException, ImageProcessingException, IOException {
 
-//        System.out.println();
+//        String url = "https://c.tenor.com/aUIzEUjVdgIAAAAd/goku-mad.gif";
+        String url = "https://c.tenor.com/aUIzEUjVdgIAAAAd/goku-mad.gif";
 
-//        System.exit(9);
+        System.out.println(Gif.getGifAnimatedTimeLengthFromUrl(url));
+
+        System.exit(9);
 
         // Set the database
         dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
@@ -174,10 +181,13 @@ public abstract class Android24 {
         commandClientBuilder.setOwnerId("739532349280354404");
         commandClientBuilder.setPrefix(prefix);
         commandClientBuilder.setHelpWord("help");
+
         commandClientBuilder.addCommand(new Echo());
         commandClientBuilder.addCommand(new RefreshNames());
         commandClientBuilder.addCommand(new StartGameCommand());
         commandClientBuilder.addCommand(new GetStats());
+        commandClientBuilder.addCommand(new refreshRoles());
+
         CommandClient commandClient = commandClientBuilder.build();
         jda.addEventListener(commandClient);
 

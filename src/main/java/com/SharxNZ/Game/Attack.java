@@ -18,7 +18,7 @@ public abstract class Attack extends Ability {
     protected ATTACK_TYPE attackType;
 
 
-    public Attack(String name) throws NameNotFoundException {
+    public Attack(String name) throws NameNotFoundException, SQLException {
         try (Connection con = Android24.getConnection();
              PreparedStatement getAttack = con.prepareStatement(
                      "SELECT * FROM android24.attacks where AttackName = ? or AttackAbbreviated = ?;")) {
@@ -38,9 +38,6 @@ public abstract class Attack extends Ability {
             kiConsumption = resultSet.getInt(6);
             counter = resultSet.getBoolean(7);
             attackType = ATTACK_TYPE.valueOf(resultSet.getString(8));
-        } catch (SQLException | NullPointerException exception) {
-            Android24.logError(exception);
-            exception.printStackTrace();
         }
     }
 

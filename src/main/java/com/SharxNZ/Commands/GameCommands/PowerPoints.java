@@ -9,6 +9,7 @@ import com.SharxNZ.Utilities.Utils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
+import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
 import java.sql.Connection;
@@ -20,7 +21,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class PowerPoints extends Being {
 
-    private short pointer;
+    private byte pointer;
 
     protected Stat<Integer> health = new Stat<>();
     protected Stat<Integer> ki = new Stat<>();
@@ -47,7 +48,7 @@ public class PowerPoints extends Being {
         }
     }
 
-    public static PowerPoints getPowerPoints(long userID){
+    public static @NotNull PowerPoints getPowerPoints(long userID){
         PowerPoints powerPoints;
         if(ppoints.containsKey(userID)){
             powerPoints = ppoints.get(userID);
@@ -60,7 +61,7 @@ public class PowerPoints extends Being {
         return powerPoints;
     }
 
-    public static MessageEmbed getPowerPointsEmbed(PowerPoints powerPoints, boolean ephemeral, boolean image){
+    public static @NotNull MessageEmbed getPowerPointsEmbed(PowerPoints powerPoints, boolean ephemeral, boolean image){
         AtomicReference<String> imageUrl = new AtomicReference<>();
         Thread thread = null;
         if (ephemeral && image) {
@@ -128,7 +129,7 @@ public class PowerPoints extends Being {
         return ppEmbed.build();
     }
 
-    public static MessageEmbed getPowerPointsEmbed(PowerPoints powerPoints, boolean ephemeral) {
+    public static @NotNull MessageEmbed getPowerPointsEmbed(PowerPoints powerPoints, boolean ephemeral) {
         AtomicReference<String> imageUrl = new AtomicReference<>();
         Thread thread = null;
         if (ephemeral) {

@@ -52,14 +52,14 @@ public abstract class Graphics {
 //    }
 
     public static BufferedImage imageFromURL(String url) throws IOException {
-        URL URL = null;
         try {
-            URL = new URL(url);
+            URL URL = new URL(url);
+            return ImageIO.read(URL);
         } catch (IOException e) {
             Android24.logError(e);
             e.printStackTrace();
+            return null;
         }
-        return ImageIO.read(URL);
     }
 
     private static void frame3D(Graphics2D graphics2D, int stroke, int width, int height){

@@ -9,21 +9,19 @@ import com.SharxNZ.Game.Race;
 import com.SharxNZ.Game.Transformation;
 import com.SharxNZ.GameFunctions.StartGame;
 import com.SharxNZ.Utilities.*;
-import javafx.util.Pair;
+import com.drew.imaging.ImageProcessingException;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.Button;
 
 import javax.naming.NameNotFoundException;
+import java.io.IOException;
 import java.sql.SQLException;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Objects;
@@ -51,9 +49,15 @@ public class SlashCommandEvents extends ListenerAdapter {
 
         switch (slashCommandEvent.getName()) {
             case "start_game" -> {
-                slashCommandEvent.reply(StartGame.startGame(userID,
-                                Race.valueOf(slashCommandEvent.getOption("race").getAsString())))
-                        .setEphemeral(true).queue();
+                try {
+                    slashCommandEvent.reply(StartGame.startGame(userID,
+                                    new Race(slashCommandEvent.getOption("race").getAsString())))
+                            .setEphemeral(true).queue();
+                } catch (SQLException | NameNotFoundException e) {
+                    Android24.logError(e);
+                    e.printStackTrace();
+                    slashCommandEvent.replyEmbeds(Embeds.errorEmbed()).setEphemeral(true).queue();
+                }
             }
             case "echo" -> slashCommandEvent.reply(slashCommandEvent.getOption("content").getAsString()).queue();
 
@@ -158,7 +162,7 @@ public class SlashCommandEvents extends ListenerAdapter {
                         Android24.logError(throwables);
                         throwables.printStackTrace();
                     } catch (NameNotFoundException exception) {
-                        slashCommandEvent.replyEmbeds(Embeds.errorTextEmbed("You have no items to display...")).queue();
+                        slashCommandEvent.replyEmbeds(Embeds.errorEmbed("You have no items to display...")).queue();
                     }
             }
 
@@ -168,7 +172,7 @@ public class SlashCommandEvents extends ListenerAdapter {
                 Transformation currentT = null;
                 try {
                     currentT = new Transformation(being.getCurrentTrans());
-                } catch (NameNotFoundException ignored) {
+                } catch (NameNotFoundException | SQLException ignored) {
 
                 }
                 if (Transformation.checkTransformation(userID, slashCommandEvent.getOption("name").getAsString())) {
@@ -178,12 +182,12 @@ public class SlashCommandEvents extends ListenerAdapter {
                             Transformation transformation = new Transformation(slashCommandEvent.getOption("name").getAsString());
 
                             if (transformation.getName().equals(finalCurrentT.getName())) {
-                                Pair<String, Integer> pair = Gifs.getTransGif(finalCurrentT.getAbbreviated(), transformation.getAbbreviated());
-                                if (pair == null)
+                                Gif gif = TransGif.getTransGif(finalCurrentT.getAbbreviated(), transformation.getAbbreviated());
+                                if (gif == null)
                                     slashCommandEvent.reply("not gifs available for power up...").setEphemeral(true).queue();
                                 else
-                                    slashCommandEvent.reply(pair.getKey())
-                                            .queue(interactionHook -> interactionHook.deleteOriginal().queueAfter(pair.getValue() * 3, TimeUnit.SECONDS));
+                                    slashCommandEvent.reply(gif.getLink())
+                                            .queue(interactionHook -> interactionHook.deleteOriginal().queueAfter(gif.getLength() * 3, TimeUnit.SECONDS));
                                 return;
                             }
 
@@ -194,25 +198,26 @@ public class SlashCommandEvents extends ListenerAdapter {
                             if (guild.getRoles().stream().anyMatch(role -> role.getName().equals(transformation.getName()))) {
                                 guild.addRoleToMember(userID,
                                         guild.getRolesByName(transformation.getName(), true).get(0)).queue();
-                                Pair<String, Integer> pair = Gifs.getTransGif(finalCurrentT.getAbbreviated(), transformation.getAbbreviated());
+                                Gif gif = TransGif.getTransGif(finalCurrentT.getAbbreviated(), transformation.getAbbreviated());
                                 Being.setTransformation(userID, transformation.getName());
-                                if (pair == null)
+                                if (gif == null)
                                     slashCommandEvent.reply("role added").setEphemeral(true).queue();
                                 else
-                                    slashCommandEvent.reply(pair.getKey())
-                                            .queue(interactionHook -> interactionHook.deleteOriginal().queueAfter(pair.getValue() * 3, TimeUnit.SECONDS));
+                                    slashCommandEvent.reply(gif.getLink())
+                                            .queue(interactionHook -> interactionHook.deleteOriginal().queueAfter(gif.getLength() * 3, TimeUnit.SECONDS));
 
                             } else {
                                 guild.createRole().setName(transformation.getName())
                                         .setColor(transformation.getColor()).queue(role -> {
                                             guild.addRoleToMember(userID,
                                                     guild.getRolesByName(transformation.getName(), true).get(0)).queue();
-                                            Pair<String, Integer> pair = Gifs.getTransGif(finalCurrentT.getAbbreviated(), transformation.getAbbreviated());
+                                            Gif gif = TransGif.getTransGif(finalCurrentT.getAbbreviated(), transformation.getAbbreviated());
                                             Being.setTransformation(userID, transformation.getName());
-                                            if (pair == null)
+                                            if (gif == null)
                                                 slashCommandEvent.reply("role added").setEphemeral(true).queue();
                                             else
-                                                slashCommandEvent.reply(pair.getKey()).setEphemeral(true).queue();
+                                                slashCommandEvent.reply(gif.getLink())
+                                                        .queue(interactionHook -> interactionHook.deleteOriginal().queueAfter(gif.getLength() * 3, TimeUnit.SECONDS));
                                             Server server = new Server(guildID);
                                             try {
                                                 guild.modifyRolePositions().selectPosition(role).moveTo(
@@ -235,6 +240,10 @@ public class SlashCommandEvents extends ListenerAdapter {
                             }
                         } catch (NameNotFoundException exception) {
                             slashCommandEvent.reply("This transformations doesn't exists.").setEphemeral(true).queue();
+                        } catch (SQLException throwables) {
+                            Android24.logError(throwables);
+                            throwables.printStackTrace();
+                            slashCommandEvent.replyEmbeds(Embeds.errorEmbed()).setEphemeral(true).queue();
                         }
                     });
 
@@ -245,13 +254,13 @@ public class SlashCommandEvents extends ListenerAdapter {
                             if (member.getRoles().stream().anyMatch(role -> role.getName().equals(being.getCurrentTrans())))
                                 guild.removeRoleFromMember(userID,
                                         guild.getRolesByName(being.getCurrentTrans(), true).get(0)).queue();
-                            Pair<String, Integer> pair = Gifs.getTransGif(finalCurrentT1.getAbbreviated(), null);
+                            Gif gif = TransGif.getTransGif(finalCurrentT1.getAbbreviated(), null);
                             Being.setTransformation(userID, null);
-                            if (pair == null)
+                            if (gif == null)
                                 slashCommandEvent.reply("You have reverted back").setEphemeral(true).queue();
                             else
-                                slashCommandEvent.reply(pair.getKey())
-                                        .queue(interactionHook -> interactionHook.deleteOriginal().queueAfter(pair.getValue() * 3, TimeUnit.SECONDS));
+                                slashCommandEvent.reply(gif.getLink())
+                                        .queue(interactionHook -> interactionHook.deleteOriginal().queueAfter(gif.getLength() * 3, TimeUnit.SECONDS));
                         });
                     } else
                         slashCommandEvent.reply("you're already in base").setEphemeral(true).queue();
@@ -288,6 +297,32 @@ public class SlashCommandEvents extends ListenerAdapter {
                 });
             }
 
+            case "add_gif" -> {
+                switch (slashCommandEvent.getSubcommandName()) {
+                    case "transformation" -> {
+                        slashCommandEvent.deferReply().setEphemeral(true).queue();
+                        try {
+                            TransGif.checkGif(new TransGif(
+                                    new Race(slashCommandEvent.getOption("race").getAsString()),
+                                    new Transformation(slashCommandEvent.getOption("from").getAsString()),
+                                    new Transformation(slashCommandEvent.getOption("to").getAsString()),
+                                    slashCommandEvent.getOption("link").getAsString()
+                            ), user, slashCommandEvent.getId());
+                            slashCommandEvent.getHook().sendMessageEmbeds(Embeds.successEmbed("The gif has sent do test and will wait for approval!")).setEphemeral(true).queue();
+
+                        } catch (NameNotFoundException e) {
+                            slashCommandEvent.getHook().sendMessageEmbeds(Embeds.errorEmbed("The race or transformation you have choose is not valid!")).setEphemeral(true).queue();
+                        } catch (ImageProcessingException | IOException e) {
+                            slashCommandEvent.getHook().sendMessageEmbeds(Embeds.errorEmbed("The gif you have choose is not supported 😮. Please choose another one or download and upload the gif and use the command: ")).setEphemeral(true).queue();
+                        } catch (SQLException throwables) {
+                            Android24.logError(throwables);
+                            throwables.printStackTrace();
+                            slashCommandEvent.getHook().sendMessageEmbeds(Embeds.errorEmbed()).setEphemeral(true).queue();
+                        }
+                    }
+                }
+            }
+
             case "nuke" -> {
                 slashCommandEvent.reply("""
                         **You got busted and reported to the admin!**
@@ -301,11 +336,9 @@ public class SlashCommandEvents extends ListenerAdapter {
             }
 
             case "test" -> {
-                Android24.getConnection();
-                Android24.getConnection();
-                Android24.getConnection();
-                Android24.getConnection();
-                Android24.getConnection();
+                Server server = new Server(guildID);
+                guild.modifyRolePositions().selectPosition(guild.getRoleById(889183162389897276L).getPosition())
+                        .moveTo(guild.getRoleById(server.getTransRole()).getPosition() - 1).queue();
                 slashCommandEvent.reply("r").queue();
 
             }

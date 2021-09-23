@@ -9,7 +9,6 @@ import com.SharxNZ.Utilities.PreparedSql;
 import com.SharxNZ.Utilities.Utils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.User;
 
 import javax.naming.NameNotFoundException;
 import java.sql.Connection;
@@ -150,7 +149,7 @@ public abstract class Shop {
                     return displayTransformation(item);
                 }
                 default -> {
-                    return Embeds.errorTextEmbed("The requested item doesn't exist...");
+                    return Embeds.errorEmbed("The requested item doesn't exist...");
                 }
             }
         } catch (SQLException throwables) {
@@ -179,7 +178,7 @@ public abstract class Shop {
                     buyAttack.close();
                     return purchase("Attack", item, userID);
                 } else
-                    return Embeds.errorTextEmbed(resultSet.getString(1));
+                    return Embeds.errorEmbed(resultSet.getString(1));
             } else {
                 PreparedStatement buyTransformation = con.prepareStatement(buyTransformationSql);
                 //Check if transformations
@@ -197,11 +196,11 @@ public abstract class Shop {
                         buyTransformation.close();
                         return purchase("Transformation", item, userID);
                     } else
-                        return Embeds.errorTextEmbed(resultSet.getString(1));
+                        return Embeds.errorEmbed(resultSet.getString(1));
                 } else {
                     buyAttack.close();
                     buyTransformation.close();
-                    return Embeds.errorTextEmbed("The requested item doesn't exist...");
+                    return Embeds.errorEmbed("The requested item doesn't exist...");
                 }
             }
 
@@ -236,7 +235,7 @@ public abstract class Shop {
         try (Connection con = Android24.getConnection()) {
             con.prepareStatement(subtractMoney.toString()).executeUpdate();
             con.prepareStatement(purchaseP.toString()).executeUpdate();
-            return Embeds.successTextEmbed("The item has been purchased successfully!");
+            return Embeds.successEmbed("The item has been purchased successfully!");
         } catch (SQLException throwables) {
             Android24.logError(throwables);
             throwables.printStackTrace();
@@ -256,7 +255,7 @@ order by Storey
         try {
             return new DisplayAttack(name).getEmbed().build();
         } catch (NameNotFoundException exception) {
-            return Embeds.errorTextEmbed("The requested item doesn't exist...");
+            return Embeds.errorEmbed("The requested item doesn't exist...");
         } catch (SQLException throwables) {
             Android24.logError(throwables);
             throwables.printStackTrace();
@@ -268,7 +267,7 @@ order by Storey
         try {
             return new DisplayTransformation(name).getEmbed().build();
         } catch (NameNotFoundException exception) {
-            return Embeds.errorTextEmbed("The requested item doesn't exist...");
+            return Embeds.errorEmbed("The requested item doesn't exist...");
         } catch (SQLException throwables) {
             Android24.logError(throwables);
             throwables.printStackTrace();

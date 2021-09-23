@@ -39,11 +39,11 @@ public abstract class Embeds {
         return new EmbedBuilder().setImage("https://www.computerhope.com/jargon/e/error.png").setColor(Color.red).build();
     }
 
-    public static MessageEmbed errorTextEmbed(String text){
+    public static MessageEmbed errorEmbed(String text){
         return new EmbedBuilder().setTitle(text).setColor(Color.red).build();
     }
 
-    public static MessageEmbed successTextEmbed(String text){
+    public static MessageEmbed successEmbed(String text){
         return new EmbedBuilder().setTitle(text).setColor(Color.green).build();
     }
 
