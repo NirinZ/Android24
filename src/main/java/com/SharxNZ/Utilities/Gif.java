@@ -43,34 +43,24 @@ public class Gif {
      * @return time length of gif in ms.
      */
     protected void setGifAnimatedTimeLengthFromUrl(String link) throws IOException, ImageProcessingException {
-        Random rand = new Random();
-        File file = new File(rand.nextInt() + "_temp.gif");
         try ( //This try is just for closing the resources
               InputStream in1 = new BufferedInputStream(new URL(link).openStream());
-              OutputStream out1 = new FileOutputStream(file);
         ) {
-
-            IOUtils.copy(in1, out1); // Putting the data in the file
             Metadata metadata;
-
+            InputStream in2 = null;
             try {
-                metadata = ImageMetadataReader.readMetadata(file); //Trying to take the gif
+                metadata = ImageMetadataReader.readMetadata(in1); //Trying to take the gif
             } catch (ImageProcessingException exception) { // Getting here if the file is an HTML
-
-                Document doc = Jsoup.parse(file, "UTF-8");
+                Document doc = Jsoup.connect(link).get(); // It is faster to download the site, but this is cleaner.
                 Elements elm = doc.select("img[src$=.gif]");
                 link = elm.get(0).attr("src"); // Taking the gif from the HTML
-                try ( // Another try just for the resources, and this time with the actual gif link
-                      InputStream in2 = new BufferedInputStream(new URL(link).openStream());
-                      OutputStream out2 = new FileOutputStream(file);
-                ) {
-
-                    IOUtils.copy(in2, out2); // Potting the gif data into the file
-
-                    metadata = ImageMetadataReader.readMetadata(file);
-
-                }
+                in2 = new BufferedInputStream(new URL(link).openStream());
+                metadata = ImageMetadataReader.readMetadata(in2);
+            } finally {
+                if (in2 != null)
+                    in2.close();
             }
+
             List<GifControlDirectory> gifControlDirectories =
                     (List<GifControlDirectory>) metadata.getDirectoriesOfType(GifControlDirectory.class);
 
@@ -95,9 +85,6 @@ public class Gif {
                 this.length = 1;
             else
                 this.length = (short) Math.round(timeLength / 100.0);
-        } finally { // For deleting the file.
-            if (!file.delete())
-                Android24.log("File couldn't delete!\n" + file.getName());
         }
     }
 

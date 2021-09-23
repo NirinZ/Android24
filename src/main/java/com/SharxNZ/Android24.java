@@ -125,11 +125,10 @@ public abstract class Android24 {
     public static void main(String[] args) throws LoginException, InterruptedException, SQLException, ImageProcessingException, IOException {
 
 //        String url = "https://c.tenor.com/aUIzEUjVdgIAAAAd/goku-mad.gif";
-        String url = "https://c.tenor.com/aUIzEUjVdgIAAAAd/goku-mad.gif";
-
-        System.out.println(Gif.getGifAnimatedTimeLengthFromUrl(url));
-
-        System.exit(9);
+//
+//        System.out.println(Gif.getGifAnimatedTimeLengthFromUrl(url));
+//
+//        System.exit(9);
 
         // Set the database
         dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
