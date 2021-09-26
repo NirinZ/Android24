@@ -3,6 +3,7 @@ package com.SharxNZ;
 //Normal JAVA
 
 //Discord (JDA/JDA utilities)
+import com.SharxNZ.Buttons.BattleButtons;
 import com.SharxNZ.Buttons.PPButtons;
 import com.SharxNZ.Buttons.ShopButton;
 import com.SharxNZ.Commands.*;
@@ -17,6 +18,7 @@ import com.SharxNZ.GameFunctions.XP;
 import com.SharxNZ.Slash.AddingCommands;
 import com.SharxNZ.Slash.SelectMenuEvents;
 import com.SharxNZ.Slash.SlashCommandEvents;
+import com.SharxNZ.Utilities.AddTransGif;
 import com.SharxNZ.Utilities.Gif;
 import com.drew.imaging.ImageProcessingException;
 import com.jagrosh.jdautilities.command.CommandClient;
@@ -56,7 +58,7 @@ public abstract class Android24 {
     public static EventWaiter eventWaiter = new EventWaiter();
     private static CommandListUpdateAction commandListDebug;
     private static CommandListUpdateAction commandListAll;
-    private static final long cacheChannelID = 866689902758068244L;
+    public static final long cacheChannelID = 866689902758068244L;
     private static final HikariDataSource dataSource = new HikariDataSource();
 
     public static Connection getConnection() {
@@ -75,16 +77,6 @@ public abstract class Android24 {
 
     public static void log(String log){
         jda.getTextChannelById(debugChannelID).sendMessage(log).queue();
-    }
-
-    public static void getImageUrl(byte[] image, AtomicReference<String> value){
-        EmbedBuilder wrapper = new EmbedBuilder();
-
-        value.set(
-        Android24.jda.getTextChannelById(Android24.cacheChannelID)
-                .sendFile(image, "png.png")
-                .setEmbeds(wrapper.setImage("attachment://png.png").build())
-                .complete().getEmbeds().get(0).getImage().getUrl());
     }
 
     public static void configureCache(JDABuilder builder) {
@@ -111,8 +103,14 @@ public abstract class Android24 {
         commandListAll.queue();
     }
 
+    //אפשר לשלוח קבצים באפמרל!!!! לסדר דחוף את הפוור פוינטס
+
+    // TODO: 24/09/2021
     /**
+     *
+     *
      * Improvements:
+     * 1)
      * ניתן לשפר ביצועים אם אני אעשה אבדוק אם אני יכול לעשות get במקום retrieve.
      * כל מה שאני צריך לעשות זה להחליף את כל הקוד בפונציות שמקבלות את ה- user/ member ולעשות:
      *if(getUser()!= null){
@@ -120,6 +118,11 @@ public abstract class Android24 {
      *} else{
      *     retrieveUser.queue(user -> function(user))
      *}
+     *
+     * 2)
+     * צריך ליעל את כל הקוד ולשפר ביצועים ולעשות שהוא יהיה יותר נקיא, נהיר וטוב.
+     * שיהיו כמה שפחות SQL
+     *
      * */
 
     public static void main(String[] args) throws LoginException, InterruptedException, SQLException, ImageProcessingException, IOException {
@@ -168,6 +171,7 @@ public abstract class Android24 {
         jda.addEventListener(new PPButtons());
         jda.addEventListener(new ShopButton());
         jda.addEventListener(new GFButtons());
+        jda.addEventListener(new BattleButtons());
         jda.addEventListener(eventWaiter);
         Level.Level();
         StartGame.StartGame();
@@ -186,6 +190,7 @@ public abstract class Android24 {
         commandClientBuilder.addCommand(new StartGameCommand());
         commandClientBuilder.addCommand(new GetStats());
         commandClientBuilder.addCommand(new refreshRoles());
+        commandClientBuilder.addCommand(new AddTransGif());
 
         CommandClient commandClient = commandClientBuilder.build();
         jda.addEventListener(commandClient);

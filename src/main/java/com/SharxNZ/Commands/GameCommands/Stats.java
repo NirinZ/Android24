@@ -15,7 +15,8 @@ public class Stats extends Being {
 
 
     public Stats(long userID) {
-        super(userID);
+        super(userID); // לנסות לסדר את האובג'קט פול
+
         try (
                 Connection con = Android24.getConnection();
                 PreparedStatement raceStats = con.prepareStatement(

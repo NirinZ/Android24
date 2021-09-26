@@ -8,7 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public abstract class Attack extends Ability {
+public class Attack extends Ability { // ניתן לעשות cache לכל המתקפות ולשמור את זה ולעשות פעולה של get attack
 
     enum ATTACK_TYPE {
         Strike, Ki
@@ -19,9 +19,25 @@ public abstract class Attack extends Ability {
 
 
     public Attack(String name) throws NameNotFoundException, SQLException {
-        try (Connection con = Android24.getConnection();
-             PreparedStatement getAttack = con.prepareStatement(
-                     "SELECT * FROM android24.attacks where AttackName = ? or AttackAbbreviated = ?;")) {
+        if (name.equals("Strike")) {
+            this.name = name;
+            abbreviated = name;
+            kiConsumption = 10;
+            attackType = ATTACK_TYPE.Strike;
+            return;
+        }
+        if (name.equals("Ki")) {
+            this.name = name;
+            abbreviated = name;
+            kiConsumption = 15;
+            attackType = ATTACK_TYPE.Ki;
+            return;
+        }
+        try (
+                Connection con = Android24.getConnection();
+                PreparedStatement getAttack = con.prepareStatement(
+                        "SELECT * FROM android24.attacks where AttackName = ? or AttackAbbreviated = ?;")
+        ) {
 
             getAttack.setString(1, name);
             getAttack.setString(2, name);

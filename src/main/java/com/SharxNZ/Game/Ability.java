@@ -6,9 +6,9 @@ public abstract class Ability {
 
     protected String name;
     protected String abbreviated;
-    protected int attackPowerUp;
-    protected int defencePowerUp;
-    protected int speedPowerUp;
+    protected int attackPowerUp = 1;
+    protected int defencePowerUp = 1;
+    protected int speedPowerUp = 1;
     protected int kiConsumption;
 
 

@@ -8,7 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class Race {
+public class Race { // זה יכול ליצר רשימה של אובייקטים קבועים כשעולה התוכנית
 
     protected String name;
     protected int health;

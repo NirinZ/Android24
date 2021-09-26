@@ -6,20 +6,21 @@ import com.drew.imaging.ImageProcessingException;
 import com.drew.metadata.Metadata;
 import com.drew.metadata.MetadataException;
 import com.drew.metadata.gif.GifControlDirectory;
+import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.interactions.components.Button;
-import org.apache.commons.io.IOUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
-import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -143,10 +144,10 @@ public class Gif {
             switch (bce.getComponentId().split("#")[1]) {
                 case "allow" -> {
                     if (gif.saveGif())
-                        bce.editMessageEmbeds(Embeds.successEmbed("The gif hase been added!")).queue(
+                        bce.editMessage(new MessageBuilder(Embeds.successEmbed("The gif hase been added!")).build()).queue(
                                 interactionHook -> interactionHook.deleteOriginal().queueAfter(5, TimeUnit.SECONDS));
                     else
-                        bce.editMessageEmbeds(Embeds.errorEmbed("There was an error with this gif")).queue(
+                        bce.editMessage(new MessageBuilder(Embeds.successEmbed("The gif hase been added!")).build()).queue(
                                 interactionHook -> interactionHook.deleteOriginal().queueAfter(5, TimeUnit.SECONDS));
                 }
                 case "deny" -> {

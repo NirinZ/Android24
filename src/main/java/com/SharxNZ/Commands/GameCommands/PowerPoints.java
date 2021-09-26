@@ -23,12 +23,12 @@ public class PowerPoints extends Being {
 
     private byte pointer;
 
-    protected Stat<Integer> health = new Stat<>();
-    protected Stat<Integer> ki = new Stat<>();
-    protected Stat<Integer> strikeAttack = new Stat<>();
-    protected Stat<Integer> kiAttack = new Stat<>();
-    protected Stat<Integer> defence = new Stat<>();
-    protected Stat<Integer> speed = new Stat<>();
+    protected Stat<Integer>[] health = new Stat<>();
+    protected Stat<Integer>[] ki = new Stat<>();
+    protected Stat<Integer>[] strikeAttack = new Stat<>();
+    protected Stat<Integer>[] kiAttack = new Stat<>();
+    protected Stat<Integer>[] defence = new Stat<>();
+    protected Stat<Integer>[] speed = new Stat<>();
 
     public String imageUrl = "https://www.pngjoy.com/pngm/135/2736064_warning-symbol-error-png-transparent-png.png";
 
@@ -67,7 +67,7 @@ public class PowerPoints extends Being {
         if (ephemeral && image) {
              thread = new Thread("thread") {
                 public void run() {
-                    Android24.getImageUrl(Graphics.statsImage(powerPoints), imageUrl);
+                    Utils.getImageUrl(Graphics.statsImage(powerPoints), imageUrl);
                 }
             };
             thread.start();
@@ -135,7 +135,7 @@ public class PowerPoints extends Being {
         if (ephemeral) {
             thread = new Thread("thread") {
                 public void run() {
-                    Android24.getImageUrl(Graphics.statsImage(powerPoints), imageUrl);
+                    Utils.getImageUrl(Graphics.statsImage(powerPoints), imageUrl);
                 }
             };
             thread.start();
@@ -248,12 +248,12 @@ public void previousValue(){
 
     @Override
     public int getHealth(){
-        return this.health.get() + super.health.get();
+        return health[0].get() + health[1].get();
     }
 
     @Override
     public int getKi(){
-        return this.ki.get() + super.ki.get();
+        return ki[0].get() + super.ki.get();
     }
 
     @Override

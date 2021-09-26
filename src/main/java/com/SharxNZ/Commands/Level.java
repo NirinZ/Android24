@@ -2,11 +2,13 @@ package com.SharxNZ.Commands;
 
 import com.SharxNZ.Android24;
 import com.SharxNZ.Utilities.Graphics;
+import com.SharxNZ.Utilities.Utils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import org.jetbrains.annotations.NotNull;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -29,7 +31,7 @@ public abstract class Level {
     }
 
 
-    public static byte[] returnLevel(long guildID, long userID, String userURL) {
+    public static byte @NotNull [] returnLevel(long guildID, long userID, String userURL) {
         try (
                 Connection con = Android24.getConnection();
                 PreparedStatement levelStatement = con.prepareStatement(
@@ -44,17 +46,17 @@ public abstract class Level {
                 long xp = resultSet.getLong(1);
                 levelStatement.close();
                 return Graphics.levelImage(userURL, guildName, xp);
-            } else return null;
+            } else return new byte[0];
         } catch (Exception throwables) {
             Android24.logError(throwables);
             throwables.printStackTrace();
-            return null;
+            return new byte[0];
         }
     }
 
     public static MessageEmbed returnLevelEmbed(long guildID, long userID, String userURL) {
         AtomicReference<String> imageUrl = new AtomicReference<>();
-        Android24.getImageUrl(Level.returnLevel(guildID, userID, userURL), imageUrl);
+        Utils.getImageUrl(Level.returnLevel(guildID, userID, userURL), imageUrl);
         return new EmbedBuilder().setImage(imageUrl.get()).build();
     }
 }

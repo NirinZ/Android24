@@ -22,7 +22,7 @@ import java.util.Collection;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
-public class TransGif extends Gif {
+public class TransGif extends Gif { // הכלאס הזה דורש תיקון דחוף. הגיפים לא עובדים כמו שצריך
 
     protected String race;
     protected String from;

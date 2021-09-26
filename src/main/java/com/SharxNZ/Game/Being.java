@@ -12,7 +12,7 @@ import java.sql.*;
 import java.util.HashMap;
 import java.util.List;
 
-public class Being {
+public class Being { // לסדר את זה שלא יהיה סטט כי לא צריך.
 
     protected long userID;
     protected String race;
@@ -265,5 +265,7 @@ public class Being {
     public void setInUse(boolean inUse) {
         this.inUse = inUse;
     }
+
+
 
 }

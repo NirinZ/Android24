@@ -1,6 +1,7 @@
 package com.SharxNZ.Slash;
 
 import com.SharxNZ.Android24;
+import com.SharxNZ.Battle.Battle;
 import com.SharxNZ.Buttons.PPButtons;
 import com.SharxNZ.Commands.GameCommands.*;
 import com.SharxNZ.Commands.Level;
@@ -11,6 +12,7 @@ import com.SharxNZ.GameFunctions.StartGame;
 import com.SharxNZ.Utilities.*;
 import com.drew.imaging.ImageProcessingException;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
@@ -71,16 +73,9 @@ public class SlashCommandEvents extends ListenerAdapter {
                     slashCommandEvent.replyEmbeds(GetStats.statsEmbed(user)).setEphemeral(true).queue();
             }
 
-            case "level" -> {
-                String userURL = user.getAvatarUrl();
-                if (!slashCommandEvent.getOptions().isEmpty() && slashCommandEvent.getOptions().get(0).getAsBoolean()) {
-                    slashCommandEvent.deferReply().queue();
-                    slashCommandEvent.getHook().sendFile(Objects.requireNonNull(Level.returnLevel(guildID, userID, userURL)), "Level.jpg").queue();
-                } else {
-                    slashCommandEvent.deferReply(true).queue();
-                    slashCommandEvent.getHook().sendMessageEmbeds(Level.returnLevelEmbed(guildID, userID, userURL)).queue();
-                }
-            }
+            case "level" -> slashCommandEvent.deferReply(slashCommandEvent.getOptions().isEmpty() || !slashCommandEvent.getOptions().get(0).getAsBoolean()).queue(
+                    interactionHook -> interactionHook.sendFile(Level.returnLevel(guildID, userID, user.getAvatarUrl()), "Level.jpg").queue());
+
             case "get_power_points" -> {
                 PPButtons.save.remove(userID);
                 PowerPoints.getPPoints().remove(userID);
@@ -268,41 +263,39 @@ public class SlashCommandEvents extends ListenerAdapter {
                     slashCommandEvent.reply("You don't have this transformation...").setEphemeral(true).queue();
             }
 
-            case "server_setup" -> {
-                guild.retrieveMemberById(userID).queue(member -> {
-                    if (!member.hasPermission(Permission.MANAGE_PERMISSIONS)) {
-                        slashCommandEvent.reply("You have to permission to use this command...").setEphemeral(true).queue();
-                        return;
-                    }
-                    Server server = new Server(slashCommandEvent.getGuild().getIdLong());
-                    long comCh = !slashCommandEvent.getOptionsByName("cmd_channel").isEmpty() ? slashCommandEvent.getOption("cmd_channel").getAsLong() : server.getCommandsCh();
-                    long wlcCh = !slashCommandEvent.getOptionsByName("wlc_channel").isEmpty() ? slashCommandEvent.getOption("wlc_channel").getAsLong() : server.getWelcomeCh();
-                    long logCh = !slashCommandEvent.getOptionsByName("logg_channel").isEmpty() ? slashCommandEvent.getOption("logg_channel").getAsLong() : server.getLoggingCh();
-                    long transRl = !slashCommandEvent.getOptionsByName("trans_role").isEmpty() ? slashCommandEvent.getOption("trans_role").getAsLong() : server.getTransRole();
-                    boolean allowTrsGif = !slashCommandEvent.getOptionsByName("allow_trans_gif").isEmpty() ? slashCommandEvent.getOption("allow_trans_gif").getAsBoolean() : server.isAllowTransGif();
-                    server.setCommandsCh(comCh);
-                    server.setWelcomeCh(wlcCh);
-                    server.setLoggingCh(logCh);
-                    server.setTransRole(transRl);
-                    server.setAllowTransGif(allowTrsGif);
+            case "server_setup" -> guild.retrieveMemberById(userID).queue(member -> {
+                if (!member.hasPermission(Permission.MANAGE_PERMISSIONS)) {
+                    slashCommandEvent.reply("You have to permission to use this command...").setEphemeral(true).queue();
+                    return;
+                }
+                Server server = new Server(slashCommandEvent.getGuild().getIdLong());
+                long comCh = !slashCommandEvent.getOptionsByName("cmd_channel").isEmpty() ? slashCommandEvent.getOption("cmd_channel").getAsLong() : server.getCommandsCh();
+                long wlcCh = !slashCommandEvent.getOptionsByName("wlc_channel").isEmpty() ? slashCommandEvent.getOption("wlc_channel").getAsLong() : server.getWelcomeCh();
+                long logCh = !slashCommandEvent.getOptionsByName("logg_channel").isEmpty() ? slashCommandEvent.getOption("logg_channel").getAsLong() : server.getLoggingCh();
+                long transRl = !slashCommandEvent.getOptionsByName("trans_role").isEmpty() ? slashCommandEvent.getOption("trans_role").getAsLong() : server.getTransRole();
+                boolean allowTrsGif = !slashCommandEvent.getOptionsByName("allow_trans_gif").isEmpty() ? slashCommandEvent.getOption("allow_trans_gif").getAsBoolean() : server.isAllowTransGif();
+                server.setCommandsCh(comCh);
+                server.setWelcomeCh(wlcCh);
+                server.setLoggingCh(logCh);
+                server.setTransRole(transRl);
+                server.setAllowTransGif(allowTrsGif);
 
-                    server.setServer();
-                    slashCommandEvent.reply(
-                            "Command channel: " + (guild.getTextChannelById(server.getCommandsCh()) != null ? guild.getTextChannelById(server.getCommandsCh()).getAsMention() : "`null`") +
-                                    "\nWelcome channel: " + (guild.getTextChannelById(server.getWelcomeCh()) != null ? guild.getTextChannelById(server.getWelcomeCh()).getAsMention() : "`null`") +
-                                    "\nLogging channel: " + (guild.getTextChannelById(server.getLoggingCh()) != null ? guild.getTextChannelById(server.getLoggingCh()).getAsMention() : "`null`") +
-                                    "\nTransformations role: " + (guild.getRoleById(server.getTransRole()) != null ? guild.getRoleById(server.getTransRole()).getAsMention() : "`null`") +
-                                    "\nAllow transformations gif globally: `" + server.isAllowTransGif() + "`"
-                    ).setEphemeral(true).queue();
-                });
-            }
+                server.setServer();
+                slashCommandEvent.reply(
+                        "Command channel: " + (guild.getTextChannelById(server.getCommandsCh()) != null ? guild.getTextChannelById(server.getCommandsCh()).getAsMention() : "`null`") +
+                                "\nWelcome channel: " + (guild.getTextChannelById(server.getWelcomeCh()) != null ? guild.getTextChannelById(server.getWelcomeCh()).getAsMention() : "`null`") +
+                                "\nLogging channel: " + (guild.getTextChannelById(server.getLoggingCh()) != null ? guild.getTextChannelById(server.getLoggingCh()).getAsMention() : "`null`") +
+                                "\nTransformations role: " + (guild.getRoleById(server.getTransRole()) != null ? guild.getRoleById(server.getTransRole()).getAsMention() : "`null`") +
+                                "\nAllow transformations gif globally: `" + server.isAllowTransGif() + "`"
+                ).setEphemeral(true).queue();
+            });
 
             case "add_gif" -> {
                 switch (slashCommandEvent.getSubcommandName()) {
                     case "transformation" -> {
                         slashCommandEvent.deferReply().setEphemeral(true).queue();
                         try {
-                            TransGif.checkGif(new TransGif(
+                            TransGif.checkGif(new TransGif( // שיפורים לכל אלו: לעשות שזה יחזיר רק את מה שצריך. לא צריך כל פעם ליצור אובייקט חדש, מספיק לקבל את מה שצריך ולעשות את זה יותר יעיל
                                     new Race(slashCommandEvent.getOption("race").getAsString()),
                                     new Transformation(slashCommandEvent.getOption("from").getAsString()),
                                     new Transformation(slashCommandEvent.getOption("to").getAsString()),
@@ -322,6 +315,39 @@ public class SlashCommandEvents extends ListenerAdapter {
                     }
                 }
             }
+
+            case "battle" -> {
+                String args = userID + ":";
+                String buttonID = "battle#" + slashCommandEvent.getSubcommandName() + "#$#" + args;
+                // battle#command#button#userID1:userID2(optional)
+                switch (slashCommandEvent.getSubcommandName()) {
+                    case "pvp" -> {
+                        if (slashCommandEvent.getOption("user") == null) {
+                            slashCommandEvent.reply(user.getAsMention() + " is looking for battle!")
+                                    .addActionRow(Button.success(buttonID.replace("$", "fight"), "fight").withEmoji(Emoji.fromEmote("battle", 890903425678704640L, true))).queue();
+                        } else {
+                            User targetUser = slashCommandEvent.getOption("user").getAsUser();
+                            buttonID += targetUser.getId();
+                            slashCommandEvent.reply(targetUser.getAsMention() + ", \n" +
+                                            user.getAsMention() + " is challenging you to a fight!")
+                                    .addActionRow(Button.success(buttonID.replace("$", "ufight"), "accept the challenge"), Button.danger(buttonID.replace("$", "udecline"), "decline")).queue();
+                        }
+                    }
+                    case "action", "special_attack" ->{
+                        Battle battle = Battle.getBattle(slashCommandEvent.getChannel().getIdLong());
+                        if(battle != null){
+                            if(battle.getFightersSet().contains(userID)){
+                                slashCommandEvent.reply(battle.turn(userID, slashCommandEvent.getOptions().get(0).getAsString())).queue();
+                            }else{
+                                slashCommandEvent.reply("You are not fighting in this battle").setEphemeral(true).queue();
+                            }
+                        } else{
+                            slashCommandEvent.reply("This channel isn't a battle channel").setEphemeral(true).queue();
+                        }
+                    }
+                }
+            }
+
 
             case "nuke" -> {
                 slashCommandEvent.reply("""

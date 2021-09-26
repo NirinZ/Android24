@@ -1,35 +1,18 @@
 package com.SharxNZ.Utilities;
 
-import com.SharxNZ.Commands.GameCommands.PowerPoints;
 import com.SharxNZ.Android24;
+import com.SharxNZ.Commands.GameCommands.PowerPoints;
 import com.SharxNZ.Game.Being;
-import com.drew.imaging.FileType;
-import com.drew.imaging.ImageMetadataReader;
-import com.drew.imaging.ImageProcessingException;
-import com.drew.metadata.Metadata;
-import com.drew.metadata.MetadataException;
-import com.drew.metadata.gif.GifControlDirectory;
-import org.apache.commons.io.IOUtils;
+import net.dv8tion.jda.api.EmbedBuilder;
 
-import javax.imageio.ImageIO;
-import javax.swing.*;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.awt.image.ImageObserver;
-import java.io.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -128,5 +111,14 @@ public abstract class Utils {
             }
         };
         timer.scheduleAtFixedRate(timerTask, 30000, 30000);
+    }
+
+    public static void getImageUrl(byte[] image, AtomicReference<String> value){
+        EmbedBuilder wrapper = new EmbedBuilder();
+        value.set(
+        Android24.jda.getTextChannelById(Android24.cacheChannelID)
+                .sendFile(image, "png.png")
+                .setEmbeds(wrapper.setImage("attachment://png.png").build())
+                .complete().getEmbeds().get(0).getImage().getUrl());
     }
 }
