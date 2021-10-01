@@ -1,14 +1,17 @@
 package com.SharxNZ.Slash;
 
 import com.SharxNZ.Android24;
-import com.SharxNZ.Battle.Battle;
 import com.SharxNZ.Buttons.PPButtons;
 import com.SharxNZ.Commands.GameCommands.*;
 import com.SharxNZ.Commands.Level;
+import com.SharxNZ.Game.Attack;
 import com.SharxNZ.Game.Being;
 import com.SharxNZ.Game.Race;
 import com.SharxNZ.Game.Transformation;
 import com.SharxNZ.GameFunctions.StartGame;
+import com.SharxNZ.Gifs.ActionGif;
+import com.SharxNZ.Gifs.Gif;
+import com.SharxNZ.Gifs.TransGif;
 import com.SharxNZ.Utilities.*;
 import com.drew.imaging.ImageProcessingException;
 import net.dv8tion.jda.api.Permission;
@@ -26,7 +29,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 public class SlashCommandEvents extends ListenerAdapter {
@@ -164,20 +166,14 @@ public class SlashCommandEvents extends ListenerAdapter {
             case "transform" -> {
                 // If the user owns the transformation
                 Being being = Being.getBeing(userID);
-                Transformation currentT = null;
-                try {
-                    currentT = new Transformation(being.getCurrentTrans());
-                } catch (NameNotFoundException | SQLException ignored) {
 
-                }
                 if (Transformation.checkTransformation(userID, slashCommandEvent.getOption("name").getAsString())) {
-                    Transformation finalCurrentT = currentT;
                     guild.retrieveMemberById(userID).queue(member -> { //הצעה לשיפור - ראה Android24
                         try {
-                            Transformation transformation = new Transformation(slashCommandEvent.getOption("name").getAsString());
+                            Transformation newTransformation = new Transformation(slashCommandEvent.getOption("name").getAsString());
 
-                            if (transformation.getName().equals(finalCurrentT.getName())) {
-                                Gif gif = TransGif.getTransGif(finalCurrentT.getAbbreviated(), transformation.getAbbreviated());
+                            if (newTransformation.equals(being.getTransformation())) {
+                                Gif gif = TransGif.getTransGif(being.getTransformation().getAbbreviated(), newTransformation.getAbbreviated());
                                 if (gif == null)
                                     slashCommandEvent.reply("not gifs available for power up...").setEphemeral(true).queue();
                                 else
@@ -186,15 +182,15 @@ public class SlashCommandEvents extends ListenerAdapter {
                                 return;
                             }
 
-                            if (being.getCurrentTrans() != null && member.getRoles().stream().anyMatch(role -> role.getName().equals(being.getCurrentTrans())))
+                            if (being.getTransformation().getName() != null && member.getRoles().stream().anyMatch(role -> role.getName().equals(being.getTransformation().getName())))
                                 guild.removeRoleFromMember(userID,
-                                        guild.getRolesByName(being.getCurrentTrans(), true).get(0)).queue();
+                                        guild.getRolesByName(being.getTransformation().getName(), true).get(0)).queue();
 
-                            if (guild.getRoles().stream().anyMatch(role -> role.getName().equals(transformation.getName()))) {
+                            if (guild.getRoles().stream().anyMatch(role -> role.getName().equals(newTransformation.getName()))) {
                                 guild.addRoleToMember(userID,
-                                        guild.getRolesByName(transformation.getName(), true).get(0)).queue();
-                                Gif gif = TransGif.getTransGif(finalCurrentT.getAbbreviated(), transformation.getAbbreviated());
-                                Being.setTransformation(userID, transformation.getName());
+                                        guild.getRolesByName(newTransformation.getName(), true).get(0)).queue();
+                                Gif gif = TransGif.getTransGif(being.getTransformation().getAbbreviated(), newTransformation.getAbbreviated());
+                                being.setTransformation(newTransformation);
                                 if (gif == null)
                                     slashCommandEvent.reply("role added").setEphemeral(true).queue();
                                 else
@@ -202,12 +198,12 @@ public class SlashCommandEvents extends ListenerAdapter {
                                             .queue(interactionHook -> interactionHook.deleteOriginal().queueAfter(gif.getLength() * 3, TimeUnit.SECONDS));
 
                             } else {
-                                guild.createRole().setName(transformation.getName())
-                                        .setColor(transformation.getColor()).queue(role -> {
+                                guild.createRole().setName(newTransformation.getName())
+                                        .setColor(newTransformation.getColor()).queue(role -> {
                                             guild.addRoleToMember(userID,
-                                                    guild.getRolesByName(transformation.getName(), true).get(0)).queue();
-                                            Gif gif = TransGif.getTransGif(finalCurrentT.getAbbreviated(), transformation.getAbbreviated());
-                                            Being.setTransformation(userID, transformation.getName());
+                                                    guild.getRolesByName(newTransformation.getName(), true).get(0)).queue();
+                                            Gif gif = TransGif.getTransGif(being.getTransformation().getAbbreviated(), newTransformation.getAbbreviated());
+                                            being.setTransformation(newTransformation);
                                             if (gif == null)
                                                 slashCommandEvent.reply("role added").setEphemeral(true).queue();
                                             else
@@ -243,14 +239,18 @@ public class SlashCommandEvents extends ListenerAdapter {
                     });
 
                 } else if (slashCommandEvent.getOption("name").getAsString().equalsIgnoreCase("base")) {
-                    if (being.getCurrentTrans() != null) {
-                        Transformation finalCurrentT1 = currentT;
+                    if (being.getTransformation().getName() != null) {
                         guild.retrieveMemberById(userID).queue(member -> {
-                            if (member.getRoles().stream().anyMatch(role -> role.getName().equals(being.getCurrentTrans())))
+                            if (member.getRoles().stream().anyMatch(role -> role.getName().equals(being.getTransformation().getName())))
                                 guild.removeRoleFromMember(userID,
-                                        guild.getRolesByName(being.getCurrentTrans(), true).get(0)).queue();
-                            Gif gif = TransGif.getTransGif(finalCurrentT1.getAbbreviated(), null);
-                            Being.setTransformation(userID, null);
+                                        guild.getRolesByName(being.getTransformation().getName(), true).get(0)).queue();
+                            Gif gif = TransGif.getTransGif(being.getTransformation().getAbbreviated(), null);
+                            try {
+                                being.setTransformation(new Transformation("base"));
+                            } catch (NameNotFoundException | SQLException e) {
+                                Android24.logError(e);
+                                e.printStackTrace();
+                            }
                             if (gif == null)
                                 slashCommandEvent.reply("You have reverted back").setEphemeral(true).queue();
                             else
@@ -313,6 +313,27 @@ public class SlashCommandEvents extends ListenerAdapter {
                             slashCommandEvent.getHook().sendMessageEmbeds(Embeds.errorEmbed()).setEphemeral(true).queue();
                         }
                     }
+                    case "action" ->{
+                        slashCommandEvent.deferReply().setEphemeral(true).queue();
+                        try {
+                            ActionGif.checkGif(new ActionGif( // שיפורים לכל אלו: לעשות שזה יחזיר רק את מה שצריך. לא צריך כל פעם ליצור אובייקט חדש, מספיק לקבל את מה שצריך ולעשות את זה יותר יעיל
+                                    new Race(slashCommandEvent.getOption("race").getAsString()),
+                                    new Transformation(slashCommandEvent.getOption("transformation").getAsString()),
+                                    new Attack(slashCommandEvent.getOption("attack").getAsString()),
+                                    slashCommandEvent.getOption("link").getAsString()
+                            ), user, slashCommandEvent.getId());
+                            slashCommandEvent.getHook().sendMessageEmbeds(Embeds.successEmbed("The gif has sent do test and will wait for approval!")).setEphemeral(true).queue();
+
+                        } catch (NameNotFoundException e) {
+                            slashCommandEvent.getHook().sendMessageEmbeds(Embeds.errorEmbed("The race or transformation you have choose is not valid!")).setEphemeral(true).queue();
+                        } catch (ImageProcessingException | IOException e) {
+                            slashCommandEvent.getHook().sendMessageEmbeds(Embeds.errorEmbed("The gif you have choose is not supported 😮. Please choose another one or download and upload the gif and use the command: ")).setEphemeral(true).queue();
+                        } catch (SQLException throwables) {
+                            Android24.logError(throwables);
+                            throwables.printStackTrace();
+                            slashCommandEvent.getHook().sendMessageEmbeds(Embeds.errorEmbed()).setEphemeral(true).queue();
+                        }
+                    }
                 }
             }
 
@@ -333,18 +354,7 @@ public class SlashCommandEvents extends ListenerAdapter {
                                     .addActionRow(Button.success(buttonID.replace("$", "ufight"), "accept the challenge"), Button.danger(buttonID.replace("$", "udecline"), "decline")).queue();
                         }
                     }
-                    case "action", "special_attack" ->{
-                        Battle battle = Battle.getBattle(slashCommandEvent.getChannel().getIdLong());
-                        if(battle != null){
-                            if(battle.getFightersSet().contains(userID)){
-                                slashCommandEvent.reply(battle.turn(userID, slashCommandEvent.getOptions().get(0).getAsString())).queue();
-                            }else{
-                                slashCommandEvent.reply("You are not fighting in this battle").setEphemeral(true).queue();
-                            }
-                        } else{
-                            slashCommandEvent.reply("This channel isn't a battle channel").setEphemeral(true).queue();
-                        }
-                    }
+
                 }
             }
 

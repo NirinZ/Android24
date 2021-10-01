@@ -232,6 +232,11 @@
                         </goals>
                     </execution>
                 </executions>
+                <configuration>
+                    <source>15</source>
+                    <target>15</target>
+                    <compilerArgs>--enable-preview</compilerArgs>
+                </configuration>
             </plugin>
 <!--            <plugin>
                 <groupId>org.springframework.boot</groupId>

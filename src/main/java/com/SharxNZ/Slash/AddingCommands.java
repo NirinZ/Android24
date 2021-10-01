@@ -57,23 +57,30 @@ public interface AddingCommands {
                 //Add gifs
                 new CommandData("add_gif", "Allowing you to add gifs to the bot!")
                         .addSubcommands(new SubcommandData("transformation", "Adding a transformation gif")
-                            .addOptions(new OptionData(OptionType.STRING, "race", "The race that in the transformation").setRequired(true))
-                            .addOptions(new OptionData(OptionType.STRING, "from", "The current state of the person in the gif. (Can be base)").setRequired(true))
-                            .addOptions(new OptionData(OptionType.STRING, "to", "The state which the person is transforming to. (Can be base)").setRequired(true))
-                            .addOptions(new OptionData(OptionType.STRING, "link", "The link for the gif.").setRequired(true))),
+                                .addOptions(new OptionData(OptionType.STRING, "race", "The race that in the transformation").setRequired(true))
+                                .addOptions(new OptionData(OptionType.STRING, "from", "The current state of the person in the gif. (Can be base)").setRequired(true))
+                                .addOptions(new OptionData(OptionType.STRING, "to", "The state which the person is transforming to. (Can be base)").setRequired(true))
+                                .addOptions(new OptionData(OptionType.STRING, "link", "The link for the gif.").setRequired(true)))
+                        .addSubcommands(new SubcommandData("action", "Adding an action gif")
+                                .addOptions(new OptionData(OptionType.STRING, "race", "The race that in the transformation").setRequired(true))
+                                .addOptions(new OptionData(OptionType.STRING, "transformation", "The current transformation of the person in the gif. (Can be base)").setRequired(true))
+                                .addOptions(new OptionData(OptionType.STRING, "attack", "The attack that the fighter does").setRequired(true))
+                                .addOptions(new OptionData(OptionType.STRING, "link", "The link for the gif.").setRequired(true))),
 
                 //Battle
                 new CommandData("battle", "All the commands and actions about battles")
                         .addSubcommands(new SubcommandData("pvp", "start a pvp battle with someone on this server!")
-                            .addOptions(new OptionData(OptionType.USER, "user", "choose a user to invite to the battle")))
+                                .addOptions(new OptionData(OptionType.USER, "user", "choose a user to invite to the battle")))
                         .addSubcommands(new SubcommandData("action", "choosing a basic battle action")
                                 .addOptions(new OptionData(OptionType.STRING, "action", "choose the action").setRequired(true)
-                                        .addChoice("Strike", "Strike attack")
-                                        .addChoice("Ki", "Ki attack")
+                                        .addChoice("Strike attack", "Strike")
+                                        .addChoice("Ki attack", "Ki")
                                         .addChoice("Defence", "Defence")
-                                        .addChoice("Charge", "Charge energy")))
+                                        .addChoice("Charge energy", "Charge"))
+                                .addOptions(new OptionData(OptionType.USER, "target", "Choose the target (it will also change your default target)")))
                         .addSubcommands(new SubcommandData("special_attack", "Use a special attack")
                                 .addOptions(new OptionData(OptionType.STRING, "attack", "The attack name").setRequired(true))
-        ));
+                                .addOptions(new OptionData(OptionType.USER, "target", "Choose the target (it will also change your default target)"))
+                        ));
     }
 }

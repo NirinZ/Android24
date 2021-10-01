@@ -46,8 +46,11 @@ public abstract class Shop {
                 android24.attacks AS a ON a.AttackName = s.Name
             WHERE
                 UserID = ?
-                    AND (AttackName = ?
-                    OR AttackAbbreviated = ?);
+                    AND
+                    (AttackName = ?
+                    OR AttackAbbreviated = ?)
+                    AND
+                    Display = true;
             """;
     private static String buyTransformationSql = """
             SELECT
@@ -88,13 +91,17 @@ public abstract class Shop {
                             android24.attacks
                                 JOIN
                             android24.shop ON Name = AttackName
-                            UNION
-                            SELECT
+                        WHERE
+                            (shop.Display = TRUE)
+                        UNION
+                        SELECT
                             AttackAbbreviated
                         FROM
                             android24.attacks
                                 JOIN
-                            android24.shop ON Name = AttackName),
+                            android24.shop ON Name = AttackName
+                        WHERE
+                            (shop.Display = TRUE)),
                     'Attack',
                     IF(? IN (SELECT
                             Name
@@ -108,7 +115,7 @@ public abstract class Shop {
                         FROM
                             android24.transformations
                                 JOIN
-                            android24.shop ON Name = TransformationName), 'Transformation', Null)) AS 'Type'
+                            android24.shop ON Name = TransformationName), 'Transformation', 'Not exists')) AS 'Type'
             """;
     public static String asStatementSql = """
             SELECT
@@ -118,7 +125,9 @@ public abstract class Shop {
                     JOIN
                 android24.shop ON AttackName = Name
             WHERE
-                ForcedRace IS NULL OR ForcedRace = ?;
+                (ForcedRace IS NULL OR ForcedRace = ?)
+                AND
+                Display = true;
             """;
     public static String tsStatementSql = """
             SELECT

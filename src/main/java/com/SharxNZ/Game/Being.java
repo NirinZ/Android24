@@ -4,34 +4,33 @@ import com.SharxNZ.Android24;
 import com.SharxNZ.Commands.GameCommands.Stats;
 import com.SharxNZ.Commands.Level;
 import com.SharxNZ.Utilities.DoublyCircularLinkedList;
-import com.SharxNZ.Utilities.Stat;
 import com.SharxNZ.Utilities.Utils;
+import org.jetbrains.annotations.NotNull;
 
 import javax.naming.NameNotFoundException;
 import java.sql.*;
 import java.util.HashMap;
-import java.util.List;
 
 public class Being { // לסדר את זה שלא יהיה סטט כי לא צריך.
 
     protected long userID;
+    protected String name;
     protected String race;
-    protected Stat<Integer> zeni = new Stat<>(0);
-    protected Stat<Integer> level = new Stat<>(0);
-    protected Stat<Integer> powerPoints = new Stat<>(0);
-    protected Stat<Integer> health = new Stat<>(0);
-    protected Stat<Integer> ki = new Stat<>(0);
-    protected Stat<Integer> strikeAttack = new Stat<>(0);
-    protected Stat<Integer> kiAttack = new Stat<>(0);
-    protected Stat<Integer> defence = new Stat<>(0);
-    protected Stat<Integer> speed = new Stat<>(0);
-    protected String currentTrans;
+    protected int zeni;
+    protected int level;
+    protected int powerPoints;
+    protected int health;
+    protected int ki;
+    protected int strikeAttack;
+    protected int kiAttack;
+    protected int defence;
+    protected int speed;
+    protected Transformation transformation;
+
     protected boolean inUse;
 
-    protected List<Stat<Integer>> powerStats = List.of(health, ki, strikeAttack,
-            kiAttack, defence, speed);
 
-    private static final HashMap<Long, Being> beings = new HashMap<>();
+    protected static final HashMap<Long, Being> beings = new HashMap<>();
 
     protected static String saveBeingStatementSql = """
             UPDATE `android24`.`users_data` SET `PowerPoints` = ?, `Health` = ?, `Ki` = ?, `StrikeAttack` = ?, `KiAttack` = ?,
@@ -73,24 +72,26 @@ public class Being { // לסדר את זה שלא יהיה סטט כי לא צר
             getBeingStatement.setLong(1, userID);
             ResultSet resultSet = getBeingStatement.executeQuery();
             this.userID = userID;
+            Android24.jda.retrieveUserById(userID).queue(user -> name = user.getName());
             if (!resultSet.next()) {
                 return;
             }
             // resultSet.getMetaData().getColumnCount()
             this.race = resultSet.getString(1);
-            this.level.set(Level.calculateLevel(resultSet.getInt(2)));
-            this.zeni.set(resultSet.getInt(3));
-            this.powerPoints.set(resultSet.getInt(4));
-            this.health.set(resultSet.getInt(5));
-            this.ki.set(resultSet.getInt(6));
-            this.strikeAttack.set(resultSet.getInt(7));
-            this.kiAttack.set(resultSet.getInt(8));
-            this.defence.set(resultSet.getInt(9));
-            this.speed.set(resultSet.getInt(10));
-            this.currentTrans = resultSet.getString(11);
-
+            this.level = Level.calculateLevel(resultSet.getInt(2));
+            this.zeni = resultSet.getInt(3);
+            this.powerPoints = resultSet.getInt(4);
+            this.health = resultSet.getInt(5);
+            this.ki = resultSet.getInt(6);
+            this.strikeAttack = resultSet.getInt(7);
+            this.kiAttack = resultSet.getInt(8);
+            this.defence = resultSet.getInt(9);
+            this.speed = resultSet.getInt(10);
+            this.transformation = new Transformation(resultSet.getString(11));
             this.inUse = true;
-        } catch (SQLException throwables) {
+
+            beings.put(userID, this);
+        } catch (SQLException | NameNotFoundException throwables) {
             Android24.logError(throwables);
             throwables.printStackTrace();
         }
@@ -103,7 +104,6 @@ public class Being { // לסדר את זה שלא יהיה סטט כי לא צר
             being.inUse = true;
         } else {
             being = new Being(userID);
-            beings.put(userID, being);
         }
         return being;
     }
@@ -190,16 +190,16 @@ public class Being { // לסדר את זה שלא יהיה סטט כי לא צר
         }
     }
 
-    public static void setTransformation(long userID, String name) {
+    public void setTransformation(@NotNull Transformation trans) {
         try (
                 Connection con = Android24.getConnection();
                 PreparedStatement setTransformation = con.prepareStatement("UPDATE `android24`.`users_data` SET `CurrentTransformation` = ? WHERE (`UserID` = ?);")
         ) {
 
-            setTransformation.setString(1, name);
+            setTransformation.setString(1, trans.getName());
             setTransformation.setLong(2, userID);
             setTransformation.executeUpdate();
-            getBeing(userID).currentTrans = name;
+            transformation = trans;
         } catch (SQLException throwables) {
             Android24.logError(throwables);
             throwables.printStackTrace();
@@ -214,53 +214,63 @@ public class Being { // לסדר את זה שלא יהיה סטט כי לא צר
         return this.userID;
     }
 
+    public String getName() {
+        return name;
+    }
+
     public String getRace() {
         return this.race;
     }
 
-    public int getLevel() {
-        return this.level.get();
+    public int getZeni() {
+        return zeni;
     }
 
-    public int getZeni() {
-        return this.zeni.get();
+    public int getLevel() {
+        return level;
     }
 
     public int getPowerPoints() {
-        return this.powerPoints.get();
+        return powerPoints;
     }
 
     public int getHealth() {
-        return this.health.get();
+        return health;
     }
 
     public int getKi() {
-        return this.ki.get();
+        return ki;
     }
 
     public int getStrikeAttack() {
-        return this.strikeAttack.get();
+        return strikeAttack;
     }
 
     public int getKiAttack() {
-        return this.kiAttack.get();
+        return kiAttack;
     }
 
     public int getDefence() {
-        return this.defence.get();
+        return defence;
     }
 
     public int getSpeed() {
-        return this.speed.get();
+        return speed;
     }
 
-    public String getCurrentTrans() {
-        return currentTrans;
+    public boolean isInUse() {
+        return inUse;
+    }
+
+    public Transformation getTransformation() {
+        return transformation;
     }
 
     public boolean getInUse() {
         return this.inUse;
     }
+
+
 
     public void setInUse(boolean inUse) {
         this.inUse = inUse;

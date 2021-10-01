@@ -3,6 +3,7 @@ package com.SharxNZ.Utilities;
 import com.SharxNZ.Android24;
 import com.SharxNZ.Game.Race;
 import com.SharxNZ.Game.Transformation;
+import com.SharxNZ.Gifs.TransGif;
 import com.drew.imaging.ImageProcessingException;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;

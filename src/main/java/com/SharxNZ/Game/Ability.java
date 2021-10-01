@@ -9,7 +9,7 @@ public abstract class Ability {
     protected int attackPowerUp = 1;
     protected int defencePowerUp = 1;
     protected int speedPowerUp = 1;
-    protected int kiConsumption;
+    protected int kiConsumption = 1;
 
 
     public EmbedBuilder getEmbed(){

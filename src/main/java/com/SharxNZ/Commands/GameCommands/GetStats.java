@@ -81,33 +81,27 @@ public class GetStats extends Command {
     }
 
     public static MessageEmbed statsEmbed(User user) {
-        try {
-            Being being = Being.getBeing(user.getIdLong());
-            EmbedBuilder generalEmbed = new EmbedBuilder();
-            generalEmbed.setTitle(user.getName());
-            if (being.getCurrentTrans() == null)
-                generalEmbed.setDescription(being.getRace());
-            else {
-                generalEmbed.setDescription(being.getRace() + " - " + being.getCurrentTrans());
-                generalEmbed.setColor(new Transformation(being.getCurrentTrans()).getColor());
-            }
-            generalEmbed.addField("Level", being.getLevel() + "", true);
-            generalEmbed.addField("Zeni", being.getZeni() + "$", true);
-            generalEmbed.addField("Power Points", being.getPowerPoints() + "", true);
-            Stats stats = being.getStats();
-            generalEmbed.addField("Health", stats.getHealth() + "", true);
-            generalEmbed.addField("Ki", stats.getKi() + "", true);
-            generalEmbed.addField("Strike Attack", stats.getStrikeAttack() + "", true);
-            generalEmbed.addField("Ki Attack", stats.getKiAttack() + "", true);
-            generalEmbed.addField("Defence", stats.getDefence() + "", true);
-            generalEmbed.addField("Speed", stats.getSpeed() + "", true);
-            generalEmbed.setFooter("The stats of " + user.getAsTag(), user.getAvatarUrl());
-
-            return generalEmbed.build();
-        } catch (NameNotFoundException | SQLException throwables) {
-            Android24.logError(throwables);
-            throwables.printStackTrace();
-            return Embeds.errorEmbed();
+        Being being = Being.getBeing(user.getIdLong());
+        EmbedBuilder generalEmbed = new EmbedBuilder();
+        generalEmbed.setTitle(user.getName());
+        if (being.getTransformation().getName() == null)
+            generalEmbed.setDescription(being.getRace());
+        else {
+            generalEmbed.setDescription(being.getRace() + " - " + being.getTransformation().getName());
+            generalEmbed.setColor(being.getTransformation().getColor());
         }
+        generalEmbed.addField("Level", being.getLevel() + "", true);
+        generalEmbed.addField("Zeni", being.getZeni() + "$", true);
+        generalEmbed.addField("Power Points", being.getPowerPoints() + "", true);
+        Stats stats = being.getStats();
+        generalEmbed.addField("Health", stats.getHealth() + "", true);
+        generalEmbed.addField("Ki", stats.getKi() + "", true);
+        generalEmbed.addField("Strike Attack", stats.getStrikeAttack() + "", true);
+        generalEmbed.addField("Ki Attack", stats.getKiAttack() + "", true);
+        generalEmbed.addField("defence", stats.getDefence() + "", true);
+        generalEmbed.addField("Speed", stats.getSpeed() + "", true);
+        generalEmbed.setFooter("The stats of " + user.getAsTag(), user.getAvatarUrl());
+
+        return generalEmbed.build();
     }
 }

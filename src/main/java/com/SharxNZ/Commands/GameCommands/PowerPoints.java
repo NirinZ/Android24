@@ -23,12 +23,12 @@ public class PowerPoints extends Being {
 
     private byte pointer;
 
-    protected Stat<Integer>[] health = new Stat<>();
-    protected Stat<Integer>[] ki = new Stat<>();
-    protected Stat<Integer>[] strikeAttack = new Stat<>();
-    protected Stat<Integer>[] kiAttack = new Stat<>();
-    protected Stat<Integer>[] defence = new Stat<>();
-    protected Stat<Integer>[] speed = new Stat<>();
+    protected Stat<Integer> health = new Stat<>();
+    protected Stat<Integer> ki = new Stat<>();
+    protected Stat<Integer> strikeAttack = new Stat<>();
+    protected Stat<Integer> kiAttack = new Stat<>();
+    protected Stat<Integer> defence = new Stat<>();
+    protected Stat<Integer> speed = new Stat<>();
 
     public String imageUrl = "https://www.pngjoy.com/pngm/135/2736064_warning-symbol-error-png-transparent-png.png";
 
@@ -52,7 +52,7 @@ public class PowerPoints extends Being {
         PowerPoints powerPoints;
         if(ppoints.containsKey(userID)){
             powerPoints = ppoints.get(userID);
-            powerPoints.inUse = true;
+            powerPoints.setInUse(true);
         }
         else{
             powerPoints = new PowerPoints(userID);
@@ -194,8 +194,8 @@ public void previousValue(){
     }
 
     public void addValue(){
-        if(powerPoints.get() > 0){
-            powerPoints.set(powerPoints.get() - 1);
+        if(powerPoints > 0){
+            powerPoints--;
             powerStats.get(pointer).set(powerStats.get(pointer).get() + 1);
         }
     }
@@ -203,17 +203,17 @@ public void previousValue(){
     public void subtractValue(){
         if(this.powerStats.get(pointer).get() > 0){
             powerStats.get(pointer).set(powerStats.get(pointer).get() - 1);
-            powerPoints.set(powerPoints.get() + 1);
+            powerPoints++;
         }
     }
 
     public Being toBeing(){
-        super.health.set(this.getHealth());
-        super.ki.set(this.getKi());
-        super.strikeAttack.set(this.getStrikeAttack());
-        super.strikeAttack.set(this.getKiAttack());
-        super.defence.set(this.getDefence());
-        super.speed.set(this.getSpeed());
+        super.health = this.getHealth();
+        super.ki = this.getKi();
+        super.strikeAttack = this.getStrikeAttack();
+        super.kiAttack = this.getKiAttack();
+        super.defence = this.getDefence();
+        super.speed = this.getSpeed();
 
         return this;
     }
@@ -232,7 +232,7 @@ public void previousValue(){
             saveBeingStatement.setInt(5, getKiAttack());
             saveBeingStatement.setInt(6, getDefence());
             saveBeingStatement.setInt(7, getSpeed());
-            saveBeingStatement.setLong(8, userID);
+            saveBeingStatement.setLong(8, getUserID());
 
             saveBeingStatement.executeUpdate();
 
@@ -248,32 +248,32 @@ public void previousValue(){
 
     @Override
     public int getHealth(){
-        return health[0].get() + health[1].get();
+        return this.health.get() + super.getHealth();
     }
 
     @Override
     public int getKi(){
-        return ki[0].get() + super.ki.get();
+        return this.ki.get() + super.getKi();
     }
 
     @Override
     public int getStrikeAttack(){
-        return this.strikeAttack.get() + super.strikeAttack.get();
+        return this.strikeAttack.get() + super.getStrikeAttack();
     }
 
     @Override
     public int getKiAttack(){
-        return this.kiAttack.get() + super.kiAttack.get();
+        return this.kiAttack.get() + super.getKiAttack();
     }
 
     @Override
     public int getDefence(){
-        return this.defence.get() + super.defence.get();
+        return this.defence.get() + super.getDefence();
     }
 
     @Override
     public int getSpeed(){
-        return this.speed.get() + super.speed.get();
+        return this.speed.get() + super.getSpeed();
     }
 
     public static HashMap<Long, PowerPoints> getPPoints(){return ppoints;}

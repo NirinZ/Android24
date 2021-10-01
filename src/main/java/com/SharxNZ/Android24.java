@@ -19,13 +19,11 @@ import com.SharxNZ.Slash.AddingCommands;
 import com.SharxNZ.Slash.SelectMenuEvents;
 import com.SharxNZ.Slash.SlashCommandEvents;
 import com.SharxNZ.Utilities.AddTransGif;
-import com.SharxNZ.Utilities.Gif;
 import com.drew.imaging.ImageProcessingException;
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.zaxxer.hikari.HikariDataSource;
-import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -41,9 +39,7 @@ import javax.security.auth.login.LoginException;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.*;
 
 
 public abstract class Android24 {
@@ -130,7 +126,7 @@ public abstract class Android24 {
 //        String url = "https://c.tenor.com/aUIzEUjVdgIAAAAd/goku-mad.gif";
 //
 //        System.out.println(Gif.getGifAnimatedTimeLengthFromUrl(url));
-//
+
 //        System.exit(9);
 
         // Set the database
@@ -197,6 +193,8 @@ public abstract class Android24 {
 
         // commandListUpdateAction = jda.updateCommands();
         queueCommands();
+
+        jda.getCategoryById(890945913734971472L).getTextChannels().stream().forEach(textChannel -> textChannel.delete().queue());
         jda.getTextChannelById(debugChannelID).sendMessage("אני דלוק").queue();
         // jda.getPresence().setStatus(OnlineStatus.DO_NOT_DISTURB);
         // Test 2

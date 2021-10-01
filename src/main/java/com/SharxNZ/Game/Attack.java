@@ -3,20 +3,22 @@ package com.SharxNZ.Game;
 import com.SharxNZ.Android24;
 
 import javax.naming.NameNotFoundException;
+import javax.naming.directory.Attributes;
+import java.awt.*;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
 
 public class Attack extends Ability { // ניתן לעשות cache לכל המתקפות ולשמור את זה ולעשות פעולה של get attack
 
-    enum ATTACK_TYPE {
-        Strike, Ki
+    public enum ATTACK_TYPE {
+        Strike, Ki, Defence, Charge
     }
 
     protected boolean counter;
     protected ATTACK_TYPE attackType;
-
 
     public Attack(String name) throws NameNotFoundException, SQLException {
         if (name.equals("Strike")) {
@@ -30,9 +32,25 @@ public class Attack extends Ability { // ניתן לעשות cache לכל המת
             this.name = name;
             abbreviated = name;
             kiConsumption = 15;
+            speedPowerUp = 3;
             attackType = ATTACK_TYPE.Ki;
             return;
         }
+        if (name.equals("Defence")) {
+            this.name = name;
+            abbreviated = name;
+            kiConsumption = 3;
+            defencePowerUp = 3;
+            attackType = ATTACK_TYPE.Defence;
+            return;
+        }
+        if (name.equals("Charge")) {
+            this.name = name;
+            abbreviated = name;
+            attackType = ATTACK_TYPE.Charge;
+            return;
+        }
+
         try (
                 Connection con = Android24.getConnection();
                 PreparedStatement getAttack = con.prepareStatement(
@@ -54,6 +72,22 @@ public class Attack extends Ability { // ניתן לעשות cache לכל המת
             kiConsumption = resultSet.getInt(6);
             counter = resultSet.getBoolean(7);
             attackType = ATTACK_TYPE.valueOf(resultSet.getString(8));
+        }
+    }
+
+    public Attack(ATTACK_TYPE type) {
+        name = abbreviated = type.toString();
+        attackType = type;
+        switch (type) {
+            case Strike -> kiConsumption = 10;
+            case Ki -> {
+                kiConsumption = 15;
+                speedPowerUp = 3;
+            }
+            case Defence -> {
+                kiConsumption = 3;
+                defencePowerUp = 3;
+            }
         }
     }
 

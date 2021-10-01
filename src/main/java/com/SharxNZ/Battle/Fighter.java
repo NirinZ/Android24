@@ -4,34 +4,70 @@ import com.SharxNZ.Android24;
 import com.SharxNZ.Commands.GameCommands.Stats;
 import com.SharxNZ.Game.Attack;
 import com.SharxNZ.Game.Being;
+import com.SharxNZ.Game.Transformation;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 
+import javax.naming.NameNotFoundException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class Fighter extends Stats {
 
+    private final int baseHealth = super.health;
+    private final int baseKi = super.ki;
+    private final int baseStrikeAttack = super.strikeAttack;
+    private final int baseKiAttack = super.kiAttack;
+    private final int baseDefence = super.defence;
+    private final int baseSpeed = super.speed;
+
     private Fighter target;
     private Attack attack;
-    private ArrayList<String> specialAttacks;
+    private final ArrayList<String> specialAttacks = new ArrayList<>();
+
+    private static final Random rand = new Random();
 
 
-    protected Fighter(long userID) {
-        super(userID);
+    public Fighter(long userID) {
+        super(userID, true);
         try (
                 Connection con = Android24.getConnection();
                 PreparedStatement statement = con.prepareStatement("SELECT AttackAbbreviated FROM android24.users_attacks WHERE UserID = ?;")
         ) {
             statement.setLong(1, userID);
             ResultSet resultSet = statement.executeQuery();
+            specialAttacks.add("Strike");
+            specialAttacks.add("Ki");
+            specialAttacks.add("Defence");
             while (resultSet.next())
                 specialAttacks.add(resultSet.getString(1));
         } catch (SQLException throwables) {
             Android24.logError(throwables);
             throwables.printStackTrace();
         }
+    }
+
+    private void resetStats() {
+        System.out.println("TN :" + transformation.getName());
+        strikeAttack = baseStrikeAttack * transformation.getAttackPowerUp();
+        kiAttack = baseKiAttack * transformation.getAttackPowerUp();
+        defence = baseDefence * transformation.getDefencePowerUp();
+        speed = baseSpeed * transformation.getSpeedPowerUp();
+    }
+
+    /**
+     * @return If dead
+     */
+    public boolean takeDamage(int damage) {
+        if (damage > 0) {
+            health -= damage;
+            return !(health > 0);
+        } else return false;
     }
 
     public Fighter getTarget() {
@@ -47,7 +83,66 @@ public class Fighter extends Stats {
     }
 
     public void setAttack(Attack attack) {
+        resetStats();
+        if (attack.getAttackType() != Attack.ATTACK_TYPE.Charge)
+            ki -= attack.getKiConsumption() * transformation.getKiConsumption();
+        switch (attack.getAttackType()) {
+            case Strike -> strikeAttack *= attack.getAttackPowerUp();
+            case Ki -> kiAttack *= attack.getAttackPowerUp();
+            case Charge -> ki = Math.min((ki + baseKi / 15), baseKi);
+
+        }
+        defence *= attack.getDefencePowerUp();
+        speed *= attack.getSpeedPowerUp();
         this.attack = attack;
+    }
+
+    public void randomizeStats() {
+        strikeAttack *= rand.nextDouble() + 1;
+        kiAttack *= rand.nextDouble() + 1;
+        defence *= rand.nextDouble() + 1;
+        speed *= rand.nextDouble() + 1;
+    }
+
+    private static String getStatBar(int part, int full, String chr) {
+        part = 10 * (Math.max(part, 0)) / full;
+        String bar = "";
+        for (int i = 0; i < part; i++) {
+            bar += chr;
+        }
+        for (int i = 0; i < 10 - part; i++) {
+            bar += "⬛";
+        }
+        return bar;
+    }
+
+    public MessageEmbed currentStats() {
+        EmbedBuilder builder = new EmbedBuilder();
+        if (transformation.getName() != null) {
+            builder.setDescription(transformation.getName());
+            builder.setColor(transformation.getColor());
+        }
+        builder.setTitle(name);
+        builder.addField("Health", health + "/" + baseHealth + "\n" + getStatBar(health, baseHealth, "🟩"), false);
+        builder.addField("Ki", ki + "/" + baseKi + "\n" + getStatBar(ki, baseKi, "🟦"), false);
+        return builder.build();
+    }
+
+    @Override
+    public String toString() {
+        return "Fighter{" +
+                "name=" + name +
+                ", userID=" + userID +
+                ", attack=" + attack.getName() +
+                ", target=" + target.name +
+                ", health=" + health +
+                ", ki=" + ki +
+                ", strikeAttack=" + strikeAttack +
+                ", kiAttack=" + kiAttack +
+                ", defence=" + defence +
+                ", speed=" + speed +
+                ", transformation='" + transformation + '\'' +
+                '}';
     }
 
     public ArrayList<String> getSpecialAttacks() {
