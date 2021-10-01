@@ -3,19 +3,17 @@ package com.SharxNZ.Battle;
 import com.SharxNZ.Android24;
 import com.SharxNZ.Commands.GameCommands.Stats;
 import com.SharxNZ.Game.Attack;
-import com.SharxNZ.Game.Being;
-import com.SharxNZ.Game.Transformation;
+import com.SharxNZ.Gifs.ActionGif;
+import com.SharxNZ.Gifs.Gif;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 
-import javax.naming.NameNotFoundException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class Fighter extends Stats {
 
@@ -82,7 +80,7 @@ public class Fighter extends Stats {
         return attack;
     }
 
-    public void setAttack(Attack attack) {
+    public Gif setAttack(Attack attack) {
         resetStats();
         if (attack.getAttackType() != Attack.ATTACK_TYPE.Charge)
             ki -= attack.getKiConsumption() * transformation.getKiConsumption();
@@ -95,6 +93,7 @@ public class Fighter extends Stats {
         defence *= attack.getDefencePowerUp();
         speed *= attack.getSpeedPowerUp();
         this.attack = attack;
+        return ActionGif.getActionGif(race, transformation.getAbbreviated(), attack.getAbbreviated());
     }
 
     public void randomizeStats() {

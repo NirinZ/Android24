@@ -2,7 +2,10 @@ package com.SharxNZ.Slash;
 
 import com.SharxNZ.Android24;
 import com.SharxNZ.Buttons.PPButtons;
-import com.SharxNZ.Commands.GameCommands.*;
+import com.SharxNZ.Commands.GameCommands.GetStats;
+import com.SharxNZ.Commands.GameCommands.Inventory;
+import com.SharxNZ.Commands.GameCommands.PowerPoints;
+import com.SharxNZ.Commands.GameCommands.Shop;
 import com.SharxNZ.Commands.Level;
 import com.SharxNZ.Game.Attack;
 import com.SharxNZ.Game.Being;
@@ -12,7 +15,10 @@ import com.SharxNZ.GameFunctions.StartGame;
 import com.SharxNZ.Gifs.ActionGif;
 import com.SharxNZ.Gifs.Gif;
 import com.SharxNZ.Gifs.TransGif;
-import com.SharxNZ.Utilities.*;
+import com.SharxNZ.Utilities.Embeds;
+import com.SharxNZ.Utilities.Graphics;
+import com.SharxNZ.Utilities.Server;
+import com.SharxNZ.Utilities.Utils;
 import com.drew.imaging.ImageProcessingException;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Emoji;
@@ -23,6 +29,7 @@ import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.Button;
+import org.jetbrains.annotations.NotNull;
 
 import javax.naming.NameNotFoundException;
 import java.io.IOException;
@@ -34,7 +41,7 @@ import java.util.concurrent.TimeUnit;
 public class SlashCommandEvents extends ListenerAdapter {
 
     @Override
-    public void onSlashCommand(SlashCommandEvent slashCommandEvent) {
+    public void onSlashCommand(@NotNull SlashCommandEvent slashCommandEvent) {
         // Only accept commands from guilds
         if (slashCommandEvent.getGuild() == null)
             return;
@@ -291,9 +298,9 @@ public class SlashCommandEvents extends ListenerAdapter {
             });
 
             case "add_gif" -> {
+                slashCommandEvent.deferReply().setEphemeral(true).queue();
                 switch (slashCommandEvent.getSubcommandName()) {
                     case "transformation" -> {
-                        slashCommandEvent.deferReply().setEphemeral(true).queue();
                         try {
                             TransGif.checkGif(new TransGif( // שיפורים לכל אלו: לעשות שזה יחזיר רק את מה שצריך. לא צריך כל פעם ליצור אובייקט חדש, מספיק לקבל את מה שצריך ולעשות את זה יותר יעיל
                                     new Race(slashCommandEvent.getOption("race").getAsString()),
@@ -306,7 +313,7 @@ public class SlashCommandEvents extends ListenerAdapter {
                         } catch (NameNotFoundException e) {
                             slashCommandEvent.getHook().sendMessageEmbeds(Embeds.errorEmbed("The race or transformation you have choose is not valid!")).setEphemeral(true).queue();
                         } catch (ImageProcessingException | IOException e) {
-                            slashCommandEvent.getHook().sendMessageEmbeds(Embeds.errorEmbed("The gif you have choose is not supported 😮. Please choose another one or download and upload the gif and use the command: ")).setEphemeral(true).queue();
+                            slashCommandEvent.getHook().sendMessageEmbeds(Embeds.errorEmbed("The gif you have choose is not supported 😮. Please choose another one or download and upload the gif and use the command: `!addTransGif`")).setEphemeral(true).queue();
                         } catch (SQLException throwables) {
                             Android24.logError(throwables);
                             throwables.printStackTrace();
@@ -314,7 +321,6 @@ public class SlashCommandEvents extends ListenerAdapter {
                         }
                     }
                     case "action" ->{
-                        slashCommandEvent.deferReply().setEphemeral(true).queue();
                         try {
                             ActionGif.checkGif(new ActionGif( // שיפורים לכל אלו: לעשות שזה יחזיר רק את מה שצריך. לא צריך כל פעם ליצור אובייקט חדש, מספיק לקבל את מה שצריך ולעשות את זה יותר יעיל
                                     new Race(slashCommandEvent.getOption("race").getAsString()),
@@ -325,7 +331,7 @@ public class SlashCommandEvents extends ListenerAdapter {
                             slashCommandEvent.getHook().sendMessageEmbeds(Embeds.successEmbed("The gif has sent do test and will wait for approval!")).setEphemeral(true).queue();
 
                         } catch (NameNotFoundException e) {
-                            slashCommandEvent.getHook().sendMessageEmbeds(Embeds.errorEmbed("The race or transformation you have choose is not valid!")).setEphemeral(true).queue();
+                            slashCommandEvent.getHook().sendMessageEmbeds(Embeds.errorEmbed("The race, transformation or attack you have choose is not valid!")).setEphemeral(true).queue();
                         } catch (ImageProcessingException | IOException e) {
                             slashCommandEvent.getHook().sendMessageEmbeds(Embeds.errorEmbed("The gif you have choose is not supported 😮. Please choose another one or download and upload the gif and use the command: ")).setEphemeral(true).queue();
                         } catch (SQLException throwables) {

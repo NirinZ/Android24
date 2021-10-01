@@ -119,7 +119,8 @@ public class TransGif extends Gif { // הכלאס הזה דורש תיקון ד�
                 other = 0;
             if ((precise + other) == 0)
                 return null;
-            if (precise >= rand.nextInt(precise * multiplier + other + 1)) {
+            precise = precise * multiplier;
+            if (precise >= rand.nextInt(precise + other + 1)) {
                 PreparedStatement pStatement = con.prepareStatement(fixSql(from, to, preciseSql));
                 pStatement.setString(1, from);
                 pStatement.setString(2, to);

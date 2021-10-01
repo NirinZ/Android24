@@ -2,6 +2,7 @@ package com.SharxNZ.Battle;
 
 import com.SharxNZ.Android24;
 import com.SharxNZ.Game.Attack;
+import com.SharxNZ.Gifs.Gif;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -128,7 +129,9 @@ public class Battle {
                 return "You don't have this attack!";
             if (attack.getKiConsumption() > fighter.getKi())
                 return "You don't have enough ki to use this attack!";
-            fighter.setAttack(attack);
+            Gif gif = fighter.setAttack(attack);
+            if (gif != null)
+                sendGif(gif.getLink());
             if (turnType == TurnType.Attack) {
                 turnType = TurnType.Defence;
                 return "You've been attacked! <@" + fighter.getTarget().getUserID() + ">\nWhat will you do?";
@@ -373,6 +376,9 @@ public class Battle {
 
     private void sendMessage(MessageEmbed embed) {
         Android24.jda.getTextChannelById(channelId).sendMessageEmbeds(embed).queue();
+    }
+    private void sendGif(String url) {
+        Android24.jda.getTextChannelById(channelId).sendMessage(url).queue(message -> message.delete().queueAfter(15, TimeUnit.SECONDS));
     }
 
     public long getChannelId() {

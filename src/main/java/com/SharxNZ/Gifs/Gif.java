@@ -57,9 +57,17 @@ public class Gif {
             } catch (ImageProcessingException exception) { // Getting here if the file is an HTML
                 Document doc = Jsoup.connect(link).get(); // It is faster to download the site, but this is cleaner.
                 Elements elm = doc.select("img[src$=.gif]");
-                link = elm.get(0).attr("src"); // Taking the gif from the HTML
-                in2 = new BufferedInputStream(new URL(link).openStream());
-                metadata = ImageMetadataReader.readMetadata(in2);
+                if (!elm.isEmpty()) {
+                    link = elm.get(0).attr("src"); // Taking the gif from the HTML
+                    in2 = new BufferedInputStream(new URL(link).openStream());
+                    metadata = ImageMetadataReader.readMetadata(in2);
+                }else{
+                    System.out.println("====================");
+                    System.out.println(link);
+                    System.out.println("====================");
+                    System.out.println(doc);
+                    throw new ImageProcessingException("The doc not supported");
+                }
             } finally {
                 if (in2 != null)
                     in2.close();
@@ -137,11 +145,9 @@ public class Gif {
 
 
     protected static <T extends Gif> void sendGifCheck(MessageEmbed embed, T gif, User user, String id) {
-
         CompletableFuture<Message> message =
                 Android24.jda.getTextChannelById(890544910057480213L).sendMessageEmbeds(embed)
                         .setActionRow(Button.success("TGif#allow#" + id, "✅"), Button.danger("TGif#deny#" + id, "❌")).submit();
-
         Android24.eventWaiter.waitForEvent(ButtonClickEvent.class, bce -> bce.getComponentId().startsWith("TGif#")
                 && bce.getComponentId().endsWith(id), bce -> {
             switch (bce.getComponentId().split("#")[1]) {
