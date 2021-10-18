@@ -62,9 +62,18 @@ public interface AddingCommands {
                                 .addOptions(new OptionData(OptionType.STRING, "to", "The state which the person is transforming to. (Can be base)").setRequired(true))
                                 .addOptions(new OptionData(OptionType.STRING, "link", "The link for the gif.").setRequired(true)))
                         .addSubcommands(new SubcommandData("action", "Adding an action gif")
-                                .addOptions(new OptionData(OptionType.STRING, "race", "The race that in the transformation").setRequired(true))
+                                .addOptions(new OptionData(OptionType.STRING, "race", "The race that in the transformation (Can be null)").setRequired(true))
                                 .addOptions(new OptionData(OptionType.STRING, "transformation", "The current transformation of the person in the gif. (Can be base)").setRequired(true))
                                 .addOptions(new OptionData(OptionType.STRING, "attack", "The attack that the fighter does").setRequired(true))
+                                .addOptions(new OptionData(OptionType.STRING, "link", "The link for the gif.").setRequired(true)))
+                        .addSubcommands(new SubcommandData("result", "Adding a result gif")
+                                .addOptions(new OptionData(OptionType.STRING, "a_race", "The attacker's race that in the transformation (Can be null)").setRequired(true))
+                                .addOptions(new OptionData(OptionType.STRING, "a_transformation", "The current attacker's transformation in the gif. (Can be base)").setRequired(true))
+                                .addOptions(new OptionData(OptionType.STRING, "a_attack", "The attacker's attack that the fighter does").setRequired(true))
+                                .addOptions(new OptionData(OptionType.STRING, "d_race", "The defender's race that in the transformation (Can be null)").setRequired(true))
+                                .addOptions(new OptionData(OptionType.STRING, "d_transformation", "The current defender's transformation in the gif. (Can be base)").setRequired(true))
+                                .addOptions(new OptionData(OptionType.STRING, "d_attack", "The defender's attack that the fighter does (null if the defender doesn't do anything)").setRequired(true))
+                                .addOptions(new OptionData(OptionType.INTEGER, "power", "The power of the attack (0 - 100 and -1 for dodge)").setRequired(true))
                                 .addOptions(new OptionData(OptionType.STRING, "link", "The link for the gif.").setRequired(true))),
 
                 //Battle

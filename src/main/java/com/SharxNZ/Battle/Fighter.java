@@ -7,6 +7,8 @@ import com.SharxNZ.Gifs.ActionGif;
 import com.SharxNZ.Gifs.Gif;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -59,13 +61,13 @@ public class Fighter extends Stats {
     }
 
     /**
-     * @return If dead
+     * @return power
      */
-    public boolean takeDamage(int damage) {
-        if (damage > 0) {
+    public short takeDamage(int damage) {
+        if (damage >= 0) {
             health -= damage;
-            return !(health > 0);
-        } else return false;
+            return (short) Math.max(0, Math.min(100, 100 * damage / (baseHealth / 4)));
+        } else return 0;
     }
 
     public Fighter getTarget() {
@@ -80,7 +82,8 @@ public class Fighter extends Stats {
         return attack;
     }
 
-    public Gif setAttack(Attack attack) {
+    @Nullable
+    public Gif setAttack(@NotNull Attack attack) {
         resetStats();
         if (attack.getAttackType() != Attack.ATTACK_TYPE.Charge)
             ki -= attack.getKiConsumption() * transformation.getKiConsumption();

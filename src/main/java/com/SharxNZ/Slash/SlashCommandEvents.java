@@ -14,6 +14,7 @@ import com.SharxNZ.Game.Transformation;
 import com.SharxNZ.GameFunctions.StartGame;
 import com.SharxNZ.Gifs.ActionGif;
 import com.SharxNZ.Gifs.Gif;
+import com.SharxNZ.Gifs.ResultGif;
 import com.SharxNZ.Gifs.TransGif;
 import com.SharxNZ.Utilities.Embeds;
 import com.SharxNZ.Utilities.Graphics;
@@ -320,12 +321,40 @@ public class SlashCommandEvents extends ListenerAdapter {
                             slashCommandEvent.getHook().sendMessageEmbeds(Embeds.errorEmbed()).setEphemeral(true).queue();
                         }
                     }
-                    case "action" ->{
+                    case "action" -> {
                         try {
                             ActionGif.checkGif(new ActionGif( // שיפורים לכל אלו: לעשות שזה יחזיר רק את מה שצריך. לא צריך כל פעם ליצור אובייקט חדש, מספיק לקבל את מה שצריך ולעשות את זה יותר יעיל
-                                    new Race(slashCommandEvent.getOption("race").getAsString()),
+                                    slashCommandEvent.getOption("race").getAsString().equals("null") ? null :
+                                            new Race(slashCommandEvent.getOption("race").getAsString()),
                                     new Transformation(slashCommandEvent.getOption("transformation").getAsString()),
                                     new Attack(slashCommandEvent.getOption("attack").getAsString()),
+                                    slashCommandEvent.getOption("link").getAsString()
+                            ), user, slashCommandEvent.getId());
+                            slashCommandEvent.getHook().sendMessageEmbeds(Embeds.successEmbed("The gif has sent do test and will wait for approval!")).setEphemeral(true).queue();
+
+                        } catch (NameNotFoundException e) {
+                            slashCommandEvent.getHook().sendMessageEmbeds(Embeds.errorEmbed("The race, transformation or attack you have choose is not valid!")).setEphemeral(true).queue();
+                        } catch (ImageProcessingException | IOException e) {
+                            slashCommandEvent.getHook().sendMessageEmbeds(Embeds.errorEmbed("The gif you have choose is not supported 😮. Please choose another one or download and upload the gif and use the command: ")).setEphemeral(true).queue();
+                        } catch (SQLException throwables) {
+                            Android24.logError(throwables);
+                            throwables.printStackTrace();
+                            slashCommandEvent.getHook().sendMessageEmbeds(Embeds.errorEmbed()).setEphemeral(true).queue();
+                        }
+                    }
+                    case "result" -> {
+                        try {
+                            ResultGif.checkGif(new ResultGif( // שיפורים לכל אלו: לעשות שזה יחזיר רק את מה שצריך. לא צריך כל פעם ליצור אובייקט חדש, מספיק לקבל את מה שצריך ולעשות את זה יותר יעיל
+                                    slashCommandEvent.getOption("a_race").getAsString().equals("null") ? null :
+                                            new Race(slashCommandEvent.getOption("a_race").getAsString()),
+                                    new Transformation(slashCommandEvent.getOption("a_transformation").getAsString()),
+                                    new Attack(slashCommandEvent.getOption("a_attack").getAsString()),
+                                    slashCommandEvent.getOption("d_race").getAsString().equals("null") ? null :
+                                            new Race(slashCommandEvent.getOption("d_race").getAsString()),
+                                    new Transformation(slashCommandEvent.getOption("d_transformation").getAsString()),
+                                    slashCommandEvent.getOption("d_attack").getAsString().equals("null") ? null :
+                                            new Attack(slashCommandEvent.getOption("d_attack").getAsString()),
+                                    slashCommandEvent.getOption("power").getAsLong(),
                                     slashCommandEvent.getOption("link").getAsString()
                             ), user, slashCommandEvent.getId());
                             slashCommandEvent.getHook().sendMessageEmbeds(Embeds.successEmbed("The gif has sent do test and will wait for approval!")).setEphemeral(true).queue();

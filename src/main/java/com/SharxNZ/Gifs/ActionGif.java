@@ -37,9 +37,9 @@ public class ActionGif extends Gif {
     private static String otherSql = "SELECT Length ,Gif FROM gifs.action where `Attack` = ? ORDER BY RAND() LIMIT 1;";
 
 
-    public ActionGif(@NotNull Race race, @NotNull Transformation transformation, @NotNull Attack attack, String link) throws ImageProcessingException, IOException {
+    public ActionGif(@Nullable Race race, @NotNull Transformation transformation, @NotNull Attack attack, String link) throws ImageProcessingException, IOException {
         this.setGifAnimatedTimeLengthFromUrl(link);
-        this.race = race.getName();
+        this.race = race != null ? race.getName() : null;
         this.transformation = transformation.getAbbreviated();
         this.attack = attack.getAbbreviated();
     }
@@ -69,7 +69,7 @@ public class ActionGif extends Gif {
             if (resultSet.next())
                 half = resultSet.getInt(1) - precise;
             if (resultSet.next())
-                other = resultSet.getInt(1) - half;
+                other = resultSet.getInt(1) - (half + precise);
             statement.close();
             if ((precise + half + other) <= 0)
                 return null;
@@ -116,7 +116,7 @@ public class ActionGif extends Gif {
     public static void checkGif(@NotNull ActionGif gif, User user, String id) {
         EmbedBuilder builder = new EmbedBuilder();
         builder.setTitle("Action Gif");
-        builder.addField("Race", gif.race, false);
+        builder.addField("Race", gif.race != null ? gif.race : "null", false);
         builder.addField("Transformation", gif.transformation != null ? gif.transformation : "base", false);
         builder.addField("Attack", gif.attack, false);
         builder.addField("Length", String.valueOf(gif.length), false);
@@ -128,6 +128,7 @@ public class ActionGif extends Gif {
 
     }
 
+    @Override
     public boolean saveGif() {
         try (
                 Connection con = Android24.getConnection();
@@ -147,7 +148,7 @@ public class ActionGif extends Gif {
     }
 
     @NotNull
-    private static String fixSql(String transformation, String sql) {
+    public static String fixSql(String transformation, String sql) {
         if (transformation == null)
             sql = sql.replaceAll("#", "is");
         else
