@@ -23,9 +23,15 @@ public class TransGif extends Gif { // הכלאס הזה דורש תיקון ד�
     protected String to;
 
     private static String statementSql = """
-            SELECT count(GifID) as 'precise' FROM gifs.transform where `From` # ? and `To` ~ ?
-            union
-            SELECT count(GifID) as 'total' FROM gifs.transform where `To` ~ ?;
+            SELECT
+                SUM(CASE WHEN
+                    `From` # ? and `To` ~ ?
+                THEN 1 ELSE 0 END) AS 'precise',
+                SUM(CASE WHEN
+                    `To` ~ ?
+                THEN 1 ELSE 0 END) AS 'total'
+            FROM
+                gifs.transform
             """;
 
     private static String preciseSql = "SELECT Length ,Gif FROM gifs.transform where `From` # ? and `To` ~ ? ORDER BY RAND() LIMIT 1;";
@@ -112,8 +118,7 @@ public class TransGif extends Gif { // הכלאס הזה דורש תיקון ד�
             if (!resultSet.next())
                 return null;
             precise = resultSet.getInt(1);
-            if (resultSet.next())
-                other = resultSet.getInt(1) - precise;
+            other = resultSet.getInt(2) - precise;
             statement.close();
             if (from != null && from.equals(to))
                 other = 0;

@@ -122,7 +122,6 @@ public abstract class Android24 {
 
     // TODO: 16/10/2021 make the result gif sql
     // TODO: 18/10/2021 add the race = null option
-    // TODO: 18/10/2021 fix the SQL and make use of the case in all the other gifs
 
     public static void main(String[] args) throws LoginException, InterruptedException, SQLException, ImageProcessingException, IOException {
 

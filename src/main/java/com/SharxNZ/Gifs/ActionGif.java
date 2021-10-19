@@ -23,11 +23,18 @@ public class ActionGif extends Gif {
     protected String attack;
 
     private static String statementSql = """
-            SELECT count(GifID) as 'precise' FROM gifs.action where `Race` = ? and `Transformation` # ? and `Attack` = ?
-            union
-            SELECT count(GifID) as 'half-total' FROM gifs.action where (`Race` = ? or `Transformation` # ?) and `Attack` = ?
-            union
-            SELECT count(GifID) as 'total' FROM gifs.action where`Attack` = ?;
+            SELECT
+                sum(case when
+                    `Race` = ? and `Transformation` # ? and `Attack` = ?
+                then 1 else 0 end) as 'precise',
+                sum(case when
+                    (`Race` = ? or `Transformation` # ?) and `Attack` = ?
+                then 1 else 0 end) as 'half',
+                sum(case when
+                    `Attack` = ?
+                then 1 else 0 end) as 'total'
+            FROM
+                gifs.action
             """;
 
     private static String preciseSql = "SELECT Length ,Gif FROM gifs.action where `Race` = ? and `Transformation` # ? and `Attack` = ? ORDER BY RAND() LIMIT 1;";
@@ -66,10 +73,8 @@ public class ActionGif extends Gif {
             if (!resultSet.next())
                 return null;
             precise = resultSet.getInt(1);
-            if (resultSet.next())
-                half = resultSet.getInt(1) - precise;
-            if (resultSet.next())
-                other = resultSet.getInt(1) - (half + precise);
+            half = resultSet.getInt(2) - precise;
+            other = resultSet.getInt(3) - (half + precise);
             statement.close();
             if ((precise + half + other) <= 0)
                 return null;
