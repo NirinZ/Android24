@@ -1,7 +1,7 @@
 package com.SharxNZ.Utilities;
 
 import com.SharxNZ.Android24;
-import com.SharxNZ.Commands.GameCommands.Shop;
+import com.SharxNZ.Shop.Shop;
 import com.SharxNZ.Game.Ability;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;

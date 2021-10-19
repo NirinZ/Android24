@@ -195,7 +195,7 @@ public class Battle {
         attacker.randomizeStats();
         defender.randomizeStats();
         double speedDiff = attacker.getSpeed() / (defender.getSpeed() + 0.0);
-        int damage;
+        long damage;
         System.out.println(attacker);
         System.out.println(defender);
         System.out.println("speed Diff : " + speedDiff);
@@ -240,7 +240,7 @@ public class Battle {
         attacker.randomizeStats();
         defender.randomizeStats();
         double speedDiff = attacker.getSpeed() / (defender.getSpeed() + 0.0);
-        int damage;
+        long damage;
         System.out.println(attacker);
         System.out.println(defender);
         System.out.println(speedDiff);
@@ -288,7 +288,7 @@ public class Battle {
         attacker.randomizeStats();
         defender.randomizeStats();
         double speedDiff = attacker.getSpeed() / (defender.getSpeed() + 0.0);
-        int damage;
+        long damage;
         System.out.println(attacker);
         System.out.println(defender);
         System.out.println("Speed Diff : " + speedDiff);
@@ -329,7 +329,7 @@ public class Battle {
         attacker.randomizeStats();
         defender.randomizeStats();
         double powerDiff = attacker.getKiAttack() / (defender.getKiAttack() + 0.0);
-        int damage;
+        long damage;
         System.out.println(attacker);
         System.out.println(defender);
         System.out.println(powerDiff);
@@ -362,7 +362,7 @@ public class Battle {
         attacker.randomizeStats();
         defender.randomizeStats();
         double speedDiff = attacker.getSpeed() / (defender.getSpeed() + 0.0);
-        int damage;
+        long damage;
         System.out.println(attacker);
         System.out.println(defender);
         System.out.println(speedDiff);

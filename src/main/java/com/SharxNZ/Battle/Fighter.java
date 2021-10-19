@@ -19,12 +19,12 @@ import java.util.Random;
 
 public class Fighter extends Stats {
 
-    private final int baseHealth = super.health;
-    private final int baseKi = super.ki;
-    private final int baseStrikeAttack = super.strikeAttack;
-    private final int baseKiAttack = super.kiAttack;
-    private final int baseDefence = super.defence;
-    private final int baseSpeed = super.speed;
+    private final long baseHealth = super.health;
+    private final long baseKi = super.ki;
+    private final long baseStrikeAttack = super.strikeAttack;
+    private final long baseKiAttack = super.kiAttack;
+    private final long baseDefence = super.defence;
+    private final long baseSpeed = super.speed;
 
     private Fighter target;
     private Attack attack;
@@ -63,7 +63,7 @@ public class Fighter extends Stats {
     /**
      * @return power
      */
-    public short takeDamage(int damage) {
+    public short takeDamage(long damage) {
         if (damage >= 0) {
             health -= damage;
             return (short) Math.max(0, Math.min(100, 100 * damage / (baseHealth / 4)));
@@ -106,7 +106,7 @@ public class Fighter extends Stats {
         speed *= rand.nextDouble() + 1;
     }
 
-    private static String getStatBar(int part, int full, String chr) {
+    private static String getStatBar(long part, long full, String chr) {
         part = 10 * (Math.max(part, 0)) / full;
         String bar = "";
         for (int i = 0; i < part; i++) {

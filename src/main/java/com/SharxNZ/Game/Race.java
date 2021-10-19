@@ -28,7 +28,7 @@ public class Race { // זה יכול ליצר רשימה של אובייקטים
             ResultSet resultSet = statement.executeQuery();
             if (!resultSet.next())
                 throw new NameNotFoundException("There is no such race");
-            this.name = name;
+            this.name = resultSet.getString(1);
             health = resultSet.getInt(2);
             ki = resultSet.getInt(3);
             strikeAttack = resultSet.getInt(4);

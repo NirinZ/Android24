@@ -16,15 +16,15 @@ public class Being { // לסדר את זה שלא יהיה סטט כי לא צר
     protected long userID;
     protected String name;
     protected String race;
-    protected int zeni;
+    protected long zeni;
     protected int level;
     protected int powerPoints;
-    protected int health;
-    protected int ki;
-    protected int strikeAttack;
-    protected int kiAttack;
-    protected int defence;
-    protected int speed;
+    protected long health;
+    protected long ki;
+    protected long strikeAttack;
+    protected long kiAttack;
+    protected long defence;
+    protected long speed;
     protected Transformation transformation;
 
     protected boolean inUse;
@@ -78,8 +78,8 @@ public class Being { // לסדר את זה שלא יהיה סטט כי לא צר
             }
             // resultSet.getMetaData().getColumnCount()
             this.race = resultSet.getString(1);
-            this.level = Level.calculateLevel(resultSet.getInt(2));
-            this.zeni = resultSet.getInt(3);
+            this.level = Level.calculateLevel(resultSet.getLong(2));
+            this.zeni = resultSet.getLong(3);
             this.powerPoints = resultSet.getInt(4);
             this.health = resultSet.getInt(5);
             this.ki = resultSet.getInt(6);
@@ -97,7 +97,7 @@ public class Being { // לסדר את זה שלא יהיה סטט כי לא צר
         }
     }
 
-    public static Being getBeing(long userID) {
+    public static @NotNull Being NA_getBeing(long userID) {
         Being being;
         if (beings.containsKey(userID)) {
             being = beings.get(userID);
@@ -108,19 +108,23 @@ public class Being { // לסדר את זה שלא יהיה סטט כי לא צר
         return being;
     }
 
+    public static @NotNull Being getBeing(long userID) {
+        return new Being(userID);
+    }
+
     public void save() {
         try (
                 Connection con = Android24.getConnection();
                 PreparedStatement saveBeingStatement = con.prepareStatement(saveBeingStatementSql)
         ) {
 
-            saveBeingStatement.setInt(1, getPowerPoints());
-            saveBeingStatement.setInt(2, getHealth());
-            saveBeingStatement.setInt(3, getKi());
-            saveBeingStatement.setInt(4, getStrikeAttack());
-            saveBeingStatement.setInt(5, getKiAttack());
-            saveBeingStatement.setInt(6, getDefence());
-            saveBeingStatement.setInt(7, getSpeed());
+            saveBeingStatement.setLong(1, getPowerPoints());
+            saveBeingStatement.setLong(2, getHealth());
+            saveBeingStatement.setLong(3, getKi());
+            saveBeingStatement.setLong(4, getStrikeAttack());
+            saveBeingStatement.setLong(5, getKiAttack());
+            saveBeingStatement.setLong(6, getDefence());
+            saveBeingStatement.setLong(7, getSpeed());
             saveBeingStatement.setLong(8, userID);
             saveBeingStatement.executeUpdate();
 
@@ -222,7 +226,7 @@ public class Being { // לסדר את זה שלא יהיה סטט כי לא צר
         return this.race;
     }
 
-    public int getZeni() {
+    public long getZeni() {
         return zeni;
     }
 
@@ -234,27 +238,27 @@ public class Being { // לסדר את זה שלא יהיה סטט כי לא צר
         return powerPoints;
     }
 
-    public int getHealth() {
+    public long getHealth() {
         return health;
     }
 
-    public int getKi() {
+    public long getKi() {
         return ki;
     }
 
-    public int getStrikeAttack() {
+    public long getStrikeAttack() {
         return strikeAttack;
     }
 
-    public int getKiAttack() {
+    public long getKiAttack() {
         return kiAttack;
     }
 
-    public int getDefence() {
+    public long getDefence() {
         return defence;
     }
 
-    public int getSpeed() {
+    public long getSpeed() {
         return speed;
     }
 

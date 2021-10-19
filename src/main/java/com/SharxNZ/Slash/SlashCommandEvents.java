@@ -5,7 +5,7 @@ import com.SharxNZ.Buttons.PPButtons;
 import com.SharxNZ.Commands.GameCommands.GetStats;
 import com.SharxNZ.Commands.GameCommands.Inventory;
 import com.SharxNZ.Commands.GameCommands.PowerPoints;
-import com.SharxNZ.Commands.GameCommands.Shop;
+import com.SharxNZ.Shop.Shop;
 import com.SharxNZ.Commands.Level;
 import com.SharxNZ.Game.Attack;
 import com.SharxNZ.Game.Being;

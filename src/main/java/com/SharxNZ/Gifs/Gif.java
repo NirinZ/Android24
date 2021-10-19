@@ -105,24 +105,34 @@ public class Gif {
               InputStream in1 = new BufferedInputStream(new URL(link).openStream());
         ) {
             Metadata metadata;
+            InputStream in2 = null;
             try {
                 metadata = ImageMetadataReader.readMetadata(in1); //Trying to take the gif
             } catch (ImageProcessingException exception) { // Getting here if the file is an HTML
                 Document doc = Jsoup.connect(link).get(); // It is faster to download the site, but this is cleaner.
                 Elements elm = doc.select("img[src$=.gif]");
-                link = elm.get(0).attr("src"); // Taking the gif from the HTML
-                try ( // Another try just for the resources, and this time with the actual gif link
-                      InputStream in2 = new BufferedInputStream(new URL(link).openStream());
-                ) {
+                if (!elm.isEmpty()) {
+                    link = elm.get(0).attr("src"); // Taking the gif from the HTML
+                    in2 = new BufferedInputStream(new URL(link).openStream());
                     metadata = ImageMetadataReader.readMetadata(in2);
+                }else{
+                    System.out.println("====================");
+                    System.out.println(link);
+                    System.out.println("====================");
+                    System.out.println(doc);
+                    throw new ImageProcessingException("The doc not supported");
                 }
+            } finally {
+                if (in2 != null)
+                    in2.close();
             }
+
             List<GifControlDirectory> gifControlDirectories =
                     (List<GifControlDirectory>) metadata.getDirectoriesOfType(GifControlDirectory.class);
 
             int timeLength = 0;
             if (gifControlDirectories.size() == 1) { // Do not read delay of static GIF files with single frame.
-                return -1;
+                throw new ImageProcessingException("This gif have only one frame");
             } else if (gifControlDirectories.size() > 1) {
                 for (GifControlDirectory gifControlDirectory : gifControlDirectories) {
                     try {
@@ -137,7 +147,7 @@ public class Gif {
                 //timeLength *= 10;
             }
             if (timeLength < 50)
-                return 1;
+                return  1;
             else
                 return (short) Math.round(timeLength / 100.0);
         }

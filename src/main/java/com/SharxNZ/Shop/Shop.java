@@ -1,8 +1,9 @@
-package com.SharxNZ.Commands.GameCommands;
+package com.SharxNZ.Shop;
 
 import com.SharxNZ.Android24;
 import com.SharxNZ.Game.DisplayAttack;
 import com.SharxNZ.Game.DisplayTransformation;
+import com.SharxNZ.Game.Transformation;
 import com.SharxNZ.Utilities.DoublyCircularLinkedList;
 import com.SharxNZ.Utilities.Embeds;
 import com.SharxNZ.Utilities.PreparedSql;
@@ -17,128 +18,154 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public abstract class Shop {
+    private static final String buyAttackSql;
+    private static final String buyTransformationSql;
+    private static final String checkTypeSql;
+    private static final String maxStoreySql;
+    public static String asStatementSql;
+    public static String tsStatementSql;
 
-    private static String buyAttackSql = """
-            SELECT
-                IF('Already owned' NOT IN (SELECT
-                            'Already owned' AS 'Check if exist'
-                        FROM
-                            android24.users_attacks
-                        WHERE
-                            UserID = ?
-                                AND AttackAbbreviated = (SELECT
-                                    AttackAbbreviated
-                                FROM
-                                    android24.attacks
-                                WHERE
-                                    AttackAbbreviated = ?
-                                        OR AttackName = ?)),
-                    IF(ForcedRace IS NULL OR Race = ForcedRace,
-                        IF(POWER(XP, ?) >= MinimalLevel,
-                            IF(Zeni >= Cost, 'Ok', 'Under budget'),
-                            'Under Level'),
-                        'Race Limited'),
-                    'Already owned') AS Result
-            FROM
-                android24.users_data AS u,
-                android24.shop AS s
-                    JOIN
-                android24.attacks AS a ON a.AttackName = s.Name
-            WHERE
-                UserID = ?
-                    AND
-                    (AttackName = ?
-                    OR AttackAbbreviated = ?)
-                    AND
-                    Display = true;
-            """;
-    private static String buyTransformationSql = """
-            SELECT
-                IF('Already owned' NOT IN (SELECT
-                            'Already owned' AS 'Check if exist'
-                        FROM
-                            android24.users_transformations
-                        WHERE
-                            UserID = ?
-                                AND TransformationAbbreviated = (SELECT
-                                    TransformationAbbreviated
-                                FROM
-                                    android24.transformations
-                                WHERE
-                                    TransformationAbbreviated = ?
-                                        OR TransformationName = ?)),
-                    IF(ForcedRace IS NULL OR Race = ForcedRace,
-                        IF(POWER(XP, ?) >= MinimalLevel,
-                            IF(Zeni >= Cost, 'Ok', 'Under budget'),
-                            'Under Level'),
-                        'Race Limited'),
-                    'Already owned') AS Result
-            FROM
-                android24.users_data AS u,
-                android24.shop AS s
-                    JOIN
-                android24.transformations AS a ON a.TransformationName = s.Name
-            WHERE
-                UserID = ?
-                    AND (TransformationName = ?
-                    OR TransformationAbbreviated = ?);
-            """;
-    private static String checkTypeSql = """
-            SELECT
-                IF(? IN (SELECT
-                            Name
-                        FROM
-                            android24.attacks
-                                JOIN
-                            android24.shop ON Name = AttackName
-                        WHERE
-                            (shop.Display = TRUE)
-                        UNION
-                        SELECT
-                            AttackAbbreviated
-                        FROM
-                            android24.attacks
-                                JOIN
-                            android24.shop ON Name = AttackName
-                        WHERE
-                            (shop.Display = TRUE)),
-                    'Attack',
+    // Setting the SQL statements
+    static {
+        buyAttackSql = """
+                SELECT
+                    IF('Already owned' NOT IN (SELECT
+                                'Already owned' AS 'Check if exist'
+                            FROM
+                                android24.users_attacks
+                            WHERE
+                                UserID = ?
+                                    AND AttackAbbreviated = (SELECT
+                                        AttackAbbreviated
+                                    FROM
+                                        android24.attacks
+                                    WHERE
+                                        AttackAbbreviated = ?
+                                            OR AttackName = ?)),
+                        IF(ForcedRace IS NULL OR Race = ForcedRace,
+                            IF(POWER(XP, ?) >= MinimalLevel,
+                                IF(Zeni >= Cost, 'Ok', 'Under budget'),
+                                'Under Level'),
+                            'Race Limited'),
+                        'Already owned') AS Result
+                FROM
+                    android24.users_data AS u,
+                    android24.shop AS s
+                        JOIN
+                    android24.attacks AS a ON a.AttackName = s.Name
+                WHERE
+                    UserID = ?
+                        AND
+                        (AttackName = ?
+                        OR AttackAbbreviated = ?)
+                        AND
+                        Display = true;
+                """;
+        buyTransformationSql = """
+                SELECT
+                    IF('Already owned' NOT IN (SELECT
+                                'Already owned' AS 'Check if exist'
+                            FROM
+                                android24.users_transformations
+                            WHERE
+                                UserID = ?
+                                    AND TransformationAbbreviated = (SELECT
+                                        TransformationAbbreviated
+                                    FROM
+                                        android24.transformations
+                                    WHERE
+                                        TransformationAbbreviated = ?
+                                            OR TransformationName = ?)),
+                        IF(ForcedRace IS NULL OR Race = ForcedRace,
+                            IF(POWER(XP, ?) >= MinimalLevel,
+                                IF(Zeni >= Cost, 'Ok', 'Under budget'),
+                                'Under Level'),
+                            'Race Limited'),
+                        'Already owned') AS Result
+                FROM
+                    android24.users_data AS u,
+                    android24.shop AS s
+                        JOIN
+                    android24.transformations AS a ON a.TransformationName = s.Name
+                WHERE
+                    UserID = ?
+                        AND (TransformationName = ?
+                        OR TransformationAbbreviated = ?);
+                """;
+        checkTypeSql = """
+                SELECT
                     IF(? IN (SELECT
-                            Name
-                        FROM
-                            android24.transformations
-                                JOIN
-                            android24.shop ON Name = TransformationName
+                                Name
+                            FROM
+                                android24.attacks
+                                    JOIN
+                                android24.shop ON Name = AttackName
+                            WHERE
+                                (shop.Display = TRUE)
                             UNION
                             SELECT
-                            TransformationAbbreviated
-                        FROM
-                            android24.transformations
-                                JOIN
-                            android24.shop ON Name = TransformationName), 'Transformation', 'Not exists')) AS 'Type'
-            """;
-    public static String asStatementSql = """
-            SELECT
-                AttackName, Cost, MinimalLevel
-            FROM
-                android24.attacks
-                    JOIN
-                android24.shop ON AttackName = Name
-            WHERE
-                (ForcedRace IS NULL OR ForcedRace = ?)
-                AND
-                Display = true;
-            """;
-    public static String tsStatementSql = """
-            SELECT
-                TransformationName, Cost, MinimalLevel
-            FROM
-                android24.transformations
-                    JOIN
-                android24.shop ON TransformationName = Name
-            WHERE
-                ForcedRace IS NULL OR ForcedRace = ?;
-            """;
+                                AttackAbbreviated
+                            FROM
+                                android24.attacks
+                                    JOIN
+                                android24.shop ON Name = AttackName
+                            WHERE
+                                (shop.Display = TRUE)),
+                        'Attack',
+                        IF(? IN (SELECT
+                                Name
+                            FROM
+                                android24.transformations
+                                    JOIN
+                                android24.shop ON Name = TransformationName
+                                UNION
+                                SELECT
+                                TransformationAbbreviated
+                            FROM
+                                android24.transformations
+                                    JOIN
+                                android24.shop ON Name = TransformationName), 'Transformation', 'Not exists')) AS 'Type'
+                """;
+
+        maxStoreySql = """
+                SELECT
+                    TransformationName
+                FROM
+                    android24.users_transformations
+                        JOIN
+                    android24.transformations USING (TransformationAbbreviated)
+                        JOIN
+                    android24.shop ON TransformationName = Name
+                WHERE
+                    UserID = ?
+                ORDER BY Storey DESC
+                LIMIT 1
+                """;
+
+        asStatementSql = """
+                SELECT
+                    AttackName, Cost, MinimalLevel
+                FROM
+                    android24.attacks
+                        JOIN
+                    android24.shop ON AttackName = Name
+                WHERE
+                    (ForcedRace IS NULL OR ForcedRace = ?)
+                    AND
+                    Display = true;
+                """;
+        tsStatementSql = """
+                SELECT
+                    TransformationName, Cost, MinimalLevel
+                FROM
+                    android24.transformations
+                        JOIN
+                    android24.shop ON TransformationName = Name
+                WHERE
+                    ForcedRace IS NULL OR ForcedRace = ?;
+                """;
+
+    }
 
     public static MessageEmbed shopView(String item) {
         try (
@@ -165,6 +192,21 @@ public abstract class Shop {
             Android24.logError(throwables);
             throwables.printStackTrace();
             return Embeds.errorEmbed();
+        }
+    }
+
+    private static boolean checkIsTransInTree(long userId, String transName) throws SQLException {
+        try (
+                Connection con = Android24.getConnection();
+                PreparedStatement maxStoreyStatement = con.prepareStatement(maxStoreySql);
+        ) {
+            maxStoreyStatement.setLong(1, userId);
+            ResultSet resultSet = maxStoreyStatement.executeQuery();
+            if (!resultSet.next())
+                return true;
+            return TreeShopItem.isAvailable(
+                    TreeShopItem.max(new TreeShopItem(resultSet.getString(1)), new TreeShopItem(transName)),
+                    TreeShopItem.min(new TreeShopItem(resultSet.getString(1)), new TreeShopItem(transName)));
         }
     }
 
@@ -200,10 +242,13 @@ public abstract class Shop {
                 buyTransformation.setString(7, item);
                 resultSet = buyTransformation.executeQuery();
                 if (resultSet.next()) {
-                    if (resultSet.getString(1).equals("Ok") /* && Check structure */) {
-                        buyAttack.close();
-                        buyTransformation.close();
-                        return purchase("Transformation", item, userID);
+                    if (resultSet.getString(1).equals("Ok")) {
+                        if (checkIsTransInTree(userID, new Transformation(item).getName())) {
+                            buyAttack.close();
+                            buyTransformation.close();
+                            return purchase("Transformation", item, userID);
+                        } else
+                            return Embeds.errorEmbed("You can't buy this transformation because you chose other path of transformations!");
                     } else
                         return Embeds.errorEmbed(resultSet.getString(1));
                 } else {
@@ -214,12 +259,15 @@ public abstract class Shop {
             }
 
 
-        } catch (SQLException throwables) {
+        } catch (SQLException | NameNotFoundException throwables) {
             Android24.logError(throwables);
             throwables.printStackTrace();
             return Embeds.errorEmbed();
         }
     }
+    /*max Storey
+
+;*/
 
     private static MessageEmbed purchase(String type, String item, long userID) {
         String purchaseSql = "INSERT INTO android24.users_#s (UserID, $Abbreviated) " +
@@ -251,13 +299,6 @@ public abstract class Shop {
             return Embeds.errorEmbed();
         }
 
-        /*max Storey
-        SELECT Storey FROM android24.users_transformations
-join android24.transformations using(TransformationAbbreviated)
-join android24.shop on TransformationName = Name
-where UserID = 739532349280354404
-order by Storey
-;*/
     }
 
     public static MessageEmbed displayAttack(String name) {

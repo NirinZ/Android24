@@ -225,13 +225,13 @@ public void previousValue(){
                 PreparedStatement saveBeingStatement = con.prepareStatement(saveBeingStatementSql)
         ){
 
-            saveBeingStatement.setInt(1, getPowerPoints());
-            saveBeingStatement.setInt(2, getHealth());
-            saveBeingStatement.setInt(3, getKi());
-            saveBeingStatement.setInt(4, getStrikeAttack());
-            saveBeingStatement.setInt(5, getKiAttack());
-            saveBeingStatement.setInt(6, getDefence());
-            saveBeingStatement.setInt(7, getSpeed());
+            saveBeingStatement.setLong(1, getPowerPoints());
+            saveBeingStatement.setLong(2, getHealth());
+            saveBeingStatement.setLong(3, getKi());
+            saveBeingStatement.setLong(4, getStrikeAttack());
+            saveBeingStatement.setLong(5, getKiAttack());
+            saveBeingStatement.setLong(6, getDefence());
+            saveBeingStatement.setLong(7, getSpeed());
             saveBeingStatement.setLong(8, getUserID());
 
             saveBeingStatement.executeUpdate();
@@ -247,32 +247,32 @@ public void previousValue(){
     }
 
     @Override
-    public int getHealth(){
+    public long getHealth(){
         return this.health.get() + super.getHealth();
     }
 
     @Override
-    public int getKi(){
+    public long getKi(){
         return this.ki.get() + super.getKi();
     }
 
     @Override
-    public int getStrikeAttack(){
+    public long getStrikeAttack(){
         return this.strikeAttack.get() + super.getStrikeAttack();
     }
 
     @Override
-    public int getKiAttack(){
+    public long getKiAttack(){
         return this.kiAttack.get() + super.getKiAttack();
     }
 
     @Override
-    public int getDefence(){
+    public long getDefence(){
         return this.defence.get() + super.getDefence();
     }
 
     @Override
-    public int getSpeed(){
+    public long getSpeed(){
         return this.speed.get() + super.getSpeed();
     }
 

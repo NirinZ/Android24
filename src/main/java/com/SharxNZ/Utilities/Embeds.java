@@ -1,12 +1,9 @@
 package com.SharxNZ.Utilities;
 
-import com.SharxNZ.Android24;
-import com.SharxNZ.Commands.GameCommands.Shop;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 
 import java.awt.*;
-import java.sql.SQLException;
 
 public abstract class Embeds {
 

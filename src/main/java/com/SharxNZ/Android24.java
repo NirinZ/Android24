@@ -15,6 +15,7 @@ import com.SharxNZ.GameFunctions.Beginning;
 import com.SharxNZ.GameFunctions.GFButtons;
 import com.SharxNZ.GameFunctions.StartGame;
 import com.SharxNZ.GameFunctions.XP;
+import com.SharxNZ.Gifs.Gif;
 import com.SharxNZ.Slash.AddingCommands;
 import com.SharxNZ.Slash.SelectMenuEvents;
 import com.SharxNZ.Slash.SlashCommandEvents;
@@ -120,15 +121,14 @@ public abstract class Android24 {
      *
      * */
 
-    // TODO: 16/10/2021 make the result gif sql
     // TODO: 18/10/2021 add the race = null option
 
     public static void main(String[] args) throws LoginException, InterruptedException, SQLException, ImageProcessingException, IOException {
 
-//        String url = "https://c.tenor.com/aUIzEUjVdgIAAAAd/goku-mad.gif";
+//        String url = "https://64.media.tumblr.com/43ab3051cbdea7d7f54de77e2ed09547/tumblr_p3aw5uWo9U1wkqooxo1_400.gifv";
 //
 //        System.out.println(Gif.getGifAnimatedTimeLengthFromUrl(url));
-
+//
 //        System.exit(9);
 
         // Set the database

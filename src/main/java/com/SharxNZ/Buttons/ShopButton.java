@@ -1,6 +1,6 @@
 package com.SharxNZ.Buttons;
 
-import com.SharxNZ.Commands.GameCommands.Shop;
+import com.SharxNZ.Shop.Shop;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
