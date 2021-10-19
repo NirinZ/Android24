@@ -81,7 +81,7 @@ public class Battle {
             }
             passes = 0;
             waiter();
-        }, 10, TimeUnit.MINUTES, () -> { // should be 1 minute
+        }, 1, TimeUnit.MINUTES, () -> { // should be 1 minute
             switch (turnType) {
                 case Attack -> {
                     if (passes > battles.size() * 2) {
@@ -422,7 +422,7 @@ public class Battle {
 
     private void end() {
         battles.remove(channelId);
-        Android24.jda.getTextChannelById(channelId).delete().queueAfter(20, TimeUnit.SECONDS);
+        Android24.jda.getTextChannelById(channelId).delete().queueAfter(20, TimeUnit.SECONDS); // should be 20 seconds
     }
 
     private void sendMessage(String message) {

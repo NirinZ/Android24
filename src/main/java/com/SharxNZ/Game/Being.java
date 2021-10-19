@@ -90,14 +90,15 @@ public class Being { // לסדר את זה שלא יהיה סטט כי לא צר
             this.transformation = new Transformation(resultSet.getString(11));
             this.inUse = true;
 
-            beings.put(userID, this);
+            beings.put(userID, this); // Put the being in the object pool
+
         } catch (SQLException | NameNotFoundException throwables) {
             Android24.logError(throwables);
             throwables.printStackTrace();
         }
     }
 
-    public static @NotNull Being NA_getBeing(long userID) {
+    public static @NotNull Being getBeing(long userID) {
         Being being;
         if (beings.containsKey(userID)) {
             being = beings.get(userID);
@@ -108,7 +109,8 @@ public class Being { // לסדר את זה שלא יהיה סטט כי לא צר
         return being;
     }
 
-    public static @NotNull Being getBeing(long userID) {
+    public static @NotNull Being getNewBeing(long userID) {
+        beings.remove(userID);
         return new Being(userID);
     }
 
@@ -275,11 +277,9 @@ public class Being { // לסדר את זה שלא יהיה סטט כי לא צר
     }
 
 
-
     public void setInUse(boolean inUse) {
         this.inUse = inUse;
     }
-
 
 
 }

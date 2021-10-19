@@ -86,7 +86,7 @@ public class Fighter extends Stats {
     public Gif setAttack(@NotNull Attack attack) {
         resetStats();
         if (attack.getAttackType() != Attack.ATTACK_TYPE.Charge)
-            ki -= attack.getKiConsumption() * transformation.getKiConsumption();
+            ki -= (long) attack.getKiConsumption() * transformation.getKiConsumption();
         switch (attack.getAttackType()) {
             case Strike -> strikeAttack *= attack.getAttackPowerUp();
             case Ki -> kiAttack *= attack.getAttackPowerUp();

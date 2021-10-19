@@ -81,7 +81,7 @@ public class GetStats extends Command {
     }
 
     public static MessageEmbed statsEmbed(User user) {
-        Being being = Being.getBeing(user.getIdLong());
+        Being being = Being.getNewBeing(user.getIdLong());
         EmbedBuilder generalEmbed = new EmbedBuilder();
         generalEmbed.setTitle(user.getName());
         if (being.getTransformation().getName() == null)

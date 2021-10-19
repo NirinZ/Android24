@@ -131,6 +131,8 @@ public abstract class Android24 {
 //
 //        System.exit(9);
 
+        // java -jar --enable-preview  Bot.jar
+
         // Set the database
         dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
         dataSource.setJdbcUrl("jdbc:mysql://159.89.111.155:3306/?user=Android24");

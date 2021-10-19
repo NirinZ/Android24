@@ -59,16 +59,10 @@ public abstract class Utils {
     }
 
     public static <T> boolean inUse(T instance) {
-        switch (instance.getClass().getSimpleName()) {
-            case "Being":
-                Being being = (Being) instance;
-                return being.getInUse();
-            case "PowerPoints":
-                PowerPoints powerPoints = (PowerPoints) instance;
-                return powerPoints.getInUse();
-            default:
-                return false;
-        }
+        if (instance instanceof Being being)
+            return being.getInUse();
+        else
+            return false;
 
         // In Java's next version:
         /*switch (instance){
@@ -113,12 +107,12 @@ public abstract class Utils {
         timer.scheduleAtFixedRate(timerTask, 30000, 30000);
     }
 
-    public static void getImageUrl(byte[] image, AtomicReference<String> value){
+    public static void getImageUrl(byte[] image, AtomicReference<String> value) {
         EmbedBuilder wrapper = new EmbedBuilder();
         value.set(
-        Android24.jda.getTextChannelById(Android24.cacheChannelID)
-                .sendFile(image, "png.png")
-                .setEmbeds(wrapper.setImage("attachment://png.png").build())
-                .complete().getEmbeds().get(0).getImage().getUrl());
+                Android24.jda.getTextChannelById(Android24.cacheChannelID)
+                        .sendFile(image, "png.png")
+                        .setEmbeds(wrapper.setImage("attachment://png.png").build())
+                        .complete().getEmbeds().get(0).getImage().getUrl());
     }
 }
