@@ -54,7 +54,7 @@ public abstract class Graphics {
     public static BufferedImage imageFromURL(String url) throws IOException {
         try {
             URL URL = new URL(url);
-            return ImageIO.read(URL);
+            return ImageIO.read(URL); // error
         } catch (IOException e) {
             Android24.logError(e);
             e.printStackTrace();
