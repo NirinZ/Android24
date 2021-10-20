@@ -66,7 +66,7 @@ public class Marco extends ListenerAdapter {
             }
         }
         guildMemberJoinEvent.getMember().getUser().openPrivateChannel().queue(privateChannel -> {
-            privateChannel.sendMessage("Welcome to my amazing server!").queue(null, null);
+            privateChannel.sendMessage("Welcome to my amazing server!").queue(null, throwable -> {});
         });
     }
 

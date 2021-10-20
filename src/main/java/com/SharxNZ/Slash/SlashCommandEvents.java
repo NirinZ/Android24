@@ -222,18 +222,8 @@ public class SlashCommandEvents extends ListenerAdapter {
                                                 guild.modifyRolePositions().selectPosition(role).moveTo(
                                                         guild.getRoleById(server.getTransRole()).getPosition() - 1).queue();
                                             } catch (NullPointerException nullPointerException) {
-                                                guild.retrieveOwner().queue(owner -> {
-                                                    owner.getUser().openPrivateChannel().queue(privateChannel -> {
-                                                        privateChannel.sendMessage("You didn't have a role for the transformations 😱.\n" +
-                                                                "Plz set one to prevent error and for best experience :-)").queue(null, throwable -> {
-                                                            TextChannel textChannel = guild.getTextChannelById(server.getLoggingCh());
-                                                            if (textChannel != null)
-                                                                textChannel.sendMessage(owner.getAsMention() +
-                                                                        "\nYou didn't have a role for the transformations 😱.\n" +
-                                                                        "Plz set one to prevent error and for best experience :-)").queue();
-                                                        });
-                                                    });
-                                                });
+                                                Utils.notifyProblem(guild, server, "You didn't have a role for the transformations 😱.\n" +
+                                                        "Plz set one to prevent error and for best experience :-)");
                                             }
                                         });
                             }
@@ -279,11 +269,13 @@ public class SlashCommandEvents extends ListenerAdapter {
                 Server server = new Server(slashCommandEvent.getGuild().getIdLong());
                 long comCh = !slashCommandEvent.getOptionsByName("cmd_channel").isEmpty() ? slashCommandEvent.getOption("cmd_channel").getAsLong() : server.getCommandsCh();
                 long wlcCh = !slashCommandEvent.getOptionsByName("wlc_channel").isEmpty() ? slashCommandEvent.getOption("wlc_channel").getAsLong() : server.getWelcomeCh();
+                long battleCt = !slashCommandEvent.getOptionsByName("battles_category").isEmpty() ? slashCommandEvent.getOption("battles_category").getAsLong() : server.getBattlesCt();
                 long logCh = !slashCommandEvent.getOptionsByName("logg_channel").isEmpty() ? slashCommandEvent.getOption("logg_channel").getAsLong() : server.getLoggingCh();
                 long transRl = !slashCommandEvent.getOptionsByName("trans_role").isEmpty() ? slashCommandEvent.getOption("trans_role").getAsLong() : server.getTransRole();
                 boolean allowTrsGif = !slashCommandEvent.getOptionsByName("allow_trans_gif").isEmpty() ? slashCommandEvent.getOption("allow_trans_gif").getAsBoolean() : server.isAllowTransGif();
                 server.setCommandsCh(comCh);
                 server.setWelcomeCh(wlcCh);
+                server.setBattlesCt(battleCt);
                 server.setLoggingCh(logCh);
                 server.setTransRole(transRl);
                 server.setAllowTransGif(allowTrsGif);
@@ -292,6 +284,7 @@ public class SlashCommandEvents extends ListenerAdapter {
                 slashCommandEvent.reply(
                         "Command channel: " + (guild.getTextChannelById(server.getCommandsCh()) != null ? guild.getTextChannelById(server.getCommandsCh()).getAsMention() : "`null`") +
                                 "\nWelcome channel: " + (guild.getTextChannelById(server.getWelcomeCh()) != null ? guild.getTextChannelById(server.getWelcomeCh()).getAsMention() : "`null`") +
+                                "\nBattle category: " + (guild.getCategoryById(server.getBattlesCt()) != null ? guild.getCategoryById(server.getBattlesCt()).getAsMention() : "`null`") +
                                 "\nLogging channel: " + (guild.getTextChannelById(server.getLoggingCh()) != null ? guild.getTextChannelById(server.getLoggingCh()).getAsMention() : "`null`") +
                                 "\nTransformations role: " + (guild.getRoleById(server.getTransRole()) != null ? guild.getRoleById(server.getTransRole()).getAsMention() : "`null`") +
                                 "\nAllow transformations gif globally: `" + server.isAllowTransGif() + "`"
@@ -389,7 +382,6 @@ public class SlashCommandEvents extends ListenerAdapter {
                                     .addActionRow(Button.success(buttonID.replace("$", "ufight"), "accept the challenge"), Button.danger(buttonID.replace("$", "udecline"), "decline")).queue();
                         }
                     }
-
                 }
             }
 

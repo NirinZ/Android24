@@ -3,6 +3,8 @@ package com.SharxNZ;
 //Normal JAVA
 
 //Discord (JDA/JDA utilities)
+
+import com.SharxNZ.Battle.Battle;
 import com.SharxNZ.Buttons.BattleButtons;
 import com.SharxNZ.Buttons.PPButtons;
 import com.SharxNZ.Buttons.ShopButton;
@@ -10,12 +12,14 @@ import com.SharxNZ.Commands.*;
 import com.SharxNZ.Commands.GameCommands.GetStats;
 import com.SharxNZ.Commands.GameCommands.Inventory;
 import com.SharxNZ.Commands.GameCommands.StartGameCommand;
+import com.SharxNZ.Commands.ModeretionCommands.CleanDatabase;
+import com.SharxNZ.Commands.ModeretionCommands.LeaveServer;
+import com.SharxNZ.Commands.ModeretionCommands.RefreshNames;
 import com.SharxNZ.Commands.ModeretionCommands.refreshRoles;
 import com.SharxNZ.GameFunctions.Beginning;
 import com.SharxNZ.GameFunctions.GFButtons;
 import com.SharxNZ.GameFunctions.StartGame;
 import com.SharxNZ.GameFunctions.XP;
-import com.SharxNZ.Gifs.Gif;
 import com.SharxNZ.Slash.AddingCommands;
 import com.SharxNZ.Slash.SelectMenuEvents;
 import com.SharxNZ.Slash.SlashCommandEvents;
@@ -33,11 +37,14 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
+import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 
 //SQL
+import javax.imageio.ImageIO;
 import javax.security.auth.login.LoginException;
 import java.io.IOException;
+import java.net.URL;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.*;
@@ -68,11 +75,16 @@ public abstract class Android24 {
         }
     }
 
-    public static void logError(Exception throwables){
-        jda.getTextChannelById(debugChannelID).sendMessage(nirin.getAsMention()+"\n"+throwables.toString()).queue();
+    public static void logError(Exception throwables) {
+        jda.getTextChannelById(debugChannelID).sendMessage("<@" + nirinId + ">\n" + throwables.toString()).queue();
     }
 
-    public static void log(String log){
+    public static void logError(Exception throwables, String text) {
+        jda.getTextChannelById(debugChannelID).sendMessage("<@" + nirinId + ">\n" + throwables.toString()
+                + "\nText:\n" + text).queue();
+    }
+
+    public static void log(String log) {
         jda.getTextChannelById(debugChannelID).sendMessage(log).queue();
     }
 
@@ -86,16 +98,17 @@ public abstract class Android24 {
         // AND are also online
         // OR are the owner of the guild
         policy = policy.or(MemberCachePolicy.OWNER);
-        //policy.cacheMember(jda.getGuildById(728638053559828581L).retrieveMemberById(nirinId).complete());
+        // policy.cacheMember(jda.getGuildById(728638053559828581L).retrieveMemberById(nirinId).complete());
         builder.setMemberCachePolicy(policy);
+        // builder.setChunkingFilter(ChunkingFilter.ALL); I can use that to cache ALL the members
     }
 
-    public static void addCommands(CommandData... commandData){
+    public static void addCommands(CommandData... commandData) {
         commandListDebug.addCommands(commandData);
         commandListAll.addCommands(commandData);
     }
 
-    private static void queueCommands(){
+    private static void queueCommands() {
         commandListDebug.queue();
         commandListAll.queue();
     }
@@ -103,35 +116,29 @@ public abstract class Android24 {
     //אפשר לשלוח קבצים באפמרל!!!! לסדר דחוף את הפוור פוינטס
 
     /**
-     *
-     *
      * Improvements:
      * 1)
      * ניתן לשפר ביצועים אם אני אעשה אבדוק אם אני יכול לעשות get במקום retrieve.
      * כל מה שאני צריך לעשות זה להחליף את כל הקוד בפונציות שמקבלות את ה- user/ member ולעשות:
-     *if(getUser()!= null){
-     *     function(user)
-     *} else{
-     *     retrieveUser.queue(user -> function(user))
-     *}
-     *
+     * if(getUser()!= null){
+     * function(user)
+     * } else{
+     * retrieveUser.queue(user -> function(user))
+     * }
+     * <p>
      * 2)
      * צריך ליעל את כל הקוד ולשפר ביצועים ולעשות שהוא יהיה יותר נקיא, נהיר וטוב.
      * שיהיו כמה שפחות SQL
-     *
-     * */
-
-    // TODO: 18/10/2021 add the race = null option
+     */
 
     public static void main(String[] args) throws LoginException, InterruptedException, SQLException, ImageProcessingException, IOException {
 
-//        String url = "https://64.media.tumblr.com/43ab3051cbdea7d7f54de77e2ed09547/tumblr_p3aw5uWo9U1wkqooxo1_400.gifv";
-//
-//        System.out.println(Gif.getGifAnimatedTimeLengthFromUrl(url));
-//
+//        String url = "https://i.stack.imgur.com/Ke92A.png";
+
 //        System.exit(9);
 
-        // java -jar --enable-preview  Bot.jar
+        // java -jar --enable-preview  android24/Bot.jar > android24/log.log &
+        // 633074
 
         // Set the database
         dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
@@ -139,7 +146,6 @@ public abstract class Android24 {
         dataSource.setUsername("Android24");
         dataSource.setPassword(System.getenv("MySQLPass"));
         dataSource.setMinimumIdle(6);
-
 
 
         //!docs JDABuilder#setMemberCachePolicy
@@ -187,6 +193,8 @@ public abstract class Android24 {
 
         commandClientBuilder.addCommand(new Echo());
         commandClientBuilder.addCommand(new RefreshNames());
+        commandClientBuilder.addCommand(new LeaveServer());
+        commandClientBuilder.addCommand(new CleanDatabase());
         commandClientBuilder.addCommand(new StartGameCommand());
         commandClientBuilder.addCommand(new GetStats());
         commandClientBuilder.addCommand(new refreshRoles());
@@ -198,7 +206,7 @@ public abstract class Android24 {
         // commandListUpdateAction = jda.updateCommands();
         queueCommands();
 
-        jda.getCategoryById(890945913734971472L).getTextChannels().stream().forEach(textChannel -> textChannel.delete().queue());
+        Battle.battlesCleanup();
         jda.getTextChannelById(debugChannelID).sendMessage("אני דלוק").queue();
         // jda.getPresence().setStatus(OnlineStatus.DO_NOT_DISTURB);
         // Test 2

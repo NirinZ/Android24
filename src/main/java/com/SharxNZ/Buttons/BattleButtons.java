@@ -3,8 +3,10 @@ package com.SharxNZ.Buttons;
 import com.SharxNZ.Android24;
 import com.SharxNZ.Battle.Battle;
 import com.SharxNZ.Utilities.Embeds;
+import com.SharxNZ.Utilities.Server;
 import com.SharxNZ.Utilities.Utils;
 import net.dv8tion.jda.api.MessageBuilder;
+import net.dv8tion.jda.api.entities.Category;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
@@ -30,7 +32,13 @@ public class BattleButtons extends ListenerAdapter {
             return;
 
         User clickedUser = buttonClickEvent.getUser();
-        Guild guild = buttonClickEvent.getGuild();
+        Category category = Android24.jda.getCategoryById(new Server(buttonClickEvent.getGuild().getIdLong()).getBattlesCt());
+
+        if (category == null){
+            buttonClickEvent.replyEmbeds(Embeds.errorEmbed("This server hasn't enable battles! Tell the server's admins to set a battles category")).setEphemeral(true).queue();
+//            Utils.notifyProblem(buttonClickEvent.getGuild(), "This server doesn't have a category for battles, please use the `/server_setup` command to set one ☺");
+            return;
+        }
 
         String command = split[1];
         String button = split[2];
@@ -51,13 +59,13 @@ public class BattleButtons extends ListenerAdapter {
             case "pvp" -> {
                 switch (button) {
                     case "fight" -> Android24.jda.retrieveUserById(args[0]).queue(user -> {
-                        new Battle(guild, user, clickedUser);
+                        new Battle(category, user, clickedUser);
                         buttonClickEvent.editMessage(new MessageBuilder("The battle has started in: " + user.getName() + " vs " + clickedUser.getName()).build()).queue();
                     });
                     case "ufight" -> {
                         if (clickedUser.getId().equals(args[1])) {
                             Android24.jda.retrieveUserById(args[0]).queue(user -> {
-                                new Battle(guild, user, clickedUser);
+                                new Battle(category, user, clickedUser);
                                 buttonClickEvent.editMessage(new MessageBuilder("The battle has started in: " + user.getName() + " vs " + clickedUser.getName()).build()).queue();
                             });
                         } else {

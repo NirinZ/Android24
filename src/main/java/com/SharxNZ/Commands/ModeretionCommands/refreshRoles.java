@@ -4,6 +4,7 @@ import com.SharxNZ.Android24;
 import com.SharxNZ.Utilities.Server;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.requests.restaction.order.RoleOrderAction;
 
@@ -19,6 +20,7 @@ public class refreshRoles extends Command {
         super.name = "refreshRoles";
         super.aliases = new String[]{"rr", "rf rl"};
         super.help = "Refreshes the transformations roles base on the location of the role that sets them";
+        super.userPermissions = new Permission[]{Permission.MANAGE_ROLES};
     }
 
     @Override

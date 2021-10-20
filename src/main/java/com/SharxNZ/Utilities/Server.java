@@ -1,6 +1,7 @@
 package com.SharxNZ.Utilities;
 
 import com.SharxNZ.Android24;
+import org.jetbrains.annotations.Nullable;
 
 import javax.management.relation.Role;
 import javax.naming.NameNotFoundException;
@@ -13,19 +14,20 @@ import java.sql.SQLException;
 import static com.SharxNZ.Android24.jda;
 
 public class Server {
-    private long guildID;
-    private long commandsCh;
-    private long welcomeCh;
-    private long loggingCh;
-    private long transRole;
-    private boolean allowTransGif;
+    protected long guildID;
+    protected long commandsCh;
+    protected long welcomeCh;
+    protected long battlesCt;
+    protected long loggingCh;
+    protected long transRole;
+    protected boolean allowTransGif;
 
 
     public Server(long guildID) {
         try (
                 Connection con = Android24.getConnection();
                 PreparedStatement create = con.prepareStatement(
-                        "SELECT CommandsCh, WelcomeCh, LoggingCh,TransRole, AllowTransGif FROM guilds.guilds_data WHERE GuildID = ?;")
+                        "SELECT CommandsCh, WelcomeCh, BattlesCt, LoggingCh, TransRole, AllowTransGif FROM guilds.guilds_data WHERE GuildID = ?;")
         ) {
 
             create.setLong(1, guildID);
@@ -37,9 +39,10 @@ public class Server {
             this.guildID = guildID;
             commandsCh = resultSet.getLong(1);
             welcomeCh = resultSet.getLong(2);
-            loggingCh = resultSet.getLong(3);
-            transRole = resultSet.getLong(4);
-            allowTransGif = resultSet.getBoolean(5);
+            battlesCt = resultSet.getLong(3);
+            loggingCh = resultSet.getLong(4);
+            transRole = resultSet.getLong(5);
+            allowTransGif = resultSet.getBoolean(6);
         } catch (SQLException | NameNotFoundException throwables) {
             Android24.logError(throwables);
             throwables.printStackTrace();
@@ -50,14 +53,15 @@ public class Server {
         try (
                 Connection con = Android24.getConnection();
                 PreparedStatement set = con.prepareStatement(
-                        "UPDATE guilds.guilds_data SET CommandsCh = ?, WelcomeCh = ?, LoggingCh = ?,TransRole = ?, AllowTransGif = ? WHERE GuildID = ?;")
+                        "UPDATE guilds.guilds_data SET CommandsCh = ?, WelcomeCh = ?, BattlesCt = ?, LoggingCh = ?,TransRole = ?, AllowTransGif = ? WHERE GuildID = ?;")
         ) {
             set.setLong(1, commandsCh);
             set.setLong(2, welcomeCh);
-            set.setLong(3, loggingCh);
-            set.setLong(4, transRole);
-            set.setBoolean(5, allowTransGif);
-            set.setLong(6, guildID);
+            set.setLong(3, battlesCt);
+            set.setLong(4, loggingCh);
+            set.setLong(5, transRole);
+            set.setBoolean(6, allowTransGif);
+            set.setLong(7, guildID);
             set.executeUpdate();
         } catch (SQLException throwables) {
             Android24.logError(throwables);
@@ -75,6 +79,10 @@ public class Server {
 
     public long getWelcomeCh() {
         return welcomeCh;
+    }
+
+    public long getBattlesCt() {
+        return battlesCt;
     }
 
     public long getLoggingCh() {
@@ -99,6 +107,10 @@ public class Server {
 
     public void setWelcomeCh(long welcomeCh) {
         this.welcomeCh = welcomeCh;
+    }
+
+    public void setBattlesCt(long battlesCt) {
+        this.battlesCt = battlesCt;
     }
 
     public void setLoggingCh(long loggingCh) {

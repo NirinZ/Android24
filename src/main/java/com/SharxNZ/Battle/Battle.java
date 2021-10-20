@@ -5,15 +5,15 @@ import com.SharxNZ.Game.Attack;
 import com.SharxNZ.Gifs.Gif;
 import com.SharxNZ.Gifs.ResultGif;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.requests.restaction.ChannelAction;
 import org.jetbrains.annotations.NotNull;
 
 import javax.naming.NameNotFoundException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -34,8 +34,8 @@ public class Battle {
 
     private static final HashMap<Long, Battle> battles = new HashMap<>();
 
-    public Battle(Guild guild, User @NotNull ... users) {
-        ChannelAction<TextChannel> channel = guild.getCategoryById(890945913734971472L).createTextChannel(users[0].getName() + " vs " + users[1].getName());
+    public Battle(@NotNull Category category, User @NotNull ... users) {
+        ChannelAction<TextChannel> channel = category.createTextChannel(users[0].getName() + " vs " + users[1].getName());
         String mention = "";
         Fighter tempFighter;
         for (User user : users) {
@@ -440,6 +440,20 @@ public class Battle {
     private void sendGif(Gif gif) {
         if (gif != null)
             Android24.jda.getTextChannelById(channelId).sendMessage(gif.getLink()).queue(message -> message.delete().queueAfter(15, TimeUnit.SECONDS));
+    }
+
+    public static void battlesCleanup() throws SQLException {
+        try (
+                Connection con = Android24.getConnection();
+                PreparedStatement statement = con.prepareStatement("SELECT BattlesCt FROM guilds.guilds_data;")
+        ) {
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                Category category = Android24.jda.getCategoryById(resultSet.getLong(1));
+                if (category != null)
+                    category.getTextChannels().forEach(textChannel -> textChannel.delete().queue());
+            }
+        }
     }
 
     public long getChannelId() {

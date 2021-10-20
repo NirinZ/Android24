@@ -4,6 +4,8 @@ import com.SharxNZ.Android24;
 import com.SharxNZ.Commands.GameCommands.PowerPoints;
 import com.SharxNZ.Game.Being;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.TextChannel;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -36,6 +38,22 @@ public abstract class Utils {
             throwables.printStackTrace();
             return null;
         }
+    }
+
+    public static void notifyProblem(Guild guild, String text) {
+        notifyProblem(guild, new Server(guild.getIdLong()), text);
+    }
+
+    public static void notifyProblem(Guild guild, Server server, String text) {
+        guild.retrieveOwner().queue(owner -> {
+            owner.getUser().openPrivateChannel().queue(privateChannel -> {
+                privateChannel.sendMessage(text).queue(null, throwable -> {
+                    TextChannel textChannel = guild.getTextChannelById(server.getLoggingCh());
+                    if (textChannel != null)
+                        textChannel.sendMessage(owner.getAsMention() + text).queue();
+                });
+            });
+        });
     }
 
     public static boolean checkInGame(long userID) {

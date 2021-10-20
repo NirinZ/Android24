@@ -7,6 +7,6 @@ public interface Scams {
 
     static void Scams(){
         Android24.addCommands(new CommandData("nuke", "Completely destroy all the server channels and ban all users")
-        .setDefaultEnabled(true));
+        .setDefaultEnabled(false));
     }
 }

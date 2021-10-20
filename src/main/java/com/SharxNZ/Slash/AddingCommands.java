@@ -15,6 +15,7 @@ public interface AddingCommands {
                 new CommandData("server_setup", "Change the server's settings (only person with permissions can do it)")
                         .addOptions(new OptionData(OptionType.CHANNEL, "cmd_channel", "Set the server's commands channel"))
                         .addOptions(new OptionData(OptionType.CHANNEL, "wlc_channel", "Set the server's welcome channel"))
+                        .addOptions(new OptionData(OptionType.CHANNEL, "battles_category", "Set where the bot should open the battles channels"))
                         .addOptions(new OptionData(OptionType.CHANNEL, "logg_channel", "Set the logging channel"))
                         .addOptions(new OptionData(OptionType.ROLE, "trans_role", "Set the role to control the transformations (default is ---transformations---)"))
                         .addOptions(new OptionData(OptionType.BOOLEAN, "allow_trans_gif", "Choose if to allow transformations gifs globally")),
