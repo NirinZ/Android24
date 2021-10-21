@@ -149,7 +149,7 @@ public abstract class Android24 {
 
 //        System.exit(9);
 
-        // java -jar --enable-preview  android24/Bot.jar > android24/log.log &
+        // java -jar --enable-preview  android24/Compiled/Bot.jar > android24/Compiled/log.log &
         // 633074
 
         // Set the database
