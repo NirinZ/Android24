@@ -44,8 +44,6 @@ public class Stats extends Being {
             }
         } catch (Exception throwables) {
             logError(throwables);
-            throwables.printStackTrace();
-
         }
     }
 
@@ -71,8 +69,6 @@ public class Stats extends Being {
 
         } catch (Exception throwables) {
             logError(throwables);
-            throwables.printStackTrace();
-
         }
     }
 

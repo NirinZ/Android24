@@ -67,7 +67,6 @@ public class SlashCommandEvents extends ListenerAdapter {
                             .setEphemeral(true).queue();
                 } catch (SQLException | NameNotFoundException e) {
                     Android24.logError(e);
-                    e.printStackTrace();
                     slashCommandEvent.replyEmbeds(Embeds.errorEmbed()).setEphemeral(true).queue();
                 }
             }
@@ -165,7 +164,7 @@ public class SlashCommandEvents extends ListenerAdapter {
                         }
                     } catch (SQLException throwables) {
                         Android24.logError(throwables);
-                        throwables.printStackTrace();
+
                     } catch (NameNotFoundException exception) {
                         slashCommandEvent.replyEmbeds(Embeds.errorEmbed("You have no items to display...")).queue();
                     }
@@ -231,7 +230,7 @@ public class SlashCommandEvents extends ListenerAdapter {
                             slashCommandEvent.reply("This transformations doesn't exists.").setEphemeral(true).queue();
                         } catch (SQLException throwables) {
                             Android24.logError(throwables);
-                            throwables.printStackTrace();
+
                             slashCommandEvent.replyEmbeds(Embeds.errorEmbed()).setEphemeral(true).queue();
                         }
                     });
@@ -247,7 +246,6 @@ public class SlashCommandEvents extends ListenerAdapter {
                                 being.setTransformation(new Transformation("base"));
                             } catch (NameNotFoundException | SQLException e) {
                                 Android24.logError(e);
-                                e.printStackTrace();
                             }
                             if (gif == null)
                                 slashCommandEvent.reply("You have reverted back").setEphemeral(true).queue();
@@ -310,7 +308,7 @@ public class SlashCommandEvents extends ListenerAdapter {
                             slashCommandEvent.getHook().sendMessageEmbeds(Embeds.errorEmbed("The gif you have choose is not supported 😮. Please choose another one or download and upload the gif and use the command: `!addTransGif`")).setEphemeral(true).queue();
                         } catch (SQLException throwables) {
                             Android24.logError(throwables);
-                            throwables.printStackTrace();
+
                             slashCommandEvent.getHook().sendMessageEmbeds(Embeds.errorEmbed()).setEphemeral(true).queue();
                         }
                     }
@@ -331,7 +329,7 @@ public class SlashCommandEvents extends ListenerAdapter {
                             slashCommandEvent.getHook().sendMessageEmbeds(Embeds.errorEmbed("The gif you have choose is not supported 😮. Please choose another one or download and upload the gif and use the command: ")).setEphemeral(true).queue();
                         } catch (SQLException throwables) {
                             Android24.logError(throwables);
-                            throwables.printStackTrace();
+
                             slashCommandEvent.getHook().sendMessageEmbeds(Embeds.errorEmbed()).setEphemeral(true).queue();
                         }
                     }
@@ -358,7 +356,7 @@ public class SlashCommandEvents extends ListenerAdapter {
                             slashCommandEvent.getHook().sendMessageEmbeds(Embeds.errorEmbed("The gif you have choose is not supported 😮. Please choose another one or download and upload the gif and use the command: ")).setEphemeral(true).queue();
                         } catch (SQLException throwables) {
                             Android24.logError(throwables);
-                            throwables.printStackTrace();
+
                             slashCommandEvent.getHook().sendMessageEmbeds(Embeds.errorEmbed()).setEphemeral(true).queue();
                         }
                     }

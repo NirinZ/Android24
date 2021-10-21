@@ -144,7 +144,6 @@ public class Battle {
             return "This attack doesn't exists";
         } catch (SQLException e) {
             Android24.logError(e);
-            e.printStackTrace();
             return "Some error has accrue";
         }
     }

@@ -56,7 +56,6 @@ public class TransGif extends Gif { // הכלאס הזה דורש תיקון ד�
             link = resultSet.getString(6);
         } catch (SQLException throwables) {
             Android24.logError(throwables);
-            throwables.printStackTrace();
         }
     }
 
@@ -77,7 +76,6 @@ public class TransGif extends Gif { // הכלאס הזה דורש תיקון ד�
             this.link = link;
         } catch (SQLException throwables) {
             Android24.logError(throwables);
-            throwables.printStackTrace();
         }
     }
 
@@ -144,7 +142,6 @@ public class TransGif extends Gif { // הכלאס הזה דורש תיקון ד�
 
         } catch (SQLException throwables) {
             Android24.logError(throwables);
-            throwables.printStackTrace();
             return null;
         }
     }

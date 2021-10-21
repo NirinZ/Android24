@@ -60,7 +60,7 @@ public class Marco extends ListenerAdapter {
                 guildMemberJoinEvent.getGuild().getTextChannelById(server.getWelcomeCh()).sendMessage(guildMemberJoinEvent.getMember().getAsMention() + " Joined he is cool!").queue();
                 guildMemberJoinEvent.getGuild().getTextChannelById(server.getWelcomeCh()).sendFile(Graphics.welcomeImage(guildMemberJoinEvent), "welcome.jpg").queue();
             } catch (IOException e) {
-                e.printStackTrace();
+                Android24.logError(e);
             } catch (NullPointerException ignored){
 
             }

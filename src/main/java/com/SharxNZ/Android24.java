@@ -20,11 +20,14 @@ import com.SharxNZ.GameFunctions.Beginning;
 import com.SharxNZ.GameFunctions.GFButtons;
 import com.SharxNZ.GameFunctions.StartGame;
 import com.SharxNZ.GameFunctions.XP;
+import com.SharxNZ.Gifs.Gif;
 import com.SharxNZ.Slash.AddingCommands;
 import com.SharxNZ.Slash.SelectMenuEvents;
 import com.SharxNZ.Slash.SlashCommandEvents;
 import com.SharxNZ.Utilities.AddTransGif;
+import com.drew.imaging.ImageMetadataReader;
 import com.drew.imaging.ImageProcessingException;
+import com.drew.metadata.gif.GifControlDirectory;
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
@@ -43,6 +46,7 @@ import net.dv8tion.jda.api.utils.MemberCachePolicy;
 //SQL
 import javax.imageio.ImageIO;
 import javax.security.auth.login.LoginException;
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.Connection;
@@ -70,18 +74,26 @@ public abstract class Android24 {
             return dataSource.getConnection();
         } catch (SQLException throwables) {
             logError(throwables);
-            throwables.printStackTrace();
             return null;
         }
     }
 
     public static void logError(Exception throwables) {
-        jda.getTextChannelById(debugChannelID).sendMessage("<@" + nirinId + ">\n" + throwables.toString()).queue();
+        throwables.printStackTrace();
+        StringBuilder builder = new StringBuilder();
+        for (StackTraceElement stack : throwables.getStackTrace())
+            builder.append(stack).append("\n");
+        jda.getTextChannelById(debugChannelID).sendMessage("<@" + nirinId + ">\n" + throwables + "\nStack Trace:\n"
+                + builder).queue();
     }
 
     public static void logError(Exception throwables, String text) {
-        jda.getTextChannelById(debugChannelID).sendMessage("<@" + nirinId + ">\n" + throwables.toString()
-                + "\nText:\n" + text).queue();
+        throwables.printStackTrace();
+        StringBuilder builder = new StringBuilder();
+        for (StackTraceElement stack : throwables.getStackTrace())
+            builder.append(stack).append("\n");
+        jda.getTextChannelById(debugChannelID).sendMessage("<@" + nirinId + ">\n" + "Text:\n" + text + throwables
+                + "\nStack Trace:\n" + builder).queue();
     }
 
     public static void log(String log) {
@@ -133,7 +145,7 @@ public abstract class Android24 {
 
     public static void main(String[] args) throws LoginException, InterruptedException, SQLException, ImageProcessingException, IOException {
 
-//        String url = "https://i.stack.imgur.com/Ke92A.png";
+//        String url = "http.g";
 
 //        System.exit(9);
 

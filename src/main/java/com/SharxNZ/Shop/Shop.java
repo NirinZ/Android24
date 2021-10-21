@@ -190,7 +190,6 @@ public abstract class Shop {
             }
         } catch (SQLException throwables) {
             Android24.logError(throwables);
-            throwables.printStackTrace();
             return Embeds.errorEmbed();
         }
     }
@@ -261,7 +260,6 @@ public abstract class Shop {
 
         } catch (SQLException | NameNotFoundException throwables) {
             Android24.logError(throwables);
-            throwables.printStackTrace();
             return Embeds.errorEmbed();
         }
     }
@@ -295,7 +293,6 @@ public abstract class Shop {
             return Embeds.successEmbed("The item has been purchased successfully!");
         } catch (SQLException throwables) {
             Android24.logError(throwables);
-            throwables.printStackTrace();
             return Embeds.errorEmbed();
         }
 
@@ -308,7 +305,6 @@ public abstract class Shop {
             return Embeds.errorEmbed("The requested item doesn't exist...");
         } catch (SQLException throwables) {
             Android24.logError(throwables);
-            throwables.printStackTrace();
             return Embeds.errorEmbed();
         }
     }
@@ -320,7 +316,6 @@ public abstract class Shop {
             return Embeds.errorEmbed("The requested item doesn't exist...");
         } catch (SQLException throwables) {
             Android24.logError(throwables);
-            throwables.printStackTrace();
             return Embeds.errorEmbed();
         }
     }
@@ -342,7 +337,6 @@ public abstract class Shop {
             return asEmbed.build();
         } catch (SQLException throwables) {
             Android24.logError(throwables);
-            throwables.printStackTrace();
             return Embeds.errorEmbed();
         }
     }
@@ -364,7 +358,6 @@ public abstract class Shop {
             return tsEmbed.build();
         } catch (SQLException throwables) {
             Android24.logError(throwables);
-            throwables.printStackTrace();
             return Embeds.errorEmbed();
         }
     }
@@ -384,7 +377,6 @@ public abstract class Shop {
             return attacks;
         } catch (SQLException | NameNotFoundException throwables) {
             Android24.logError(throwables);
-            throwables.printStackTrace();
             return null;
         }
     }
@@ -404,7 +396,6 @@ public abstract class Shop {
             return transformations;
         } catch (SQLException | NameNotFoundException throwables) {
             Android24.logError(throwables);
-            throwables.printStackTrace();
             return null;
         }
     }

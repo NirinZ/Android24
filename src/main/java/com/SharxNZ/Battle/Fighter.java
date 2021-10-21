@@ -48,7 +48,6 @@ public class Fighter extends Stats {
                 specialAttacks.add(resultSet.getString(1));
         } catch (SQLException throwables) {
             Android24.logError(throwables);
-            throwables.printStackTrace();
         }
     }
 

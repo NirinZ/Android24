@@ -49,7 +49,6 @@ public abstract class Level {
             } else return new byte[0];
         } catch (Exception throwables) {
             Android24.logError(throwables);
-            throwables.printStackTrace();
             return new byte[0];
         }
     }

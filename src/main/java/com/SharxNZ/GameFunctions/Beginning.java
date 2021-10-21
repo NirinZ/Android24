@@ -1,10 +1,12 @@
 package com.SharxNZ.GameFunctions;
 
 import com.SharxNZ.Android24;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.events.guild.GuildLeaveEvent;
 import net.dv8tion.jda.api.exceptions.ContextException;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.requests.RestAction;
 import org.apache.commons.lang3.exception.ContextedException;
 
 import javax.annotation.Nonnull;
@@ -14,7 +16,7 @@ import java.sql.SQLException;
 
 public class Beginning extends ListenerAdapter {
 
-    private static String joiningMessage = """
+    private static final String joiningMessage = """
             Thanks for inviting my to your server!
             There are some stuff that you should take care of before we start.
             1) You or one of your staff should use the command `/server_setup` to define the server settings.
@@ -59,7 +61,6 @@ public class Beginning extends ListenerAdapter {
 
                             } catch (SQLException throwables) {
                                 Android24.logError(throwables);
-                                throwables.printStackTrace();
                             }
 
                         })

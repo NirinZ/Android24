@@ -85,10 +85,8 @@ public class Transformation extends Ability {
                     checkTransformation.close();
                     return true;
                 }
-            checkTransformation.close();
         } catch (SQLException throwables) {
             Android24.logError(throwables);
-            throwables.printStackTrace();
         }
         return false;
     }

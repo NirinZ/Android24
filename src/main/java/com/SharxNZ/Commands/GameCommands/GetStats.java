@@ -74,7 +74,6 @@ public class GetStats extends Command {
                     "\nYour speed: " + stats[5]
             );
         } catch (SQLException throwables) {
-            throwables.printStackTrace();
             logError(throwables);
             return "An error in the execute";
         }

@@ -94,7 +94,6 @@ public class Being { // לסדר את זה שלא יהיה סטט כי לא צר
 
         } catch (SQLException | NameNotFoundException throwables) {
             Android24.logError(throwables);
-            throwables.printStackTrace();
         }
     }
 
@@ -132,7 +131,6 @@ public class Being { // לסדר את זה שלא יהיה סטט כי לא צר
 
         } catch (SQLException throwables) {
             Android24.logError(throwables);
-            throwables.printStackTrace();
         }
     }
 
@@ -208,7 +206,6 @@ public class Being { // לסדר את זה שלא יהיה סטט כי לא צר
             transformation = trans;
         } catch (SQLException throwables) {
             Android24.logError(throwables);
-            throwables.printStackTrace();
         }
     }
 

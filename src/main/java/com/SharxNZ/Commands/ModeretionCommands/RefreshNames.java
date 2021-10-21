@@ -49,7 +49,6 @@ public class RefreshNames extends Command {
                                 } catch (SQLException throwables) {
                                     System.out.println("Inner try");
                                     Android24.logError(throwables);
-                                    throwables.printStackTrace();
                                 }
                                 Android24.log("Changing name to -> {" + user.getAsMention() + ", name: " + user.getName() + "}");
                             });
@@ -85,7 +84,6 @@ public class RefreshNames extends Command {
                             } catch (SQLException throwables) {
                                 System.out.println("Inner try " + name);
                                 Android24.logError(throwables);
-                                throwables.printStackTrace();
                             }
                             Android24.log("Changing name to -> { id: " + id + ", name: " + name + "}");
                         } else {
@@ -101,7 +99,6 @@ public class RefreshNames extends Command {
         } catch (SQLException | NullPointerException throwables) {
             System.out.println("Outer try");
             Android24.logError(throwables);
-            throwables.printStackTrace();
         }
 
     }

@@ -43,7 +43,7 @@ public class AddTransGif extends Command {
                 commandEvent.reply(Embeds.errorEmbed("The gif you have choose is not supported 😮. Please choose another one or download and upload the gif and use the command: "));
             } catch (SQLException throwables) {
                 Android24.logError(throwables);
-                throwables.printStackTrace();
+
                 commandEvent.reply(Embeds.errorEmbed());
             }
         }

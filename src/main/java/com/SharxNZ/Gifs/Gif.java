@@ -86,7 +86,7 @@ public class Gif {
                             timeLength += gifControlDirectory.getInt(GifControlDirectory.TAG_DELAY);
                         }
                     } catch (MetadataException e) {
-                        e.printStackTrace();
+                        Android24.logError(e);
                     }
                 }
                 // Unit of time is 10 milliseconds in GIF.
@@ -140,7 +140,7 @@ public class Gif {
                             timeLength += gifControlDirectory.getInt(GifControlDirectory.TAG_DELAY);
                         }
                     } catch (MetadataException e) {
-                        e.printStackTrace();
+                        Android24.logError(e);
                     }
                 }
                 // Unit of time is 10 milliseconds in GIF.
@@ -182,7 +182,6 @@ public class Gif {
                 message.get().delete().queue();
             } catch (InterruptedException | ExecutionException e) {
                 Android24.logError(e);
-                e.printStackTrace();
             }
         });
     }

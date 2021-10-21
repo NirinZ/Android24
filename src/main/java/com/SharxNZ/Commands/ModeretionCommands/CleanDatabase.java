@@ -73,7 +73,6 @@ public class CleanDatabase extends Command {
                         commandEvent.reply("Finished cleaning the database");
                     } catch (SQLException throwables) {
                         Android24.logError(throwables);
-                        throwables.printStackTrace();
                     }
                 });
             }

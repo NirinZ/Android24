@@ -27,7 +27,6 @@ public class TreeShopItem {
             this.storey = resultSet.getShort(2);
         } catch (SQLException throwables) {
             Android24.logError(throwables);
-            throwables.printStackTrace();
         }
     }
 

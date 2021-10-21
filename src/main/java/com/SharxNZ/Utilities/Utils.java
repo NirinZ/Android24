@@ -35,7 +35,6 @@ public abstract class Utils {
                 return null;
         } catch (SQLException throwables) {
             Android24.logError(throwables);
-            throwables.printStackTrace();
             return null;
         }
     }
@@ -71,7 +70,6 @@ public abstract class Utils {
                 return false;
         } catch (SQLException throwables) {
             Android24.logError(throwables);
-            throwables.printStackTrace();
             return false;
         }
     }

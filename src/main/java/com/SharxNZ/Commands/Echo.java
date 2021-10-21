@@ -26,7 +26,7 @@ public class Echo extends Command {
                 Thread.sleep(20000l);
                 commandEvent.reply("Awoken"/* + m.getGuild().getDefaultChannel()*/);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                Android24.logError(e);
             }
         }
         else {

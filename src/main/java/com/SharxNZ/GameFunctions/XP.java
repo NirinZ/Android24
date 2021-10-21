@@ -134,13 +134,11 @@ public class XP extends ListenerAdapter {
                             resultSet.close();
                         } catch (Exception throwables) {
                             Android24.logError(throwables);
-                            throwables.printStackTrace();
                         }
                     }
                     xpMap.clear();
                 } catch (SQLException throwables) {
                     Android24.logError(throwables);
-                    throwables.printStackTrace();
                 }
             }
         };

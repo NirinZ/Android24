@@ -50,7 +50,6 @@ public class refreshRoles extends Command {
 
         } catch (SQLException throwables) {
             Android24.logError(throwables);
-            throwables.printStackTrace();
         }
     }
 }

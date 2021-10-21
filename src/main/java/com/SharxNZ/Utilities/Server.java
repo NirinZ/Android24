@@ -45,7 +45,6 @@ public class Server {
             allowTransGif = resultSet.getBoolean(6);
         } catch (SQLException | NameNotFoundException throwables) {
             Android24.logError(throwables);
-            throwables.printStackTrace();
         }
     }
 
@@ -65,7 +64,6 @@ public class Server {
             set.executeUpdate();
         } catch (SQLException throwables) {
             Android24.logError(throwables);
-            throwables.printStackTrace();
         }
     }
 

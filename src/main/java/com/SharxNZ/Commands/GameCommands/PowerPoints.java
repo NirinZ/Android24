@@ -123,7 +123,6 @@ public class PowerPoints extends Being {
 
         } catch (Exception e) {
             Android24.logError(e);
-            e.printStackTrace();
         }
         ppEmbed.setImage(imageUrl.get());
         return ppEmbed.build();
@@ -172,7 +171,6 @@ public class PowerPoints extends Being {
 
         } catch (Exception e) {
             Android24.logError(e);
-            e.printStackTrace();
         }
 
         ppEmbed.setImage(imageUrl.get());
@@ -238,7 +236,6 @@ public void previousValue(){
 
         } catch (SQLException throwables) {
             Android24.logError(throwables);
-            throwables.printStackTrace();
         }
     }
 

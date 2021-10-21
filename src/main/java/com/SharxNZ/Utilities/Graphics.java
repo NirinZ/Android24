@@ -61,7 +61,6 @@ public abstract class Graphics {
             return ImageIO.read(URL); // test for the saved info
         } catch (IOException e) {
             Android24.logError(e, url);
-            e.printStackTrace();
             return null;
         }
     }
@@ -454,7 +453,7 @@ public abstract class Graphics {
         try {
             ImageIO.write(bufferedImage, "png", output);
         } catch (IOException e) {
-            e.printStackTrace();
+            Android24.logError(e);
         }
         return output.toByteArray();
     }

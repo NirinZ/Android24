@@ -42,7 +42,6 @@ public abstract class StartGame {
 
         } catch (SQLException throwables) {
             Android24.logError(throwables);
-            throwables.printStackTrace();
         }
     }
 
@@ -65,7 +64,7 @@ public abstract class StartGame {
                 return "You're already in the game";
                 //Adding the race to the user
             else if (con1.prepareStatement("SELECT `UserID` FROM `android24`.`users_data` where `UserID` = " + userID + ";").executeQuery().next()) {
-                setRace.setString(1, race.toString());
+                setRace.setString(1, race.getName());
                 setRace.setLong(2, userID);
                 setRace.executeUpdate();
             }
@@ -83,7 +82,6 @@ public abstract class StartGame {
                         insertUser.setString(2, user.getAsTag());
                         insertUser.executeUpdate();
                     } catch (SQLException throwables) {
-                        throwables.printStackTrace();
                         Android24.logError(throwables);
                     }
                 });

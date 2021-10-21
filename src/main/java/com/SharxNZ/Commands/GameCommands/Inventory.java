@@ -31,7 +31,6 @@ public abstract class Inventory {
             return embedBuilder.build();
         } catch (SQLException | NameNotFoundException throwables) {
             Android24.logError(throwables);
-            throwables.printStackTrace();
             return Embeds.errorEmbed();
         }
     }
@@ -47,7 +46,6 @@ public abstract class Inventory {
             return embedBuilder.build();
         } catch (SQLException | NameNotFoundException throwables) {
             Android24.logError(throwables);
-            throwables.printStackTrace();
             return Embeds.errorEmbed();
         }
     }

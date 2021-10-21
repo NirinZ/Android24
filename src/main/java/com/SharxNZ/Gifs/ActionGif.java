@@ -113,7 +113,6 @@ public class ActionGif extends Gif {
 
         } catch (SQLException throwables) {
             Android24.logError(throwables);
-            throwables.printStackTrace();
             return null;
         }
     }
