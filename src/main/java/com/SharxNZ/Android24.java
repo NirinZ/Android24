@@ -92,8 +92,8 @@ public abstract class Android24 {
         StringBuilder builder = new StringBuilder();
         for (StackTraceElement stack : throwables.getStackTrace())
             builder.append(stack).append("\n");
-        jda.getTextChannelById(debugChannelID).sendMessage("<@" + nirinId + ">\n" + "Text:\n" + text + throwables
-                + "\nStack Trace:\n" + builder).queue();
+        jda.getTextChannelById(debugChannelID).sendMessage("<@" + nirinId + ">\n" + "Text:\n" + text + "\n----------\n"
+                + throwables + "\nStack Trace:\n" + builder).queue();
     }
 
     public static void log(String log) {

@@ -248,7 +248,7 @@ public abstract class Graphics {
         int lvl = Level.calculateLevel(xp);
 
         //Starting
-        BufferedImage background = imageFromURL("https://c4.wallpaperflare.com/wallpaper/844/6/554/dragon-ball-dragon-ball-z-nappa-dragon-ball-raditz-dragon-ball-wallpaper-preview.jpg");
+        BufferedImage background = imageFromURL("https://cdn.discordapp.com/attachments/866689902758068244/900820398118170624/dragon-ball-dragon-ball-z-nappa-dragon-ball-raditz-dragon-ball-wallpaper-preview.jpg");
         //BufferedImage background = imageFromURL("https://www.comingsoon.net/assets/uploads/2021/05/dragon-ball-618x362.jpg");
         BufferedImage userImage;
         userImage = imageFromURL(Objects.requireNonNullElse(userURL, "https://www.google.co.il/url?sa=i&url=https%3A%2F%2Fwww.youtube.com%2Fchannel%2FUCZ5XnGb-3t7jCkXdawN2tkA&psig=AOvVaw2XPWp7NOBO1CkFGJRunLPs&ust=1620733791474000&source=images&cd=vfe&ved=0CAIQjRxqFwoTCKji_ISGv_ACFQAAAAAdAAAAABAJ"));
