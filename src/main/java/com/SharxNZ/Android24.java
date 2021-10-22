@@ -218,7 +218,7 @@ public abstract class Android24 {
         queueCommands();
 
         Battle.battlesCleanup();
-        jda.getTextChannelById(debugChannelID).sendMessage("אני דלוק").queue();
+        jda.getTextChannelById(debugChannelID).sendMessage("אני דלוק 😁").queue();
         // jda.getPresence().setStatus(OnlineStatus.DO_NOT_DISTURB);
         // Test 2
     }
