@@ -149,8 +149,7 @@ public abstract class Android24 {
 
 //        System.exit(9);
 
-        // java -jar --enable-preview  android24/Compiled/Bot.jar > android24/Compiled/log.log &
-        // 633074
+        // java --enable-preview -jar bot-b.jar > log.log
 
         // Set the database
         dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
