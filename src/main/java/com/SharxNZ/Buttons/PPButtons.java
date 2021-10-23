@@ -79,6 +79,7 @@ public class PPButtons extends ListenerAdapter {
             }
             case "Save" -> {
                 powerPoints.save();
+                PowerPoints.getPPoints().remove(userID);
                 buttonClickEvent.editMessageEmbeds(Embeds.savedEmbed()).queue();
                 if (!ephemeral)
                     buttonClickEvent.getMessage().delete().queue();

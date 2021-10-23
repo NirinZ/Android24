@@ -5,7 +5,6 @@ import com.SharxNZ.Android24;
 import com.SharxNZ.Game.Being;
 import com.SharxNZ.Utilities.Point;
 import com.SharxNZ.Utilities.Stat;
-import com.SharxNZ.Utilities.Graphics;
 import com.SharxNZ.Utilities.Utils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -22,11 +21,14 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class PowerPoints extends Being {
 
-    private byte pointer;
+    private static final HashMap<Long, PowerPoints> ppoints = new HashMap<>();
+
+    static {
+        Utils.garbageCollector(ppoints);
+    }
 
     protected Stat<Integer> health = new Stat<>();
     protected Stat<Integer> ki = new Stat<>();
@@ -34,34 +36,31 @@ public class PowerPoints extends Being {
     protected Stat<Integer> kiAttack = new Stat<>();
     protected Stat<Integer> defence = new Stat<>();
     protected Stat<Integer> speed = new Stat<>();
-
     protected List<Stat<Integer>> powerStats = List.of(health, ki, strikeAttack,
             kiAttack, defence, speed);
+    private byte pointer;
 
-    private static final HashMap<Long, PowerPoints> ppoints = new HashMap<>();
-
-    static{
-        Utils.garbageCollector(ppoints);
-    }
-
-    private PowerPoints(long userID){
+    private PowerPoints(long userID) {
         super(userID);
-        for(int i = 0; i < 6; i++){
+        for (int i = 0; i < 6; i++) {
             this.powerStats.get(i).set(0);
         }
     }
 
-    public static @NotNull PowerPoints getPowerPoints(long userID){
+    public static @NotNull PowerPoints getPowerPoints(long userID) {
         PowerPoints powerPoints;
-        if(ppoints.containsKey(userID)){
+        if (ppoints.containsKey(userID)) {
             powerPoints = ppoints.get(userID);
             powerPoints.setInUse(true);
-        }
-        else{
+        } else {
             powerPoints = new PowerPoints(userID);
             ppoints.put(userID, powerPoints);
         }
         return powerPoints;
+    }
+
+    public static HashMap<Long, PowerPoints> getPPoints() {
+        return ppoints;
     }
 
     public byte[] statsImage() {
@@ -160,17 +159,16 @@ public class PowerPoints extends Being {
         return output.toByteArray();
     }
 
-    public @NotNull MessageEmbed getPowerPointsEmbed(){
+    public @NotNull MessageEmbed getPowerPointsEmbed() {
 
         char[] charPointer = new char[6];
         charPointer[this.getPointer()] = '↘';
 
         String[] changeHighlight = new String[6];
         for (int i = 0; i < changeHighlight.length; i++) {
-            if (this.powerStats.get(i).get() > 0){
+            if (this.powerStats.get(i).get() > 0) {
                 changeHighlight[i] = "```yaml\n";
-            }
-            else{
+            } else {
                 changeHighlight[i] = "```\n";
             }
         }
@@ -189,7 +187,7 @@ public class PowerPoints extends Being {
         ppEmbed.setTitle("Your power points:");
         ppEmbed.setDescription("here you can edit your power points");
         ppEmbed.addBlankField(true);
-        ppEmbed.addField("Available Power Points: "+ this.getPowerPoints(), "", false);
+        ppEmbed.addField("Available Power Points: " + this.getPowerPoints(), "", false);
         ppEmbed.addField(String.valueOf(charPointer[0]), strings[0], true);
         ppEmbed.addField(String.valueOf(charPointer[1]), strings[1], true);
         ppEmbed.addField(String.valueOf(charPointer[2]), strings[2], true);
@@ -222,7 +220,7 @@ public class PowerPoints extends Being {
 
                 (Press save again to save)```""", false);
         ppEmbed.addBlankField(true);
-        ppEmbed.addField("Available Power Points: "+ this.getPowerPoints(), "", false);
+        ppEmbed.addField("Available Power Points: " + this.getPowerPoints(), "", false);
         ppEmbed.addField("", "```Health: " + this.getHealth() + "```", true);
         ppEmbed.addField("", "```Ki: " + this.getKi() + "```", true);
         ppEmbed.addField("", "```Strike Attack: " + this.getStrikeAttack() + "```", true);
@@ -240,35 +238,35 @@ public class PowerPoints extends Being {
         return ppEmbed.build();
     }
 
-    public void nextValue(){
+    public void nextValue() {
         pointer++;
-        if(pointer > 5){
+        if (pointer > 5) {
             pointer = 0;
         }
     }
 
-public void previousValue(){
+    public void previousValue() {
         pointer--;
-        if(pointer < 0){
+        if (pointer < 0) {
             pointer = 5;
         }
     }
 
-    public void addValue(){
-        if(powerPoints > 0){
+    public void addValue() {
+        if (powerPoints > 0) {
             powerPoints--;
             powerStats.get(pointer).set(powerStats.get(pointer).get() + 1);
         }
     }
 
-    public void subtractValue(){
-        if(this.powerStats.get(pointer).get() > 0){
+    public void subtractValue() {
+        if (this.powerStats.get(pointer).get() > 0) {
             powerStats.get(pointer).set(powerStats.get(pointer).get() - 1);
             powerPoints++;
         }
     }
 
-    public Being toBeing(){
+    public Being toBeing() {
         super.health = this.getHealth();
         super.ki = this.getKi();
         super.strikeAttack = this.getStrikeAttack();
@@ -280,11 +278,11 @@ public void previousValue(){
     }
 
     @Override
-    public void save(){
+    public void save() {
         try (
                 Connection con = Android24.getConnection();
                 PreparedStatement saveBeingStatement = con.prepareStatement(saveBeingStatementSql)
-        ){
+        ) {
 
             saveBeingStatement.setLong(1, getPowerPoints());
             saveBeingStatement.setLong(2, getHealth());
@@ -302,40 +300,38 @@ public void previousValue(){
         }
     }
 
-    public int getPointer(){
+    public int getPointer() {
         return pointer;
     }
 
     @Override
-    public long getHealth(){
+    public long getHealth() {
         return this.health.get() + super.getHealth();
     }
 
     @Override
-    public long getKi(){
+    public long getKi() {
         return this.ki.get() + super.getKi();
     }
 
     @Override
-    public long getStrikeAttack(){
+    public long getStrikeAttack() {
         return this.strikeAttack.get() + super.getStrikeAttack();
     }
 
     @Override
-    public long getKiAttack(){
+    public long getKiAttack() {
         return this.kiAttack.get() + super.getKiAttack();
     }
 
     @Override
-    public long getDefence(){
+    public long getDefence() {
         return this.defence.get() + super.getDefence();
     }
 
     @Override
-    public long getSpeed(){
+    public long getSpeed() {
         return this.speed.get() + super.getSpeed();
     }
-
-    public static HashMap<Long, PowerPoints> getPPoints(){return ppoints;}
 
 }

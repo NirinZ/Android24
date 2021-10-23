@@ -1,13 +1,12 @@
 package com.SharxNZ.GameFunctions;
 
-import com.SharxNZ.Game.Race;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 
 public class GFButtons extends ListenerAdapter {
     @Override
-    public void onButtonClick(@NotNull ButtonClickEvent buttonClickEvent){
+    public void onButtonClick(@NotNull ButtonClickEvent buttonClickEvent) {
         String command = buttonClickEvent.getComponentId();
         long userID = buttonClickEvent.getUser().getIdLong();
 

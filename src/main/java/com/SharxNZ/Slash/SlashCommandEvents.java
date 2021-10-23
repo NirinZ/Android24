@@ -4,7 +4,6 @@ import com.SharxNZ.Android24;
 import com.SharxNZ.Commands.GameCommands.GetStats;
 import com.SharxNZ.Commands.GameCommands.Inventory;
 import com.SharxNZ.Commands.GameCommands.PowerPoints;
-import com.SharxNZ.Shop.Shop;
 import com.SharxNZ.Commands.Level;
 import com.SharxNZ.Game.Attack;
 import com.SharxNZ.Game.Being;
@@ -15,6 +14,7 @@ import com.SharxNZ.Gifs.ActionGif;
 import com.SharxNZ.Gifs.Gif;
 import com.SharxNZ.Gifs.ResultGif;
 import com.SharxNZ.Gifs.TransGif;
+import com.SharxNZ.Shop.Shop;
 import com.SharxNZ.Utilities.Embeds;
 import com.SharxNZ.Utilities.Server;
 import com.SharxNZ.Utilities.Utils;
@@ -101,11 +101,11 @@ public class SlashCommandEvents extends ListenerAdapter {
                                 Button.primary(buttonID.replace("$", "Refresh"), "Refresh 🔄"))
                 ));
 
-                    PowerPoints powerPoints = PowerPoints.getPowerPoints(userID);
-                    slashCommandEvent.deferReply().setEphemeral(ephemeral).queue();
-                    slashCommandEvent.getHook().sendFile(powerPoints.statsImage(), "png.png")
-                            .addEmbeds(powerPoints.getPowerPointsEmbed())
-                            .addActionRows(ppButtons).queue();
+                PowerPoints powerPoints = PowerPoints.getPowerPoints(userID);
+                slashCommandEvent.deferReply().setEphemeral(ephemeral).queue();
+                slashCommandEvent.getHook().sendFile(powerPoints.statsImage(), "png.png")
+                        .addEmbeds(powerPoints.getPowerPointsEmbed())
+                        .addActionRows(ppButtons).queue();
 
 //                if (ephemeral) {
 //                    slashCommandEvent.deferReply(true).queue();

@@ -1,13 +1,9 @@
 package com.SharxNZ.GameFunctions;
 
 import com.SharxNZ.Android24;
-import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.events.guild.GuildLeaveEvent;
-import net.dv8tion.jda.api.exceptions.ContextException;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.requests.RestAction;
-import org.apache.commons.lang3.exception.ContextedException;
 
 import javax.annotation.Nonnull;
 import java.sql.Connection;

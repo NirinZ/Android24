@@ -20,14 +20,11 @@ import com.SharxNZ.GameFunctions.Beginning;
 import com.SharxNZ.GameFunctions.GFButtons;
 import com.SharxNZ.GameFunctions.StartGame;
 import com.SharxNZ.GameFunctions.XP;
-import com.SharxNZ.Gifs.Gif;
 import com.SharxNZ.Slash.AddingCommands;
 import com.SharxNZ.Slash.SelectMenuEvents;
 import com.SharxNZ.Slash.SlashCommandEvents;
 import com.SharxNZ.Utilities.AddTransGif;
-import com.drew.imaging.ImageMetadataReader;
 import com.drew.imaging.ImageProcessingException;
-import com.drew.metadata.gif.GifControlDirectory;
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
@@ -40,34 +37,30 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
-import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 
-//SQL
-import javax.imageio.ImageIO;
 import javax.security.auth.login.LoginException;
-import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.net.URL;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public abstract class Android24 {
 
+    public static final long debugChannelID = 887426748306825217L;
+    public static final long cacheChannelID = 866689902758068244L;
+    private static final long nirinId = 739532349280354404L;
+    private static final HikariDataSource dataSource = new HikariDataSource();
     public static JDA jda;
     public static String prefix = "!";
     public static float difficulty = 0.4f; // should be 0.3
     public static short xp = 50; // should be 20
-    public static final long debugChannelID = 887426748306825217L;
-    private static final long nirinId = 739532349280354404L;
     public static User nirin;
     public static EventWaiter eventWaiter = new EventWaiter();
     private static CommandListUpdateAction commandListDebug;
     private static CommandListUpdateAction commandListAll;
-    public static final long cacheChannelID = 866689902758068244L;
-    private static final HikariDataSource dataSource = new HikariDataSource();
 
     public static Connection getConnection() {
         try {
