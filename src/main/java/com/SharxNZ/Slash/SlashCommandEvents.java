@@ -1,7 +1,6 @@
 package com.SharxNZ.Slash;
 
 import com.SharxNZ.Android24;
-import com.SharxNZ.Buttons.PPButtons;
 import com.SharxNZ.Commands.GameCommands.GetStats;
 import com.SharxNZ.Commands.GameCommands.Inventory;
 import com.SharxNZ.Commands.GameCommands.PowerPoints;
@@ -17,14 +16,12 @@ import com.SharxNZ.Gifs.Gif;
 import com.SharxNZ.Gifs.ResultGif;
 import com.SharxNZ.Gifs.TransGif;
 import com.SharxNZ.Utilities.Embeds;
-import com.SharxNZ.Utilities.Graphics;
 import com.SharxNZ.Utilities.Server;
 import com.SharxNZ.Utilities.Utils;
 import com.drew.imaging.ImageProcessingException;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -86,7 +83,6 @@ public class SlashCommandEvents extends ListenerAdapter {
                     interactionHook -> interactionHook.sendFile(Level.returnLevel(guildID, userID, user.getAvatarUrl()), "Level.jpg").queue());
 
             case "get_power_points" -> {
-                PPButtons.save.remove(userID);
                 PowerPoints.getPPoints().remove(userID);
                 boolean ephemeral = slashCommandEvent.getOptionsByName("display").isEmpty() || !slashCommandEvent.getOptionsByName("display").get(0).getAsBoolean();
                 boolean refresh = !(slashCommandEvent.getOptionsByName("refresh").isEmpty() || !slashCommandEvent.getOptionsByName("refresh").get(0).getAsBoolean());
@@ -107,7 +103,7 @@ public class SlashCommandEvents extends ListenerAdapter {
 
                     PowerPoints powerPoints = PowerPoints.getPowerPoints(userID);
                     slashCommandEvent.deferReply().setEphemeral(ephemeral).queue();
-                    slashCommandEvent.getHook().sendFile(Graphics.statsImage(powerPoints), "png.png")
+                    slashCommandEvent.getHook().sendFile(powerPoints.statsImage(), "png.png")
                             .addEmbeds(powerPoints.getPowerPointsEmbed())
                             .addActionRows(ppButtons).queue();
 

@@ -17,37 +17,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Objects;
 
-class Point {
-    int x;
-    int y;
-    static ArrayList<Point> points = new ArrayList<>();
-    private static double offset;
-
-    public Point() {
-    }
-
-    public static void print() {
-        for (Point point : points) {
-            System.out.println("X: " + point.x + "  ||  Y: " + point.y);
-        }
-    }
-
-    public Point(double x, double y) {
-        this.x = (int) (x + offset);
-        this.y = (int) (y + offset);
-        points.add(this);
-    }
-
-    public void set(double x, double y) {
-        this.x = (int) (x + offset);
-        this.y = (int) (y + offset);
-    }
-
-    public static void setOffset(double offset) {
-        Point.offset = offset;
-    }
-}
-
 public abstract class Graphics {
 
 //    public Graphics(){
@@ -360,101 +329,6 @@ public abstract class Graphics {
         jFrame.setVisible(true);
         jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);*/
 
-        return output.toByteArray();
-    }
-
-    public static byte[] statsImage(PowerPoints powerPoints) {
-        final int r = 200;
-        final int frame = (int) ((2 * r) * 1.2);
-        final int offset = frame / 2 - r;
-        final double square3 = 1.732d;
-
-        Point.setOffset(offset);
-
-        double[] parameters = new double[]{
-                powerPoints.getHealth(),
-                powerPoints.getKi(),
-                powerPoints.getStrikeAttack(),
-                powerPoints.getKiAttack(),
-                powerPoints.getDefence(),
-                powerPoints.getSpeed()
-        };
-
-        double[] percents = new double[6];
-
-        double max = 0;
-        for (double parameter : parameters) {
-            max = Math.max(max, parameter);
-        }
-        // If I want to do like Xenoverse
-        //max = 20;
-        for (int i = 0; i < percents.length; i++) {
-            percents[i] = parameters[i] / max;
-        }
-
-        Point health = new Point(r, r - percents[0] * r);
-        Point ki = new Point(r + (percents[1] * square3 / 2 * r), r - (percents[1] * 1 / 2 * r));
-        Point strikeAttack = new Point(r + (percents[2] * square3 / 2 * r), r + (percents[2] * 1 / 2 * r));
-        Point kiAttack = new Point(r, r + percents[3] * r);
-        Point defence = new Point(r - (percents[4] * square3 / 2 * r), r + (percents[4] * 1 / 2 * r));
-        Point speed = new Point(r - (percents[5] * square3 / 2 * r), r - (percents[5] * 1 / 2 * r));
-
-        Point hex1 = new Point(r, 0);
-        Point hex2 = new Point(r + (square3 / 2 * r), r / 2);
-        Point hex3 = new Point(r + (square3 / 2 * r), r + r / 2);
-        Point hex4 = new Point(r, 2 * r);
-        Point hex5 = new Point(r - (square3 / 2 * r), r + r / 2);
-        Point hex6 = new Point(r - (square3 / 2 * r), r / 2);
-
-
-        // Draw the BufferedImage
-        BufferedImage bufferedImage = new BufferedImage(frame, frame, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D graphics2D = bufferedImage.createGraphics();
-
-        // Rendering settings
-        graphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                RenderingHints.VALUE_ANTIALIAS_ON);
-        graphics2D.setRenderingHint(RenderingHints.KEY_RENDERING,
-                RenderingHints.VALUE_RENDER_QUALITY);
-
-
-
-        /* Start drawing */
-        graphics2D.setStroke(new BasicStroke(8));
-
-        // The circle around
-        graphics2D.setColor(new Color(172, 171, 171, 255));
-        graphics2D.drawOval(offset, offset, 2 * r, 2 * r);
-        graphics2D.setStroke(new BasicStroke(3));
-
-        graphics2D.setColor(new Color(255, 197, 127, 10));
-        graphics2D.fillPolygon(new int[]{hex1.x, hex2.x, hex3.x, hex4.x, hex5.x, hex6.x},
-                new int[]{hex1.y, hex2.y, hex3.y, hex4.y, hex5.y, hex6.y}, 6);
-
-        graphics2D.setColor(new Color(23, 162, 215, 255));
-        graphics2D.fillPolygon(new int[]{health.x, ki.x, strikeAttack.x, kiAttack.x, defence.x, speed.x},
-                new int[]{health.y, ki.y, strikeAttack.y, kiAttack.y, defence.y, speed.y}, 6);
-
-        graphics2D.setColor(new Color(2, 217, 251, 255));
-        graphics2D.drawPolygon(new int[]{health.x, ki.x, strikeAttack.x, kiAttack.x, defence.x, speed.x},
-                new int[]{health.y, ki.y, strikeAttack.y, kiAttack.y, defence.y, speed.y}, 6);
-
-        graphics2D.setColor(new Color(255, 206, 127, 92));
-        graphics2D.drawLine(hex1.x, hex1.y, hex4.x, hex4.y);
-        graphics2D.drawLine(hex2.x, hex2.y, hex5.x, hex5.y);
-        graphics2D.drawLine(hex3.x, hex3.y, hex6.x, hex6.y);
-
-        graphics2D.setPaint(new GradientPaint(offset, offset, new Color(0x2ED4EAEA, true),
-                2 * r + offset, 2 * r + offset, new Color(50, true)));
-        graphics2D.fillOval(offset, offset, 2 * r, 2 * r);
-
-
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
-        try {
-            ImageIO.write(bufferedImage, "png", output);
-        } catch (IOException e) {
-            Android24.logError(e);
-        }
         return output.toByteArray();
     }
 
