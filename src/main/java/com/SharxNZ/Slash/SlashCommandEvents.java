@@ -105,20 +105,26 @@ public class SlashCommandEvents extends ListenerAdapter {
                                 Button.primary(buttonID.replace("$", "Refresh"), "Refresh 🔄"))
                 ));
 
-                if (ephemeral) {
-                    slashCommandEvent.deferReply(true).queue();
-                    slashCommandEvent.getHook()
-                            .sendMessageEmbeds(PowerPoints.getPowerPointsEmbed(
-                                    PowerPoints.getPowerPoints(userID), true, true))
-                            .setEphemeral(true).addActionRows(ppButtons).queue();
-                } else {
                     PowerPoints powerPoints = PowerPoints.getPowerPoints(userID);
-                    slashCommandEvent.deferReply().queue();
+                    slashCommandEvent.deferReply().setEphemeral(ephemeral).queue();
                     slashCommandEvent.getHook().sendFile(Graphics.statsImage(powerPoints), "png.png")
-                            .addEmbeds(PowerPoints.getPowerPointsEmbed(
-                                    PowerPoints.getPowerPoints(userID), false, true))
+                            .addEmbeds(powerPoints.getPowerPointsEmbed())
                             .addActionRows(ppButtons).queue();
-                }
+
+//                if (ephemeral) {
+//                    slashCommandEvent.deferReply(true).queue();
+//                    slashCommandEvent.getHook()
+//                            .sendMessageEmbeds(PowerPoints.getPowerPointsEmbed(
+//                                    PowerPoints.getPowerPoints(userID), true, true))
+//                            .setEphemeral(true).addActionRows(ppButtons).queue();
+//                } else {
+//                    PowerPoints powerPoints = PowerPoints.getPowerPoints(userID);
+//                    slashCommandEvent.deferReply().queue();
+//                    slashCommandEvent.getHook().sendFile(Graphics.statsImage(powerPoints), "png.png")
+//                            .addEmbeds(PowerPoints.getPowerPointsEmbed(
+//                                    PowerPoints.getPowerPoints(userID), false, true))
+//                            .addActionRows(ppButtons).queue();
+//                }
 
             }
 

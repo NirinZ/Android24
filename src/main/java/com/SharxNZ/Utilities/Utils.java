@@ -6,6 +6,7 @@ import com.SharxNZ.Game.Being;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
+import org.jetbrains.annotations.NotNull;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -123,7 +124,7 @@ public abstract class Utils {
         timer.scheduleAtFixedRate(timerTask, 30000, 30000);
     }
 
-    public static void getImageUrl(byte[] image, AtomicReference<String> value) {
+    public static void getImageUrl(byte[] image, @NotNull AtomicReference<String> value) {
         EmbedBuilder wrapper = new EmbedBuilder();
         value.set(
                 Android24.jda.getTextChannelById(Android24.cacheChannelID)

@@ -125,7 +125,7 @@ public abstract class Android24 {
         commandListAll.queue();
     }
 
-    //אפשר לשלוח קבצים באפמרל!!!! לסדר דחוף את הפוור פוינטס
+    //אפשר לשלוח קבצים באפמרל!!!! לסדר דחוף את הפוור פוינטס todo
 
     /**
      * Improvements:
