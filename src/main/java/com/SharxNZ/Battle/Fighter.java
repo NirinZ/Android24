@@ -19,18 +19,18 @@ import java.util.Random;
 
 public class Fighter extends Stats {
 
-    private final long baseHealth = super.health;
-    private final long baseKi = super.ki;
-    private final long baseStrikeAttack = super.strikeAttack;
-    private final long baseKiAttack = super.kiAttack;
-    private final long baseDefence = super.defence;
-    private final long baseSpeed = super.speed;
+    protected long health = super.health;
+    protected long ki = super.ki;
+    protected long strikeAttack = super.strikeAttack;
+    protected long kiAttack = super.kiAttack;
+    protected long defence = super.defence;
+    protected long speed = super.speed;
 
-    private Fighter target;
-    private Attack attack;
-    private final ArrayList<String> specialAttacks = new ArrayList<>();
+    protected Fighter target;
+    protected Attack attack;
+    protected final ArrayList<String> specialAttacks = new ArrayList<>();
 
-    private static final Random rand = new Random();
+    protected static final Random rand = new Random();
 
 
     public Fighter(long userID) {
@@ -51,12 +51,12 @@ public class Fighter extends Stats {
         }
     }
 
-    private void resetStats() {
+    protected void resetStats() {
         System.out.println("TN :" + transformation.getName());
-        strikeAttack = baseStrikeAttack * transformation.getAttackPowerUp();
-        kiAttack = baseKiAttack * transformation.getAttackPowerUp();
-        defence = baseDefence * transformation.getDefencePowerUp();
-        speed = baseSpeed * transformation.getSpeedPowerUp();
+        strikeAttack = super.strikeAttack * transformation.getAttackPowerUp();
+        kiAttack = super.kiAttack * transformation.getAttackPowerUp();
+        defence = super.defence * transformation.getDefencePowerUp();
+        speed = super.speed * transformation.getSpeedPowerUp();
     }
 
     /**
@@ -65,7 +65,7 @@ public class Fighter extends Stats {
     public short takeDamage(long damage) {
         if (damage >= 0) {
             health -= damage;
-            return (short) Math.max(0, Math.min(100, 100 * damage / (baseHealth / 4)));
+            return (short) Math.max(0, Math.min(100, 100 * damage / (super.health / 4)));
         } else return 0;
     }
 
@@ -89,7 +89,7 @@ public class Fighter extends Stats {
         switch (attack.getAttackType()) {
             case Strike -> strikeAttack *= attack.getAttackPowerUp();
             case Ki -> kiAttack *= attack.getAttackPowerUp();
-            case Charge -> ki = Math.min((ki + baseKi / 15), baseKi);
+            case Charge -> ki = Math.min((ki + super.ki / 15), super.ki);
 
         }
         defence *= attack.getDefencePowerUp();
@@ -105,16 +105,17 @@ public class Fighter extends Stats {
         speed *= rand.nextDouble() + 1;
     }
 
-    private static String getStatBar(long part, long full, String chr) {
+    @NotNull
+    protected static String getStatBar(long part, long full, String chr) {
         part = 10 * (Math.max(part, 0)) / full;
-        String bar = "";
+        StringBuilder bar = new StringBuilder();
         for (int i = 0; i < part; i++) {
-            bar += chr;
+            bar.append(chr);
         }
         for (int i = 0; i < 10 - part; i++) {
-            bar += "⬛";
+            bar.append("⬛");
         }
-        return bar;
+        return bar.toString();
     }
 
     public MessageEmbed currentStats() {
@@ -124,8 +125,8 @@ public class Fighter extends Stats {
             builder.setColor(transformation.getColor());
         }
         builder.setTitle(name);
-        builder.addField("Health", health + "/" + baseHealth + "\n" + getStatBar(health, baseHealth, "🟩"), false);
-        builder.addField("Ki", ki + "/" + baseKi + "\n" + getStatBar(ki, baseKi, "🟦"), false);
+        builder.addField("Health", health + "/" + super.health + "\n" + getStatBar(health, super.health, "🟩"), false);
+        builder.addField("Ki", ki + "/" + super.ki + "\n" + getStatBar(ki, super.ki, "🟦"), false);
         return builder.build();
     }
 
