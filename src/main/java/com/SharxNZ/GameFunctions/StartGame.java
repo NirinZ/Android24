@@ -8,7 +8,6 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.Button;
 import net.dv8tion.jda.api.interactions.components.selections.SelectionMenu;
-import okhttp3.OkHttpClient.Builder;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -17,6 +16,8 @@ import java.sql.SQLException;
 
 
 public abstract class StartGame {
+
+    protected static SelectionMenu selectionMenu;
 
     public static void StartGame() {
         try (
@@ -32,11 +33,11 @@ public abstract class StartGame {
                 optionData.addChoice(resultSet.getString(1), resultSet.getString(1));
                 smBuilder.addOption(resultSet.getString(1), resultSet.getString(1));
             }
+            selectionMenu = smBuilder.build();
             Android24.addCommands(new CommandData("start_game", "Let's you start the game and choose your race")
                     .addOptions(optionData));
-//            System.out.println(Android24.jda.getTextChannelById(811955959328145458L).getI);
             Android24.jda.getTextChannelById(890891683166818305L).retrieveMessageById(890894750100652042L).queue(message ->
-                    message.editMessageComponents().setActionRow(smBuilder.build()).queue());
+                    message.editMessageComponents().setActionRow(selectionMenu).queue());
 
             //startGameButton();
 
@@ -95,4 +96,7 @@ public abstract class StartGame {
         }
     }
 
+    public static SelectionMenu getSelectionMenu() {
+        return selectionMenu;
+    }
 }
