@@ -17,10 +17,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Random;
 
-public class TransGif extends Gif { // הכלאס הזה דורש תיקון דחוף. הגיפים לא עובדים כמו שצריך
-
-    protected String from;
-    protected String to;
+public class TransGif extends AGif { // הכלאס הזה דורש תיקון דחוף. הגיפים לא עובדים כמו שצריך
 
     private static String statementSql = """
             SELECT
@@ -33,10 +30,10 @@ public class TransGif extends Gif { // הכלאס הזה דורש תיקון ד�
             FROM
                 gifs.transform
             """;
-
     private static String preciseSql = "SELECT Length ,Gif FROM gifs.transform where `From` # ? and `To` ~ ? ORDER BY RAND() LIMIT 1;";
-
     private static String otherSql = "SELECT Length ,Gif FROM gifs.transform where `To` ~ ? ORDER BY RAND() LIMIT 1;";
+    protected String from;
+    protected String to;
 
 
     public TransGif(int id) throws ClassNotFoundException {
@@ -130,14 +127,14 @@ public class TransGif extends Gif { // הכלאס הזה דורש תיקון ד�
                 ResultSet pResultSet = pStatement.executeQuery();
                 if (!pResultSet.next())
                     return null;
-                return new Gif(pResultSet.getShort(1), pResultSet.getString(2));
+                return Gif.getGif(pResultSet.getShort(1), pResultSet.getString(2));
             } else {
                 PreparedStatement oStatement = con.prepareStatement(fixSql(from, to, otherSql));
                 oStatement.setString(1, to);
                 ResultSet oResultSet = oStatement.executeQuery();
                 if (!oResultSet.next())
                     return null;
-                return new Gif(oResultSet.getShort(1), oResultSet.getString(2));
+                return Gif.getGif(oResultSet.getShort(1), oResultSet.getString(2));
             }
 
         } catch (SQLException throwables) {

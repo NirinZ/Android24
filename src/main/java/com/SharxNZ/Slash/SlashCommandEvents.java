@@ -52,7 +52,7 @@ public class SlashCommandEvents extends ListenerAdapter {
         //Make sure you are in the game
         if (!slashCommandEvent.getName().equals("start_game") && !Utils.checkInGame(userID)) {
             slashCommandEvent.reply("You are not in the game! Please use the selection menu" +
-                    " or use the command `/start_game` to join the game 😁").addActionRow(StartGame.getSelectionMenu())
+                            " or use the command `/start_game` to join the game 😁").addActionRow(StartGame.getSelectionMenu())
                     .setEphemeral(true).queue();
             return;
         }

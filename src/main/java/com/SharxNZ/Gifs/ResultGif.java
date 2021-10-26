@@ -20,14 +20,7 @@ import java.util.Random;
 
 import static com.SharxNZ.Gifs.ActionGif.fixSql;
 
-public class ResultGif extends Gif {
-    protected String aTransformation;
-    protected String aAttack;
-    protected String dRace;
-    protected String dTransformation;
-    protected String dAttack;
-    protected int power;
-
+public class ResultGif extends AGif {
     protected static String statementSql = """
             SELECT
                 SUM(CASE WHEN
@@ -58,7 +51,6 @@ public class ResultGif extends Gif {
             FROM
                 gifs.result
             """;
-
     protected static String preciseSql = """
             SELECT Length ,Gif FROM gifs.result WHERE
                 (Power BETWEEN ?-15 AND ?+15)
@@ -67,7 +59,6 @@ public class ResultGif extends Gif {
                     AND ARace = ? AND ATransformation # ? AND (DRace = ? OR DRace is null) AND (DTransformation = ? OR DTransformation is null)
                     ORDER BY RAND() LIMIT 1;
             """;
-
     protected static String halfSql = """
             SELECT Length ,Gif FROM gifs.result WHERE
                 (Power BETWEEN ?-15 AND ?+15)
@@ -76,7 +67,6 @@ public class ResultGif extends Gif {
                     AND (ARace = ? OR ATransformation # ?) AND (DRace = ? OR DRace is null) AND (DTransformation = ? OR DTransformation is null)
                     ORDER BY RAND() LIMIT 1;
             """;
-
     protected static String otherSql = """
             SELECT Length ,Gif as 'total' FROM gifs.result WHERE
                 (Power BETWEEN ?-15 AND ?+15)
@@ -84,6 +74,12 @@ public class ResultGif extends Gif {
                     AND (DAttack = ? OR DAttack IS NULL)
                     ORDER BY RAND() LIMIT 1;
             """;
+    protected String aTransformation;
+    protected String aAttack;
+    protected String dRace;
+    protected String dTransformation;
+    protected String dAttack;
+    protected int power;
 
     public ResultGif(@Nullable Race aRace, @NotNull Transformation aTransformation, @NotNull Attack aAttack,
                      @Nullable Race dRace, @NotNull Transformation dTransformation, @Nullable Attack dAttack, long power, String link) throws ImageProcessingException, IOException {
@@ -168,7 +164,7 @@ public class ResultGif extends Gif {
                 if (!pResultSet.next())
                     return null;
                 System.out.println(pResultSet.getString(2));
-                return new Gif(pResultSet.getShort(1), pResultSet.getString(2));
+                return Gif.getGif(pResultSet.getShort(1), pResultSet.getString(2));
             } else if (half > rand.nextInt(precise + half + other + 1)) {
                 System.out.println("half-gif");
                 PreparedStatement hStatement = con.prepareStatement(fixSql(aTransformation, halfSql));
@@ -184,7 +180,7 @@ public class ResultGif extends Gif {
                 if (!hResultSet.next())
                     return null;
                 System.out.println(hResultSet.getString(2));
-                return new Gif(hResultSet.getShort(1), hResultSet.getString(2));
+                return Gif.getGif(hResultSet.getShort(1), hResultSet.getString(2));
             } else {
                 System.out.println("other-gif");
                 PreparedStatement oStatement = con.prepareStatement(otherSql);
@@ -196,7 +192,7 @@ public class ResultGif extends Gif {
                 if (!oResultSet.next())
                     return null;
                 System.out.println(oResultSet.getString(2));
-                return new Gif(oResultSet.getShort(1), oResultSet.getString(2));
+                return Gif.getGif(oResultSet.getShort(1), oResultSet.getString(2));
             }
 
         } catch (SQLException throwables) {

@@ -18,10 +18,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Random;
 
-public class ActionGif extends Gif {
-    protected String transformation;
-    protected String attack;
-
+public class ActionGif extends AGif {
     private static String statementSql = """
             SELECT
                 sum(case when
@@ -36,12 +33,11 @@ public class ActionGif extends Gif {
             FROM
                 gifs.action
             """;
-
     private static String preciseSql = "SELECT Length ,Gif FROM gifs.action where `Race` = ? and `Transformation` # ? and `Attack` = ? ORDER BY RAND() LIMIT 1;";
-
     private static String halfSql = "SELECT Length ,Gif FROM gifs.action where (`Race` = ? or `Transformation` # ?) and `Attack` = ? ORDER BY RAND() LIMIT 1;";
-
     private static String otherSql = "SELECT Length ,Gif FROM gifs.action where `Attack` = ? ORDER BY RAND() LIMIT 1;";
+    protected String transformation;
+    protected String attack;
 
 
     public ActionGif(@Nullable Race race, @NotNull Transformation transformation, @NotNull Attack attack, String link) throws ImageProcessingException, IOException {
@@ -89,7 +85,7 @@ public class ActionGif extends Gif {
                 ResultSet pResultSet = pStatement.executeQuery();
                 if (!pResultSet.next())
                     return null;
-                return new Gif(pResultSet.getShort(1), pResultSet.getString(2));
+                return Gif.getGif(pResultSet.getShort(1), pResultSet.getString(2));
             } else if (half > rand.nextInt(precise + half + other + 1)) {
                 System.out.println("h");
                 PreparedStatement hStatement = con.prepareStatement(fixSql(transformation, halfSql));
@@ -99,7 +95,7 @@ public class ActionGif extends Gif {
                 ResultSet hResultSet = hStatement.executeQuery();
                 if (!hResultSet.next())
                     return null;
-                return new Gif(hResultSet.getShort(1), hResultSet.getString(2));
+                return Gif.getGif(hResultSet.getShort(1), hResultSet.getString(2));
             } else {
                 System.out.println("o");
                 PreparedStatement oStatement = con.prepareStatement(otherSql);
@@ -107,7 +103,7 @@ public class ActionGif extends Gif {
                 ResultSet oResultSet = oStatement.executeQuery();
                 if (!oResultSet.next())
                     return null;
-                return new Gif(oResultSet.getShort(1), oResultSet.getString(2));
+                return Gif.getGif(oResultSet.getShort(1), oResultSet.getString(2));
 
             }
 
@@ -117,7 +113,16 @@ public class ActionGif extends Gif {
         }
     }
 
-    public void checkGif(User user, String id) {
+    @NotNull
+    public static String fixSql(String transformation, String sql) {
+        if (transformation == null)
+            sql = sql.replaceAll("#", "is");
+        else
+            sql = sql.replaceAll("#", "=");
+        return sql;
+    }
+
+    public void checkGif(@NotNull User user, String id) {
         EmbedBuilder builder = new EmbedBuilder();
         builder.setTitle("Action Gif");
         builder.addField("Race", race != null ? race : "null", false);
@@ -149,15 +154,6 @@ public class ActionGif extends Gif {
         } catch (SQLException throwables) {
             return false;
         }
-    }
-
-    @NotNull
-    public static String fixSql(String transformation, String sql) {
-        if (transformation == null)
-            sql = sql.replaceAll("#", "is");
-        else
-            sql = sql.replaceAll("#", "=");
-        return sql;
     }
 
     public String getTransformation() {
