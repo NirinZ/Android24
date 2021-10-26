@@ -146,18 +146,18 @@ public class TransGif extends Gif { // הכלאס הזה דורש תיקון ד�
         }
     }
 
-    public static void checkGif(@NotNull TransGif gif, User user, String id) {
+    public void checkGif(User user, String id) {
         EmbedBuilder builder = new EmbedBuilder();
         builder.setTitle("Transformation Gif");
-        builder.addField("Race", gif.race, false);
-        builder.addField("From", gif.from != null ? gif.from : "base", false);
-        builder.addField("To", gif.to != null ? gif.to : "base", false);
-        builder.addField("Length", String.valueOf(gif.length), false);
-        builder.setImage(gif.link);
+        builder.addField("Race", race, false);
+        builder.addField("From", from != null ? from : "base", false);
+        builder.addField("To", to != null ? to : "base", false);
+        builder.addField("Length", String.valueOf(length), false);
+        builder.setImage(link);
         builder.setColor(Color.YELLOW);
         builder.setFooter("Sent by: " + user.getAsTag(), user.getAvatarUrl());
 
-        sendGifCheck(builder.build(), gif, user, id);
+        sendGifCheck(builder.build(), user, id);
 
     }
 

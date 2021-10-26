@@ -29,12 +29,12 @@ public class AddTransGif extends Command {
             commandEvent.reply("You haven't put the arguments correctly. The arguments are:\n`" + arguments + "`");
         else {
             try {
-                TransGif.checkGif(new TransGif(
+                new TransGif(
                         new Race(args[0]),
                         new Transformation(args[1]),
                         new Transformation(args[2]),
-                        commandEvent.getMessage().getAttachments().get(0).getUrl()
-                ), commandEvent.getAuthor(), commandEvent.getMessage().getId());
+                        commandEvent.getMessage().getAttachments().get(0).getUrl())
+                        .checkGif(commandEvent.getAuthor(), commandEvent.getMessage().getId());
                 commandEvent.reply(Embeds.successEmbed("The gif has sent do test and will wait for approval!"));
 
             } catch (NameNotFoundException e) {

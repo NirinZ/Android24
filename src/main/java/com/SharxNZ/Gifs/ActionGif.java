@@ -117,18 +117,18 @@ public class ActionGif extends Gif {
         }
     }
 
-    public static void checkGif(@NotNull ActionGif gif, User user, String id) {
+    public void checkGif(User user, String id) {
         EmbedBuilder builder = new EmbedBuilder();
         builder.setTitle("Action Gif");
-        builder.addField("Race", gif.race != null ? gif.race : "null", false);
-        builder.addField("Transformation", gif.transformation != null ? gif.transformation : "base", false);
-        builder.addField("Attack", gif.attack, false);
-        builder.addField("Length", String.valueOf(gif.length), false);
-        builder.setImage(gif.link);
+        builder.addField("Race", race != null ? race : "null", false);
+        builder.addField("Transformation", transformation != null ? transformation : "base", false);
+        builder.addField("Attack", attack, false);
+        builder.addField("Length", String.valueOf(length), false);
+        builder.setImage(link);
         builder.setColor(Color.BLUE);
         builder.setFooter("Sent by: " + user.getAsTag(), user.getAvatarUrl());
 
-        sendGifCheck(builder.build(), gif, user, id);
+        sendGifCheck(builder.build(), user, id);
 
     }
 

@@ -206,22 +206,22 @@ public class ResultGif extends Gif {
 
     }
 
-    public static void checkGif(@NotNull ResultGif gif, User user, String id) {
+    public void checkGif(@NotNull User user, String id) {
         EmbedBuilder builder = new EmbedBuilder();
         builder.setTitle("Result Gif");
-        builder.addField("Attacker's race", gif.race == null ? "null" : gif.race, false);
-        builder.addField("Attacker's transformation", gif.aTransformation != null ? gif.aTransformation : "base", false);
-        builder.addField("Attacker's attack", gif.aAttack, false);
-        builder.addField("Defender's race", gif.dRace == null ? "null" : gif.dRace, false);
-        builder.addField("Defender's transformation", gif.dTransformation != null ? gif.dTransformation : "base", false);
-        builder.addField("Defender's attack", gif.dAttack == null ? "null" : gif.dAttack, false);
-        builder.addField("Power", String.valueOf(gif.power), false);
-        builder.addField("Length", String.valueOf(gif.length), false);
-        builder.setImage(gif.link);
+        builder.addField("Attacker's race", race == null ? "null" : race, false);
+        builder.addField("Attacker's transformation", aTransformation != null ? aTransformation : "base", false);
+        builder.addField("Attacker's attack", aAttack, false);
+        builder.addField("Defender's race", dRace == null ? "null" : dRace, false);
+        builder.addField("Defender's transformation", dTransformation != null ? dTransformation : "base", false);
+        builder.addField("Defender's attack", dAttack == null ? "null" : dAttack, false);
+        builder.addField("Power", String.valueOf(power), false);
+        builder.addField("Length", String.valueOf(length), false);
+        builder.setImage(link);
         builder.setColor(Color.RED);
         builder.setFooter("Sent by: " + user.getAsTag(), user.getAvatarUrl());
 
-        sendGifCheck(builder.build(), gif, user, id);
+        sendGifCheck(builder.build(), user, id);
 
     }
 

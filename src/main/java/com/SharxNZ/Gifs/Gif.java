@@ -154,7 +154,7 @@ public class Gif {
     }
 
 
-    protected static <T extends Gif> void sendGifCheck(MessageEmbed embed, T gif, User user, String id) {
+    protected void sendGifCheck(MessageEmbed embed, User user, String id) {
         CompletableFuture<Message> message =
                 Android24.jda.getTextChannelById(890544910057480213L).sendMessageEmbeds(embed)
                         .setActionRow(Button.success("TGif#allow#" + id, "✅"), Button.danger("TGif#deny#" + id, "❌")).submit();
@@ -162,7 +162,7 @@ public class Gif {
                 && bce.getComponentId().endsWith(id), bce -> {
             switch (bce.getComponentId().split("#")[1]) {
                 case "allow" -> {
-                    if (gif.saveGif())
+                    if (saveGif())
                         bce.editMessage(new MessageBuilder(Embeds.successEmbed("The gif hase been added!")).build()).queue(
                                 interactionHook -> interactionHook.deleteOriginal().queueAfter(5, TimeUnit.SECONDS));
                     else

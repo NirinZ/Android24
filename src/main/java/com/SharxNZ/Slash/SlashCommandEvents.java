@@ -297,12 +297,12 @@ public class SlashCommandEvents extends ListenerAdapter {
                 switch (slashCommandEvent.getSubcommandName()) {
                     case "transformation" -> {
                         try {
-                            TransGif.checkGif(new TransGif( // שיפורים לכל אלו: לעשות שזה יחזיר רק את מה שצריך. לא צריך כל פעם ליצור אובייקט חדש, מספיק לקבל את מה שצריך ולעשות את זה יותר יעיל
+                            new TransGif( // שיפורים לכל אלו: לעשות שזה יחזיר רק את מה שצריך. לא צריך כל פעם ליצור אובייקט חדש, מספיק לקבל את מה שצריך ולעשות את זה יותר יעיל
                                     new Race(slashCommandEvent.getOption("race").getAsString()),
                                     new Transformation(slashCommandEvent.getOption("from").getAsString()),
                                     new Transformation(slashCommandEvent.getOption("to").getAsString()),
-                                    slashCommandEvent.getOption("link").getAsString()
-                            ), user, slashCommandEvent.getId());
+                                    slashCommandEvent.getOption("link").getAsString())
+                                    .checkGif(user, slashCommandEvent.getId());
                             slashCommandEvent.getHook().sendMessageEmbeds(Embeds.successEmbed("The gif has sent do test and will wait for approval!")).setEphemeral(true).queue();
 
                         } catch (NameNotFoundException e) {
@@ -317,13 +317,13 @@ public class SlashCommandEvents extends ListenerAdapter {
                     }
                     case "action" -> {
                         try {
-                            ActionGif.checkGif(new ActionGif( // שיפורים לכל אלו: לעשות שזה יחזיר רק את מה שצריך. לא צריך כל פעם ליצור אובייקט חדש, מספיק לקבל את מה שצריך ולעשות את זה יותר יעיל
+                            new ActionGif( // שיפורים לכל אלו: לעשות שזה יחזיר רק את מה שצריך. לא צריך כל פעם ליצור אובייקט חדש, מספיק לקבל את מה שצריך ולעשות את זה יותר יעיל
                                     slashCommandEvent.getOption("race").getAsString().equals("null") ? null :
                                             new Race(slashCommandEvent.getOption("race").getAsString()),
                                     new Transformation(slashCommandEvent.getOption("transformation").getAsString()),
                                     new Attack(slashCommandEvent.getOption("attack").getAsString()),
-                                    slashCommandEvent.getOption("link").getAsString()
-                            ), user, slashCommandEvent.getId());
+                                    slashCommandEvent.getOption("link").getAsString())
+                                    .checkGif(user, slashCommandEvent.getId());
                             slashCommandEvent.getHook().sendMessageEmbeds(Embeds.successEmbed("The gif has sent do test and will wait for approval!")).setEphemeral(true).queue();
 
                         } catch (NameNotFoundException e) {
@@ -338,7 +338,7 @@ public class SlashCommandEvents extends ListenerAdapter {
                     }
                     case "result" -> {
                         try {
-                            ResultGif.checkGif(new ResultGif( // שיפורים לכל אלו: לעשות שזה יחזיר רק את מה שצריך. לא צריך כל פעם ליצור אובייקט חדש, מספיק לקבל את מה שצריך ולעשות את זה יותר יעיל
+                            new ResultGif( // שיפורים לכל אלו: לעשות שזה יחזיר רק את מה שצריך. לא צריך כל פעם ליצור אובייקט חדש, מספיק לקבל את מה שצריך ולעשות את זה יותר יעיל
                                     slashCommandEvent.getOption("a_race").getAsString().equals("null") ? null :
                                             new Race(slashCommandEvent.getOption("a_race").getAsString()),
                                     new Transformation(slashCommandEvent.getOption("a_transformation").getAsString()),
@@ -349,8 +349,8 @@ public class SlashCommandEvents extends ListenerAdapter {
                                     slashCommandEvent.getOption("d_attack").getAsString().equals("null") ? null :
                                             new Attack(slashCommandEvent.getOption("d_attack").getAsString()),
                                     slashCommandEvent.getOption("power").getAsLong(),
-                                    slashCommandEvent.getOption("link").getAsString()
-                            ), user, slashCommandEvent.getId());
+                                    slashCommandEvent.getOption("link").getAsString())
+                                    .checkGif(user, slashCommandEvent.getId());
                             slashCommandEvent.getHook().sendMessageEmbeds(Embeds.successEmbed("The gif has sent do test and will wait for approval!")).setEphemeral(true).queue();
 
                         } catch (NameNotFoundException e) {
