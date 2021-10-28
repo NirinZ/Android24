@@ -175,7 +175,7 @@ public class SlashCommandEvents extends ListenerAdapter {
 
             case "transform" -> {
                 // If the user owns the transformation
-                Being being = Being.getBeing(userID);
+                Being being = new Being(userID);
 
                 if (Transformation.checkTransformation(userID, slashCommandEvent.getOption("name").getAsString())) {
                     guild.retrieveMemberById(userID).queue(member -> { //הצעה לשיפור - ראה Android24
@@ -233,7 +233,6 @@ public class SlashCommandEvents extends ListenerAdapter {
                             slashCommandEvent.reply("This transformations doesn't exists.").setEphemeral(true).queue();
                         } catch (SQLException throwables) {
                             Android24.logError(throwables);
-
                             slashCommandEvent.replyEmbeds(Embeds.errorEmbed()).setEphemeral(true).queue();
                         }
                     });

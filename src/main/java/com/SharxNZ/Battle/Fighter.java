@@ -5,6 +5,7 @@ import com.SharxNZ.Commands.GameCommands.Stats;
 import com.SharxNZ.Game.Attack;
 import com.SharxNZ.Gifs.ActionGif;
 import com.SharxNZ.Gifs.Gif;
+import com.SharxNZ.Gifs.TransGif;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.jetbrains.annotations.NotNull;
@@ -15,23 +16,24 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Random;
+import java.util.Set;
 
 public class Fighter extends Stats {
 
+    protected static final Random rand = new Random();
+    protected static final HashMap<Long, Fighter> fighters = new HashMap<>();
+
+    protected final ArrayList<String> specialAttacks = new ArrayList<>();
     protected long health = super.health;
     protected long ki = super.ki;
     protected long strikeAttack = super.strikeAttack;
     protected long kiAttack = super.kiAttack;
     protected long defence = super.defence;
     protected long speed = super.speed;
-
     protected Fighter target;
     protected Attack attack;
-    protected final ArrayList<String> specialAttacks = new ArrayList<>();
-
-    protected static final Random rand = new Random();
-
 
     public Fighter(long userID) {
         super(userID, true);
@@ -44,15 +46,44 @@ public class Fighter extends Stats {
             specialAttacks.add("Strike");
             specialAttacks.add("Ki");
             specialAttacks.add("Defence");
+            specialAttacks.add("Charge");
             while (resultSet.next())
                 specialAttacks.add(resultSet.getString(1));
+            fighters.put(userID, this);
         } catch (SQLException throwables) {
             Android24.logError(throwables);
         }
     }
 
+    @NotNull
+    protected static String getStatBar(long part, long full, String chr) {
+        part = 10 * (Math.max(part, 0)) / full;
+        StringBuilder bar = new StringBuilder();
+        for (int i = 0; i < part; i++) {
+            bar.append(chr);
+        }
+        for (int i = 0; i < 10 - part; i++) {
+            bar.append("⬛");
+        }
+        return bar.toString();
+    }
+
+    @Nullable
+    public static Fighter getFighter(long id) {
+        return fighters.get(id);
+    }
+
+    public static void removeFighters(long @NotNull ... ids) {
+        for (long id : ids)
+            fighters.remove(id);
+    }
+
+    public static void removeFighters(@NotNull Set<Long> ids) {
+        for (Long id : ids)
+            fighters.remove(id);
+    }
+
     protected void resetStats() {
-        System.out.println("TN :" + transformation.getName());
         strikeAttack = super.strikeAttack * transformation.getAttackPowerUp();
         kiAttack = super.kiAttack * transformation.getAttackPowerUp();
         defence = super.defence * transformation.getDefencePowerUp();
@@ -95,7 +126,10 @@ public class Fighter extends Stats {
         defence *= attack.getDefencePowerUp();
         speed *= attack.getSpeedPowerUp();
         this.attack = attack;
-        return ActionGif.getActionGif(race, transformation.getAbbreviated(), attack.getAbbreviated());
+        if (attack.getAttackType() == Attack.ATTACK_TYPE.Charge)
+            return TransGif.getTransGif(transformation.getAbbreviated(), transformation.getAbbreviated());
+        else
+            return ActionGif.getActionGif(race, transformation.getAbbreviated(), attack.getAbbreviated());
     }
 
     public void randomizeStats() {
@@ -103,19 +137,6 @@ public class Fighter extends Stats {
         kiAttack *= rand.nextDouble() + 1;
         defence *= rand.nextDouble() + 1;
         speed *= rand.nextDouble() + 1;
-    }
-
-    @NotNull
-    protected static String getStatBar(long part, long full, String chr) {
-        part = 10 * (Math.max(part, 0)) / full;
-        StringBuilder bar = new StringBuilder();
-        for (int i = 0; i < part; i++) {
-            bar.append(chr);
-        }
-        for (int i = 0; i < 10 - part; i++) {
-            bar.append("⬛");
-        }
-        return bar.toString();
     }
 
     public MessageEmbed currentStats() {
@@ -149,6 +170,36 @@ public class Fighter extends Stats {
 
     public ArrayList<String> getSpecialAttacks() {
         return specialAttacks;
+    }
+
+    @Override
+    public long getHealth() {
+        return health;
+    }
+
+    @Override
+    public long getKi() {
+        return ki;
+    }
+
+    @Override
+    public long getStrikeAttack() {
+        return strikeAttack;
+    }
+
+    @Override
+    public long getKiAttack() {
+        return kiAttack;
+    }
+
+    @Override
+    public long getDefence() {
+        return defence;
+    }
+
+    @Override
+    public long getSpeed() {
+        return speed;
     }
 
 }

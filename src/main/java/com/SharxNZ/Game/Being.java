@@ -1,42 +1,24 @@
 package com.SharxNZ.Game;
 
 import com.SharxNZ.Android24;
+import com.SharxNZ.Battle.Fighter;
 import com.SharxNZ.Commands.GameCommands.Stats;
 import com.SharxNZ.Commands.Level;
 import com.SharxNZ.Utilities.DoublyCircularLinkedList;
-import com.SharxNZ.Utilities.Utils;
 import org.jetbrains.annotations.NotNull;
 
 import javax.naming.NameNotFoundException;
-import java.sql.*;
-import java.util.HashMap;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class Being { // לסדר את זה שלא יהיה סטט כי לא צריך.
-
-    protected long userID;
-    protected String name;
-    protected String race;
-    protected long zeni;
-    protected int level;
-    protected int powerPoints;
-    protected long health;
-    protected long ki;
-    protected long strikeAttack;
-    protected long kiAttack;
-    protected long defence;
-    protected long speed;
-    protected Transformation transformation;
-
-    protected boolean inUse;
-
-
-    protected static final HashMap<Long, Being> beings = new HashMap<>();
 
     protected static String saveBeingStatementSql = """
             UPDATE `android24`.`users_data` SET `PowerPoints` = ?, `Health` = ?, `Ki` = ?, `StrikeAttack` = ?, `KiAttack` = ?,
             `Defence` = ?, `Speed` = ? WHERE `UserID` = ?
             """;
-
     protected static String getAttacksSql = """
             SELECT
                 AttackName
@@ -55,12 +37,23 @@ public class Being { // לסדר את זה שלא יהיה סטט כי לא צר
                 android24.transformations USING (TransformationAbbreviated)
                 Where UserID = ?;
             """;
+    public String type;
+    protected long userID;
+    protected String name;
+    protected String race;
+    protected long zeni;
+    protected int level;
+    protected int powerPoints;
+    protected long health;
+    protected long ki;
+    protected long strikeAttack;
+    protected long kiAttack;
+    protected long defence;
+    protected long speed;
+    protected Transformation transformation;
+    protected boolean inUse;
 
-    static {
-        Utils.garbageCollector(beings);
-    }
-
-    protected Being(long userID) {
+    public Being(long userID) {
         try
                 (Connection con = Android24.getConnection();
                  PreparedStatement getBeingStatement = con.prepareStatement("""
@@ -90,27 +83,39 @@ public class Being { // לסדר את זה שלא יהיה סטט כי לא צר
             this.transformation = new Transformation(resultSet.getString(11));
             this.inUse = true;
 
-            beings.put(userID, this); // Put the being in the object pool
-
         } catch (SQLException | NameNotFoundException throwables) {
             Android24.logError(throwables);
         }
     }
 
-    public static @NotNull Being getBeing(long userID) {
-        Being being;
-        if (beings.containsKey(userID)) {
-            being = beings.get(userID);
-            being.inUse = true;
-        } else {
-            being = new Being(userID);
+    public static DoublyCircularLinkedList<DisplayAttack> getDisplayAttacks(long userID) throws SQLException, NameNotFoundException {
+        try (
+                Connection con = Android24.getConnection();
+                PreparedStatement getAttacks = con.prepareStatement(getAttacksSql)
+        ) {
+            DoublyCircularLinkedList<DisplayAttack> attacks = new DoublyCircularLinkedList<>();
+            getAttacks.setLong(1, userID);
+            ResultSet resultSet = getAttacks.executeQuery();
+            while (resultSet.next())
+                attacks.add(new DisplayAttack(resultSet.getString(1)));
+            getAttacks.close();
+            return attacks;
         }
-        return being;
     }
 
-    public static @NotNull Being getNewBeing(long userID) {
-        beings.remove(userID);
-        return new Being(userID);
+    public static DoublyCircularLinkedList<DisplayTransformation> getDisplayTransformations(long userID) throws SQLException, NameNotFoundException {
+        try (
+                Connection con = Android24.getConnection();
+                PreparedStatement getTransformations = con.prepareStatement(getTransformationsSql)
+        ) {
+            DoublyCircularLinkedList<DisplayTransformation> transformations = new DoublyCircularLinkedList<>();
+            getTransformations.setLong(1, userID);
+            ResultSet resultSet = getTransformations.executeQuery();
+            while (resultSet.next())
+                transformations.add(new DisplayTransformation(resultSet.getString(1)));
+            getTransformations.close();
+            return transformations;
+        }
     }
 
     public void save() {
@@ -161,51 +166,6 @@ public class Being { // לסדר את זה שלא יהיה סטט כי לא צר
                 transformations.add(new DisplayTransformation(resultSet.getString(1)));
             getTransformations.close();
             return transformations;
-        }
-    }
-
-    public static DoublyCircularLinkedList<DisplayAttack> getDisplayAttacks(long userID) throws SQLException, NameNotFoundException {
-        try (
-                Connection con = Android24.getConnection();
-                PreparedStatement getAttacks = con.prepareStatement(getAttacksSql)
-        ) {
-            DoublyCircularLinkedList<DisplayAttack> attacks = new DoublyCircularLinkedList<>();
-            getAttacks.setLong(1, userID);
-            ResultSet resultSet = getAttacks.executeQuery();
-            while (resultSet.next())
-                attacks.add(new DisplayAttack(resultSet.getString(1)));
-            getAttacks.close();
-            return attacks;
-        }
-    }
-
-    public static DoublyCircularLinkedList<DisplayTransformation> getDisplayTransformations(long userID) throws SQLException, NameNotFoundException {
-        try (
-                Connection con = Android24.getConnection();
-                PreparedStatement getTransformations = con.prepareStatement(getTransformationsSql)
-        ) {
-            DoublyCircularLinkedList<DisplayTransformation> transformations = new DoublyCircularLinkedList<>();
-            getTransformations.setLong(1, userID);
-            ResultSet resultSet = getTransformations.executeQuery();
-            while (resultSet.next())
-                transformations.add(new DisplayTransformation(resultSet.getString(1)));
-            getTransformations.close();
-            return transformations;
-        }
-    }
-
-    public void setTransformation(@NotNull Transformation trans) {
-        try (
-                Connection con = Android24.getConnection();
-                PreparedStatement setTransformation = con.prepareStatement("UPDATE `android24`.`users_data` SET `CurrentTransformation` = ? WHERE (`UserID` = ?);")
-        ) {
-
-            setTransformation.setString(1, trans.getName());
-            setTransformation.setLong(2, userID);
-            setTransformation.executeUpdate();
-            transformation = trans;
-        } catch (SQLException throwables) {
-            Android24.logError(throwables);
         }
     }
 
@@ -267,6 +227,30 @@ public class Being { // לסדר את זה שלא יהיה סטט כי לא צר
 
     public Transformation getTransformation() {
         return transformation;
+    }
+
+    public void setTransformation(@NotNull Transformation trans) {
+        try (
+                Connection con = Android24.getConnection();
+                PreparedStatement setTransformation = con.prepareStatement("UPDATE `android24`.`users_data` SET `CurrentTransformation` = ? WHERE (`UserID` = ?);")
+        ) {
+
+            setTransformation.setString(1, trans.getName());
+            setTransformation.setLong(2, userID);
+            setTransformation.executeUpdate();
+            transformation = trans;
+
+            Fighter fighter = Fighter.getFighter(userID);
+            if (fighter != null)
+                fighter.setTrans(trans);
+
+        } catch (SQLException throwables) {
+            Android24.logError(throwables);
+        }
+    }
+
+    protected void setTrans(Transformation trans) {
+        transformation = trans;
     }
 
     public boolean getInUse() {

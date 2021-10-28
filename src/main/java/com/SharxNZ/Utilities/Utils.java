@@ -1,7 +1,6 @@
 package com.SharxNZ.Utilities;
 
 import com.SharxNZ.Android24;
-import com.SharxNZ.Commands.GameCommands.PowerPoints;
 import com.SharxNZ.Game.Being;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -44,7 +43,7 @@ public abstract class Utils {
         notifyProblem(guild, new Server(guild.getIdLong()), text);
     }
 
-    public static void notifyProblem(Guild guild, Server server, String text) {
+    public static void notifyProblem(@NotNull Guild guild, Server server, String text) {
         guild.retrieveOwner().queue(owner -> {
             owner.getUser().openPrivateChannel().queue(privateChannel -> {
                 privateChannel.sendMessage(text).queue(null, throwable -> {
@@ -88,40 +87,35 @@ public abstract class Utils {
     }
 
     public static <T> void setInUse(T instance) {
-        switch (instance.getClass().getSimpleName()) {
-            case "Being":
-                Being being = (Being) instance;
-                being.setInUse(false);
-                break;
-            case "PowerPoints":
-                PowerPoints powerPoints = (PowerPoints) instance;
-                powerPoints.setInUse(false);
-                break;
+        switch (instance) {
+            case Being being -> being.setInUse(false);
+
+            default -> throw new IllegalStateException("Unexpected value: " + instance);
         }
     }
 
-    public static <T1, T2> void garbageCollector(HashMap<T1, T2> hashMap) {
+    public static <T1, T2> void garbageCollector(@NotNull HashMap<T1, T2> hashMap) {
         Lock lock = new ReentrantLock();
         Timer timer = new Timer();
         final int[] i = {0};
-        HashMap<T1, T2> tempMap = (HashMap<T1, T2>) hashMap.clone();
         TimerTask timerTask = new TimerTask() {
             @Override
             public void run() {
+                HashMap<T1, T2> tempMap = (HashMap<T1, T2>) hashMap.clone();
                 for (T1 key : tempMap.keySet()) {
                     lock.lock();
                     if (inUse(tempMap.get(key))) {
                         setInUse(tempMap.get(key));
                         System.out.println(" === Prolonged === ");
                     } else {
-                        tempMap.remove(key);
+                        hashMap.remove(key);
                         System.out.println(" === deleted === ");
                     }
                     lock.unlock();
                 }
             }
         };
-        timer.scheduleAtFixedRate(timerTask, 30000, 30000);
+        timer.scheduleAtFixedRate(timerTask, 60000, 60000); // 60000 -> 60 seconds
     }
 
     public static void getImageUrl(byte[] image, @NotNull AtomicReference<String> value) {

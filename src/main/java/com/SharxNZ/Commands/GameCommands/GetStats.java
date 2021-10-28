@@ -3,8 +3,6 @@ package com.SharxNZ.Commands.GameCommands;
 
 import com.SharxNZ.Android24;
 import com.SharxNZ.Game.Being;
-import com.SharxNZ.Game.Transformation;
-import com.SharxNZ.Utilities.Embeds;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -14,13 +12,12 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
-import javax.naming.NameNotFoundException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import static com.SharxNZ.Android24.*;
+import static com.SharxNZ.Android24.logError;
 
 public class GetStats extends Command {
 
@@ -34,7 +31,7 @@ public class GetStats extends Command {
 
     @Override
     protected void execute(CommandEvent commandEvent) {
-        commandEvent.reply(getStats(Being.getBeing(commandEvent.getAuthor().getIdLong())));
+        commandEvent.reply(getStats(new Being(commandEvent.getAuthor().getIdLong())));
     }
 
     public static String getStats(Being being) {
@@ -80,7 +77,7 @@ public class GetStats extends Command {
     }
 
     public static MessageEmbed statsEmbed(User user) {
-        Being being = Being.getNewBeing(user.getIdLong());
+        Being being = new Being(user.getIdLong());
         EmbedBuilder generalEmbed = new EmbedBuilder();
         generalEmbed.setTitle(user.getName());
         if (being.getTransformation().getName() == null)

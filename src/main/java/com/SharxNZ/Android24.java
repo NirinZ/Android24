@@ -38,6 +38,7 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
+import org.jetbrains.annotations.NotNull;
 
 import javax.security.auth.login.LoginException;
 import java.io.IOException;
@@ -71,16 +72,20 @@ public abstract class Android24 {
         }
     }
 
-    public static void logError(Exception throwables) {
+    public static void logError(@NotNull Exception throwables) {
         throwables.printStackTrace();
         StringBuilder builder = new StringBuilder();
         for (StackTraceElement stack : throwables.getStackTrace())
             builder.append(stack).append("\n");
-        jda.getTextChannelById(debugChannelID).sendMessage("<@" + nirinId + ">\n" + throwables + "\nStack Trace:\n"
-                + builder).queue();
+        if (builder.length() + throwables.toString().length() > 1950)
+            jda.getTextChannelById(debugChannelID).sendMessage("<@" + nirinId + ">\n" + throwables + "\nStack Trace:\n"
+                    + builder).queue();
+        else
+            jda.getTextChannelById(debugChannelID).sendMessage("<@" + nirinId + ">\n" + throwables + "\nStack Trace:\n"
+                    + builder.substring(0, 1000)).queue();
     }
 
-    public static void logError(Exception throwables, String text) {
+    public static void logError(@NotNull Exception throwables, String text) {
         throwables.printStackTrace();
         StringBuilder builder = new StringBuilder();
         for (StackTraceElement stack : throwables.getStackTrace())
@@ -93,7 +98,7 @@ public abstract class Android24 {
         jda.getTextChannelById(debugChannelID).sendMessage(log).queue();
     }
 
-    public static void configureCache(JDABuilder builder) {
+    public static void configureCache(@NotNull JDABuilder builder) {
         // Cache members who are in a voice channel
         MemberCachePolicy policy = MemberCachePolicy.VOICE;
         // Cache members who are in a voice channel
@@ -117,8 +122,6 @@ public abstract class Android24 {
         commandListDebug.queue();
         commandListAll.queue();
     }
-
-    //אפשר לשלוח קבצים באפמרל!!!! לסדר דחוף את הפוור פוינטס todo
 
     /**
      * Improvements:
@@ -188,7 +191,6 @@ public abstract class Android24 {
         Inventory.start();
         AddingCommands.AddingCommands();
         Scams.Scams();
-        //jda.addEventListener(new SlashTest());
 
         CommandClientBuilder commandClientBuilder = new CommandClientBuilder();
         commandClientBuilder.setOwnerId("739532349280354404");
@@ -207,12 +209,10 @@ public abstract class Android24 {
         CommandClient commandClient = commandClientBuilder.build();
         jda.addEventListener(commandClient);
 
-        // commandListUpdateAction = jda.updateCommands();
         queueCommands();
 
         Battle.battlesCleanup();
         jda.getTextChannelById(debugChannelID).sendMessage("אני דלוק 😁").queue();
-        // jda.getPresence().setStatus(OnlineStatus.DO_NOT_DISTURB);
-        // Test 2
+
     }
 }
