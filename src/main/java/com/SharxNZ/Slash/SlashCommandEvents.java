@@ -385,6 +385,7 @@ public class SlashCommandEvents extends ListenerAdapter {
                 }
             }
 
+            case "minecraft" -> slashCommandEvent.reply("The IP is: `nahidk.apexmc.co`").queue();
 
             case "nuke" -> {
                 slashCommandEvent.reply("""
@@ -405,6 +406,8 @@ public class SlashCommandEvents extends ListenerAdapter {
                 slashCommandEvent.reply("r").queue();
 
             }
+
+
             //slashCommandEvent.getHook().sendFile().addEmbeds().queue();
             default -> slashCommandEvent.reply("Unregistered command :" + slashCommandEvent.getName() + " | " + slashCommandEvent.getSubcommandName()
                     + " ~ " + slashCommandEvent.getSubcommandGroup()).queue();

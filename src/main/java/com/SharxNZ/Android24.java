@@ -205,6 +205,7 @@ public abstract class Android24 {
         commandClientBuilder.addCommand(new GetStats());
         commandClientBuilder.addCommand(new refreshRoles());
         commandClientBuilder.addCommand(new AddTransGif());
+        commandClientBuilder.addCommand(new IP());
 
         CommandClient commandClient = commandClientBuilder.build();
         jda.addEventListener(commandClient);
