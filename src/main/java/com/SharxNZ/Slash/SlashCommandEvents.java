@@ -400,7 +400,7 @@ public class SlashCommandEvents extends ListenerAdapter {
             }
 
             case "test" -> {
-                slashCommandEvent.reply("s").queue();
+                slashCommandEvent.reply("su").queue();
             }
 
 
