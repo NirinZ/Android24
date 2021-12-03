@@ -400,11 +400,7 @@ public class SlashCommandEvents extends ListenerAdapter {
             }
 
             case "test" -> {
-                Server server = new Server(guildID);
-                guild.modifyRolePositions().selectPosition(guild.getRoleById(889183162389897276L).getPosition())
-                        .moveTo(guild.getRoleById(server.getTransRole()).getPosition() - 1).queue();
-                slashCommandEvent.reply("r").queue();
-
+                slashCommandEvent.reply("s").queue();
             }
 
 
