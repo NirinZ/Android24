@@ -21,7 +21,6 @@ public class SysCommand extends Command {
 
     @Override
     protected void execute(CommandEvent commandEvent) {
-        System.out.println("df");
         final Runtime run = Runtime.getRuntime();
 
         String cmd = commandEvent.getArgs();
