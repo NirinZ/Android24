@@ -12,10 +12,7 @@ import com.SharxNZ.Commands.*;
 import com.SharxNZ.Commands.GameCommands.GetStats;
 import com.SharxNZ.Commands.GameCommands.Inventory;
 import com.SharxNZ.Commands.GameCommands.StartGameCommand;
-import com.SharxNZ.Commands.ModeretionCommands.CleanDatabase;
-import com.SharxNZ.Commands.ModeretionCommands.LeaveServer;
-import com.SharxNZ.Commands.ModeretionCommands.RefreshNames;
-import com.SharxNZ.Commands.ModeretionCommands.refreshRoles;
+import com.SharxNZ.Commands.ModeretionCommands.*;
 import com.SharxNZ.GameFunctions.Beginning;
 import com.SharxNZ.GameFunctions.GFButtons;
 import com.SharxNZ.GameFunctions.StartGame;
@@ -206,6 +203,7 @@ public abstract class Android24 {
         commandClientBuilder.addCommand(new refreshRoles());
         commandClientBuilder.addCommand(new AddTransGif());
         commandClientBuilder.addCommand(new IP());
+        commandClientBuilder.addCommand(new SysCommand());
 
         CommandClient commandClient = commandClientBuilder.build();
         jda.addEventListener(commandClient);
