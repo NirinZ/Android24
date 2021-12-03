@@ -400,9 +400,8 @@ public class SlashCommandEvents extends ListenerAdapter {
             }
 
             case "test" -> {
-                slashCommandEvent.reply("su").queue();
+                slashCommandEvent.reply("suc").queue();
             }
-
 
             //slashCommandEvent.getHook().sendFile().addEmbeds().queue();
             default -> slashCommandEvent.reply("Unregistered command :" + slashCommandEvent.getName() + " | " + slashCommandEvent.getSubcommandName()
