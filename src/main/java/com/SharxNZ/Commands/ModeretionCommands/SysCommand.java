@@ -14,15 +14,20 @@ public class SysCommand extends Command {
         super.arguments = "[command]";
         super.help = "Run system commands on the server";
         super.userPermissions = new Permission[]{Permission.BAN_MEMBERS, Permission.ADMINISTRATOR};
-        super.ownerCommand = true;
+        super.requiredRole = "Can do all";
+        super.ownerCommand = false;
         super.hidden = true;
     }
 
     @Override
     protected void execute(CommandEvent commandEvent) {
+        System.out.println("df");
         final Runtime run = Runtime.getRuntime();
 
         String cmd = commandEvent.getArgs();
+
+        if(cmd.equals(""))
+            return;
 
         Process process;
         StringBuilder output = new StringBuilder();

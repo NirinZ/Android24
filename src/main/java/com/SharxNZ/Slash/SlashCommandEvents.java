@@ -400,7 +400,7 @@ public class SlashCommandEvents extends ListenerAdapter {
             }
 
             case "test" -> {
-                slashCommandEvent.reply("succ").queue();
+                slashCommandEvent.reply("success").queue();
             }
 
             //slashCommandEvent.getHook().sendFile().addEmbeds().queue();
