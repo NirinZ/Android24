@@ -100,6 +100,18 @@ public class Fighter extends Stats {
         } else return 0;
     }
 
+    //אולי אפשר לעשות שנשבר המגן אם נגמר הקי
+    /**
+     * @return demage
+     */
+    public long defende(long attack){
+        Math.pow()attack/defence;
+    }
+
+    void changeKi(int change){
+        ki = Math.max(0, Math.min(super.ki, ki + change));
+    }
+
     public Fighter getTarget() {
         return target;
     }
@@ -120,7 +132,7 @@ public class Fighter extends Stats {
         switch (attack.getAttackType()) {
             case Strike -> strikeAttack *= attack.getAttackPowerUp();
             case Ki -> kiAttack *= attack.getAttackPowerUp();
-            case Charge -> ki = Math.min((ki + super.ki / 15), super.ki);
+            case Charge -> changeKi(super.ki / 15);
 
         }
         defence *= attack.getDefencePowerUp();
