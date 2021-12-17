@@ -226,7 +226,7 @@ public class Battle {
             damage = (int) (attacker.getStrikeAttack() - defender.getDefence() * 0.2);
             log("to the face");
         } else if (speedDiff > 0.6) {
-            damage = attacker.getStrikeAttack() - defender.getDefence();
+            damage = defender.defende(attacker.getStrikeAttack());
             switch (rand.nextInt(2)) {
                 case 0 -> log("defence");
                 case 1 -> {
@@ -285,7 +285,7 @@ public class Battle {
                     defender.getRace(), defender.getTransformation().getAbbreviated(), defender.getAttack().getAbbreviated(), defender.takeDamage(damage));
         } else if (speedDiff > 0.6) {
             log("Defender blast attacker but there was defence");
-            damage = defender.getKiAttack() - attacker.getDefence();
+            damage = defender.defende(attacker.getKiAttack());
         } else {
             log("Defender blast attacker in the face");
             damage = (int) (defender.getKiAttack() - attacker.getDefence() * 0.2);
@@ -314,7 +314,7 @@ public class Battle {
             log("to the face");
             damage = (int) (attacker.getStrikeAttack() - defender.getDefence() * 0.4);
         } else if (speedDiff > 0.7) {
-            damage = attacker.getStrikeAttack() - defender.getDefence();
+            damage = defender.defende(attacker.getStrikeAttack());
         } else if (speedDiff > 0.5) {
             log("dodge");
             return ResultGif.getResultGif(attacker.getRace(), attacker.getTransformation().getAbbreviated(), attacker.getAttack().getAbbreviated(),
@@ -377,7 +377,7 @@ public class Battle {
             damage = (int) (attacker.getKiAttack() - defender.getDefence() * 0.4);
         } else if (speedDiff > 0.5) {
             log("defence");
-            damage = attacker.getKiAttack() - defender.getDefence();
+            damage = defender.defende(attacker.getKiAttack());
         } else {
             log("dodge");
             return ResultGif.getResultGif(attacker.getRace(), attacker.getTransformation().getAbbreviated(), attacker.getAttack().getAbbreviated(),

@@ -102,10 +102,18 @@ public class Fighter extends Stats {
 
     //אולי אפשר לעשות שנשבר המגן אם נגמר הקי
     /**
+     * f(x)=b*a^(x)-c <-- **This is working on 0.0 - 1.0 and not on 0% - 100%**
+     * g(x)=q*x+ℯ^(w x)-1
      * @return demage
      */
     public long defende(long attack){
-        Math.pow()attack/defence;
+        final double a = 1.8;
+        final double b = 0.5;
+        final double c = 0.5;
+        final double x = attack/defence; // The precent of the attack from the defence
+        final double multiplier = b * Math.pow(a, x) - c;
+        changeKi(-1*attack*multiplier);        
+        return attack - defence;
     }
 
     void changeKi(int change){
