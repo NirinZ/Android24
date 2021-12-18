@@ -51,6 +51,7 @@ import java.util.List;
 public abstract class Android24 {
 
     public static final long debugChannelID = 887426748306825217L;
+    public static final long nirinsChannelID = 882524002516598784L;
     public static final long cacheChannelID = 866689902758068244L;
     private static final long nirinId = 739532349280354404L;
     private static final HikariDataSource dataSource = new HikariDataSource();
@@ -212,7 +213,7 @@ public abstract class Android24 {
         queueCommands();
 
         Battle.battlesCleanup();
-        jda.getTextChannelById(debugChannelID).sendMessage("new_battle_system: save3").queue();
+        jda.getTextChannelById(nirinsChannelID).sendMessage("new_battle_system: save4").queue();
 
     }
 }
