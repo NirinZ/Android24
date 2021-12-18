@@ -212,7 +212,7 @@ public abstract class Android24 {
         queueCommands();
 
         Battle.battlesCleanup();
-        jda.getTextChannelById(debugChannelID).sendMessage("אני דלוק 😁").queue();
+        jda.getTextChannelById(debugChannelID).sendMessage("new_battle_system: save3").queue();
 
     }
 }
