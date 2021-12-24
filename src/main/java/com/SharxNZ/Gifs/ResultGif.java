@@ -144,8 +144,12 @@ public class ResultGif extends AGif {
             System.out.println("precise: " + precise);
             System.out.println("half: " + half);
             System.out.println("other: " + other);
-            if ((precise + half + other) <= 0)
-                return null;
+            if ((precise + half + other) <= 0) {
+                if (dAttack != null && dAttack.equalsIgnoreCase("Strike"))
+                    return getResultGif(aRace, aTransformation, aAttack, dRace, dTransformation, "Defence", power);
+                else
+                    return null;
+            }
             precise = precise * multiplier;
             half = half * multiplier / 2;
 

@@ -2,20 +2,18 @@ package com.SharxNZ.Buttons;
 
 import com.SharxNZ.Android24;
 import com.SharxNZ.Battle.Battle;
+import com.SharxNZ.Battle.Fighter;
+import com.SharxNZ.GameFunctions.StartGame;
 import com.SharxNZ.Utilities.Embeds;
 import com.SharxNZ.Utilities.Server;
 import com.SharxNZ.Utilities.Utils;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.Category;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.requests.restaction.ChannelAction;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 public class BattleButtons extends ListenerAdapter {
@@ -34,7 +32,7 @@ public class BattleButtons extends ListenerAdapter {
         User clickedUser = buttonClickEvent.getUser();
         Category category = Android24.jda.getCategoryById(new Server(buttonClickEvent.getGuild().getIdLong()).getBattlesCt());
 
-        if (category == null){
+        if (category == null) {
             buttonClickEvent.replyEmbeds(Embeds.errorEmbed("This server hasn't enable battles! Tell the server's admins to set a battles category")).setEphemeral(true).queue();
 //            Utils.notifyProblem(buttonClickEvent.getGuild(), "This server doesn't have a category for battles, please use the `/server_setup` command to set one ☺");
             return;
@@ -50,10 +48,15 @@ public class BattleButtons extends ListenerAdapter {
         }
 
         if (!Utils.checkInGame(clickedUser.getIdLong())) {
-            buttonClickEvent.replyEmbeds(Embeds.errorEmbed("You have to be in the game to participate in a battle, use the command `/start_game`!")).setEphemeral(true).queue();
+            buttonClickEvent.replyEmbeds(Embeds.errorEmbed("You have to be in the game to participate in a battle, use the command `/start_game`!"))
+                    .addActionRow(StartGame.getSelectionMenu()).setEphemeral(true).queue();
             return;
         }
 
+        if (Fighter.getFighter(clickedUser.getIdLong()) != null) {
+            buttonClickEvent.replyEmbeds(Embeds.errorEmbed("You are already in another battle! You can't join 2 battles at the same time.")).setEphemeral(true).queue();
+            return;
+        }
 
         switch (command) {
             case "pvp" -> {

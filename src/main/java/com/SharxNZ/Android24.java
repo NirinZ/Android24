@@ -12,10 +12,7 @@ import com.SharxNZ.Commands.*;
 import com.SharxNZ.Commands.GameCommands.GetStats;
 import com.SharxNZ.Commands.GameCommands.Inventory;
 import com.SharxNZ.Commands.GameCommands.StartGameCommand;
-import com.SharxNZ.Commands.ModeretionCommands.CleanDatabase;
-import com.SharxNZ.Commands.ModeretionCommands.LeaveServer;
-import com.SharxNZ.Commands.ModeretionCommands.RefreshNames;
-import com.SharxNZ.Commands.ModeretionCommands.refreshRoles;
+import com.SharxNZ.Commands.ModeretionCommands.*;
 import com.SharxNZ.GameFunctions.Beginning;
 import com.SharxNZ.GameFunctions.GFButtons;
 import com.SharxNZ.GameFunctions.StartGame;
@@ -51,7 +48,10 @@ import java.util.List;
 public abstract class Android24 {
 
     public static final long debugChannelID = 887426748306825217L;
+    public static final long nirinsChannelID = 882524002516598784L;
     public static final long cacheChannelID = 866689902758068244L;
+    private static final String branch = "master";
+    private static final String commitId = "";
     private static final long nirinId = 739532349280354404L;
     private static final HikariDataSource dataSource = new HikariDataSource();
     public static JDA jda;
@@ -62,6 +62,10 @@ public abstract class Android24 {
     public static EventWaiter eventWaiter = new EventWaiter();
     private static CommandListUpdateAction commandListDebug;
     private static CommandListUpdateAction commandListAll;
+
+    public static String getCommitName(){
+        return branch + ": " + commitId;
+    }
 
     public static Connection getConnection() {
         try {
@@ -205,6 +209,8 @@ public abstract class Android24 {
         commandClientBuilder.addCommand(new GetStats());
         commandClientBuilder.addCommand(new refreshRoles());
         commandClientBuilder.addCommand(new AddTransGif());
+        commandClientBuilder.addCommand(new IP());
+        commandClientBuilder.addCommand(new SysCommand());
 
         CommandClient commandClient = commandClientBuilder.build();
         jda.addEventListener(commandClient);
@@ -212,7 +218,7 @@ public abstract class Android24 {
         queueCommands();
 
         Battle.battlesCleanup();
-        jda.getTextChannelById(debugChannelID).sendMessage("help").queue();
+        jda.getTextChannelById(nirinsChannelID).sendMessage(getCommitName()).queue();
 
     }
 }
