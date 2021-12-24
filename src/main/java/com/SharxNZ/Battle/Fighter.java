@@ -100,6 +100,26 @@ public class Fighter extends Stats {
         } else return 0;
     }
 
+    //אולי אפשר לעשות שנשבר המגן אם נגמר הקי
+    /**
+     * f(x)=b*a^(x)-c <-- **This is working on 0.0 - 1.0 and not on 0% - 100%**
+     * g(x)=q*x+ℯ^(w x)-1
+     * @return demage
+     */
+    public long defende(long attack){
+        final double a = 1.8;
+        final double b = 0.5;
+        final double c = 0.5;
+        final double x = attack/defence; // The precent of the attack from the defence
+        final double multiplier = b * Math.pow(a, x) - c;
+        changeKi((int) (-1*attack*multiplier));
+        return attack - defence;
+    }
+
+    void changeKi(int change){
+        ki = Math.max(0, Math.min(super.ki, ki + change));
+    }
+
     public Fighter getTarget() {
         return target;
     }
@@ -120,7 +140,7 @@ public class Fighter extends Stats {
         switch (attack.getAttackType()) {
             case Strike -> strikeAttack *= attack.getAttackPowerUp();
             case Ki -> kiAttack *= attack.getAttackPowerUp();
-            case Charge -> ki = Math.min((ki + super.ki / 15), super.ki);
+            case Charge -> changeKi((int) (super.ki / 15));
 
         }
         defence *= attack.getDefencePowerUp();

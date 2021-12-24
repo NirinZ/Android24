@@ -2,8 +2,10 @@ package com.SharxNZ.Battle;
 
 import com.SharxNZ.Android24;
 import com.SharxNZ.Game.Attack;
+import com.SharxNZ.Gifs.ExpGif;
 import com.SharxNZ.Gifs.Gif;
 import com.SharxNZ.Gifs.ResultGif;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Category;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -12,16 +14,14 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.requests.restaction.ChannelAction;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.naming.NameNotFoundException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 enum TurnType {
@@ -30,9 +30,12 @@ enum TurnType {
 
 public class Battle {
 
+    private static final Random rand = new Random();
+
     private static final HashMap<Long, Battle> battles = new HashMap<>();
     private final HashMap<Long, Fighter> fightersMap = new HashMap<>();
     private long channelId;
+    private long resultEmbedId;
     private Queue<Fighter> attackOrder = new LinkedList<>();
     private TurnType turnType = TurnType.Attack;
     private byte passes;
@@ -64,7 +67,10 @@ public class Battle {
             channelId = textChannel.getIdLong();
             battles.put(channelId, this);
             textChannel.sendMessage("The battle started!\n" + finalMention).queue();
+            textChannel.sendMessageEmbeds(new EmbedBuilder().setImage("https://freepngimg.com/thumb/fight/28608-6-fight.png").build()).queue(
+                    message -> resultEmbedId = message.getIdLong());
         });
+
         attacker = attackOrder.poll();
         defender = attacker.getTarget();
         waiter();
@@ -135,7 +141,7 @@ public class Battle {
             return "You can't defence in the attack phase";
         }
         if (turnType == TurnType.Attack && action.equals("Charge")) {
-            sendGif(attacker.setAttack(new Attack(Attack.ATTACK_TYPE.Charge)));
+            updateResult(attacker.setAttack(new Attack(Attack.ATTACK_TYPE.Charge)));
             nextTurn();
             return "You charged your energy!";
         }
@@ -181,18 +187,16 @@ public class Battle {
     @NotNull
     private String calculateTurn() {
 
+        Gif gif = null;
         switch (attacker.getAttack().getAttackType().toString() + defender.getAttack().getAttackType().toString()) {
-            case "StrikeStrike" -> {
-                StrikeStrike(attacker, defender);
-                StrikeStrike(defender, attacker);
-            }
-            case "StrikeKi" -> StrikeKi(attacker, defender);
-            case "KiStrike" -> StrikeKi(defender, attacker);
-            case "StrikeDefence" -> StrikeDefence(attacker, defender);
-            case "KiKi" -> KiKi(attacker, defender);
-            case "KiDefence" -> KiDefence(attacker, defender);
-            case "StrikeCharge" -> StrikeCharge(attacker, defender);
-            case "KiCharge" -> KiCharge(attacker, defender);
+            case "StrikeStrike" -> gif = StrikeStrike(attacker, defender);
+            case "StrikeKi" -> gif = StrikeKi(attacker, defender);
+            case "KiStrike" -> gif = StrikeKi(defender, attacker);
+            case "StrikeDefence" -> gif = StrikeDefence(attacker, defender);
+            case "KiKi" -> gif = KiKi(attacker, defender);
+            case "KiDefence" -> gif = KiDefence(attacker, defender);
+            case "StrikeCharge" -> gif = StrikeCharge(attacker, defender);
+            case "KiCharge" -> gif = KiCharge(attacker, defender);
         }
         sendMessage(attacker.currentStats());
         sendMessage(defender.currentStats());
@@ -208,57 +212,58 @@ public class Battle {
         }
         turnType = TurnType.Attack;
         nextTurn();
+        updateResult(gif);
         return "Turn ended";
     }
 
-    private void StrikeStrike(@NotNull Fighter attacker, @NotNull Fighter defender) {
-        log("SS");
-//        if (attacker.getAttack().getAttackType() == Attack.ATTACK_TYPE.Defence)
-//            sendGif(attacker.setAttack(new Attack(Attack.ATTACK_TYPE.Strike)));
+    private Gif StrikeStrike(@NotNull Fighter attacker, @NotNull Fighter defender) {
         attacker.randomizeStats();
         defender.randomizeStats();
-        System.out.println("\n\n" + attacker.getStrikeAttack() + "\n\n");
         double speedDiff = attacker.getSpeed() / (defender.getSpeed() + 0.0);
         long damage;
         log(attacker, defender, "Speed diff", speedDiff);
         if (speedDiff > 2) {
             damage = (int) (attacker.getStrikeAttack() - defender.getDefence() * 0.2);
-            //לשפר את הדרך שבא ההגנה עובדת
             log("to the face");
         } else if (speedDiff > 0.6) {
-            damage = attacker.getStrikeAttack() - defender.getDefence();
-            log("defence");
+            damage = defender.defende(attacker.getStrikeAttack());
+            switch (rand.nextInt(2)) {
+                case 0 -> log("defence");
+                case 1 -> {
+                    damage = attacker.getStrikeAttack() - defender.getStrikeAttack();
+                    if (damage >= 0)
+                        defender.takeDamage(damage);
+                    else
+                        attacker.takeDamage(-1 * damage);
+                    log("cross punch");
+                    return ResultGif.getResultGif(attacker.getRace(), attacker.getTransformation().getAbbreviated(), attacker.getAttack().getAbbreviated(),
+                            defender.getRace(), defender.getTransformation().getAbbreviated(), defender.getAttack().getAbbreviated(), 50);
+                }
+            }
         } else if (speedDiff > 0.3) {
             log("dodged");
-            sendGif(ResultGif.getResultGif(attacker.getRace(), attacker.getTransformation().getAbbreviated(), attacker.getAttack().getAbbreviated(),
-                    defender.getRace(), defender.getTransformation().getAbbreviated(), "Defence", -1));
-            return;
+            return ResultGif.getResultGif(attacker.getRace(), attacker.getTransformation().getAbbreviated(), attacker.getAttack().getAbbreviated(),
+                    defender.getRace(), defender.getTransformation().getAbbreviated(), "Defence", -1);
         } else {
             log("counter dodged");
-            StrikeStrike(defender, attacker);
-            return;
+            return StrikeStrike(defender, attacker);
         }
-        if (damage < 0) {
+        if (damage < attacker.getStrikeAttack() / -4) {
             log("counter defence");
-            StrikeStrike(defender, attacker);
-            return;
+            return StrikeStrike(defender, attacker);
         }
         log("DMG : " + damage);
         short power = defender.takeDamage(damage); // Remove the health
         log("power : " + power);
-        Gif gif = ResultGif.getResultGif(attacker.getRace(), attacker.getTransformation().getAbbreviated(), attacker.getAttack().getAbbreviated(),
-                defender.getRace(), defender.getTransformation().getAbbreviated(), defender.getAttack().getAbbreviated(), power);
-        if (gif == null)
-            gif = ResultGif.getResultGif(attacker.getRace(), attacker.getTransformation().getAbbreviated(), attacker.getAttack().getAbbreviated(),
-                    defender.getRace(), defender.getTransformation().getAbbreviated(), "Defence", power);
-        if (gif != null)
-            sendGif(gif.getLink());
-        if (damage >= defender.getHealth()) {
+        if (damage >= defender.getHealth())
             log("you are ded!");
-        } else log("not dead");
+        else log("not dead");
+
+        return ResultGif.getResultGif(attacker.getRace(), attacker.getTransformation().getAbbreviated(), attacker.getAttack().getAbbreviated(),
+                defender.getRace(), defender.getTransformation().getAbbreviated(), defender.getAttack().getAbbreviated(), power);
     }
 
-    public void StrikeKi(@NotNull Fighter attacker, @NotNull Fighter defender) {
+    public Gif StrikeKi(@NotNull Fighter attacker, @NotNull Fighter defender) {
         attacker.randomizeStats();
         defender.randomizeStats();
         double speedDiff = attacker.getSpeed() / (defender.getSpeed() + 0.0);
@@ -269,42 +274,35 @@ public class Battle {
             damage = (int) (attacker.getStrikeAttack() - defender.getDefence() * 0.2);
             log("attack punched defender");
             log(damage);
-            if (damage < 0) {
+            if (damage < attacker.getStrikeAttack() / -4) {
                 log("counter defence for the blaster");
-                StrikeStrike(defender, attacker);
-                return;
+                return StrikeStrike(defender, attacker);
             }
-            Gif gif = ResultGif.getResultGif(attacker.getRace(), attacker.getTransformation().getAbbreviated(), attacker.getAttack().getAbbreviated(),
-                    defender.getRace(), defender.getTransformation().getAbbreviated(), defender.getAttack().getAbbreviated(), defender.takeDamage(damage));
-            if (gif != null)
-                sendGif(gif.getLink());
             if (damage >= defender.getHealth()) {
                 log("you are ded!");
             } else log("not dead");
-            return;
+            return ResultGif.getResultGif(attacker.getRace(), attacker.getTransformation().getAbbreviated(), attacker.getAttack().getAbbreviated(),
+                    defender.getRace(), defender.getTransformation().getAbbreviated(), defender.getAttack().getAbbreviated(), defender.takeDamage(damage));
         } else if (speedDiff > 0.6) {
             log("Defender blast attacker but there was defence");
-            damage = defender.getKiAttack() - attacker.getDefence();
+            damage = defender.defende(attacker.getKiAttack());
         } else {
             log("Defender blast attacker in the face");
             damage = (int) (defender.getKiAttack() - attacker.getDefence() * 0.2);
         }
-        if (damage < 0) {
+        if (damage < attacker.getStrikeAttack() / -6) {
             log("counter defence for the strike");
-            StrikeStrike(attacker, defender);
-            return;
+            return StrikeStrike(attacker, defender);
         }
         log(damage);
-        Gif gif = ResultGif.getResultGif(defender.getRace(), defender.getTransformation().getAbbreviated(), defender.getAttack().getAbbreviated(),
-                attacker.getRace(), attacker.getTransformation().getAbbreviated(), attacker.getAttack().getAbbreviated(), attacker.takeDamage(damage));
-        if (gif != null)
-            sendGif(gif.getLink());
         if (damage >= attacker.getHealth()) {
             log("you are ded!");
         } else log("not dead");
+        return ResultGif.getResultGif(defender.getRace(), defender.getTransformation().getAbbreviated(), defender.getAttack().getAbbreviated(),
+                attacker.getRace(), attacker.getTransformation().getAbbreviated(), attacker.getAttack().getAbbreviated(), attacker.takeDamage(damage));
     }
 
-    public void StrikeDefence(@NotNull Fighter attacker, @NotNull Fighter defender) {
+    public Gif StrikeDefence(@NotNull Fighter attacker, @NotNull Fighter defender) {
         log("SD");
         attacker.randomizeStats();
         defender.randomizeStats();
@@ -316,21 +314,18 @@ public class Battle {
             log("to the face");
             damage = (int) (attacker.getStrikeAttack() - defender.getDefence() * 0.4);
         } else if (speedDiff > 0.7) {
-            damage = attacker.getStrikeAttack() - defender.getDefence();
+            damage = defender.defende(attacker.getStrikeAttack());
         } else if (speedDiff > 0.5) {
             log("dodge");
-            sendGif(ResultGif.getResultGif(attacker.getRace(), attacker.getTransformation().getAbbreviated(), attacker.getAttack().getAbbreviated(),
-                    defender.getRace(), defender.getTransformation().getAbbreviated(), "Defence", -1));
-            return;
+            return ResultGif.getResultGif(attacker.getRace(), attacker.getTransformation().getAbbreviated(), attacker.getAttack().getAbbreviated(),
+                    defender.getRace(), defender.getTransformation().getAbbreviated(), "Defence", -1);
         } else {
             log("counter dodged");
-            StrikeStrike(defender, attacker);
-            return;
+            return StrikeStrike(defender, attacker);
         }
-        if (damage < 0) {
+        if (damage < attacker.getStrikeAttack() / -4) {
             log("counter defence");
-            StrikeStrike(defender, attacker);
-            return;
+            return StrikeStrike(defender, attacker);
         }
         log("DMG : " + damage);
         Gif gif = ResultGif.getResultGif(attacker.getRace(), attacker.getTransformation().getAbbreviated(), attacker.getAttack().getAbbreviated(),
@@ -338,14 +333,13 @@ public class Battle {
         if (gif == null)
             gif = ResultGif.getResultGif(attacker.getRace(), attacker.getTransformation().getAbbreviated(), attacker.getAttack().getAbbreviated(),
                     defender.getRace(), defender.getTransformation().getAbbreviated(), "Strike", defender.takeDamage(damage));
-        if (gif != null)
-            sendGif(gif.getLink());
-        if (damage >= defender.getHealth()) {
+        if (damage >= defender.getHealth())
             log("you are ded!");
-        } else log("not dead");
+        else log("not dead");
+        return gif;
     }
 
-    public void KiKi(@NotNull Fighter attacker, @NotNull Fighter defender) {
+    public Gif KiKi(@NotNull Fighter attacker, @NotNull Fighter defender) {
         attacker.randomizeStats();
         defender.randomizeStats();
         double powerDiff = attacker.getKiAttack() / (defender.getKiAttack() + 0.0);
@@ -356,27 +350,23 @@ public class Battle {
         log(damage);
         if (powerDiff > 1.5) {
             log("blow in the defender face");
-            Gif gif = ResultGif.getResultGif(attacker.getRace(), attacker.getTransformation().getAbbreviated(), attacker.getAttack().getAbbreviated(),
-                    defender.getRace(), defender.getTransformation().getAbbreviated(), defender.getAttack().getAbbreviated(), defender.takeDamage(damage));
-            if (gif != null)
-                sendGif(gif.getLink());
-            if (damage >= defender.getHealth()) {
+            if (damage >= defender.getHealth())
                 log("you are ded!");
-            } else log("not dead");
+            else log("not dead");
+            return ResultGif.getResultGif(attacker.getRace(), attacker.getTransformation().getAbbreviated(), attacker.getAttack().getAbbreviated(),
+                    defender.getRace(), defender.getTransformation().getAbbreviated(), defender.getAttack().getAbbreviated(), defender.takeDamage(damage));
         } else if (powerDiff < 0.5) {
             log("blow in the attacker face");
-            Gif gif = ResultGif.getResultGif(defender.getRace(), defender.getTransformation().getAbbreviated(), defender.getAttack().getAbbreviated(),
-                    attacker.getRace(), attacker.getTransformation().getAbbreviated(), attacker.getAttack().getAbbreviated(), attacker.takeDamage(damage));
-            if (gif != null)
-                sendGif(gif.getLink());
-            if (damage >= attacker.getHealth()) {
+            if (damage >= attacker.getHealth())
                 log("you are ded!");
-            } else log("not dead");
+            else log("not dead");
+            return ResultGif.getResultGif(defender.getRace(), defender.getTransformation().getAbbreviated(), defender.getAttack().getAbbreviated(),
+                    attacker.getRace(), attacker.getTransformation().getAbbreviated(), attacker.getAttack().getAbbreviated(), attacker.takeDamage(damage));
         } else
-            log("Boom!");
+            return ExpGif.getGif();
     }
 
-    public void KiDefence(@NotNull Fighter attacker, @NotNull Fighter defender) {
+    public Gif KiDefence(@NotNull Fighter attacker, @NotNull Fighter defender) {
         attacker.randomizeStats();
         defender.randomizeStats();
         double speedDiff = attacker.getSpeed() / (defender.getSpeed() + 0.0);
@@ -387,49 +377,44 @@ public class Battle {
             damage = (int) (attacker.getKiAttack() - defender.getDefence() * 0.4);
         } else if (speedDiff > 0.5) {
             log("defence");
-            damage = attacker.getKiAttack() - defender.getDefence();
+            damage = defender.defende(attacker.getKiAttack());
         } else {
             log("dodge");
-            sendGif(ResultGif.getResultGif(attacker.getRace(), attacker.getTransformation().getAbbreviated(), attacker.getAttack().getAbbreviated(),
-                    defender.getRace(), defender.getTransformation().getAbbreviated(), "Defence", -1));
-            return;
+            return ResultGif.getResultGif(attacker.getRace(), attacker.getTransformation().getAbbreviated(), attacker.getAttack().getAbbreviated(),
+                    defender.getRace(), defender.getTransformation().getAbbreviated(), "Defence", -1);
         }
         log(damage);
-        Gif gif = ResultGif.getResultGif(attacker.getRace(), attacker.getTransformation().getAbbreviated(), attacker.getAttack().getAbbreviated(),
-                defender.getRace(), defender.getTransformation().getAbbreviated(), defender.getAttack().getAbbreviated(), defender.takeDamage(damage));
-        if (gif != null)
-            sendGif(gif.getLink());
-        if (damage >= defender.getHealth()) {
+        if (damage >= defender.getHealth())
             log("you are ded!");
-        } else log("not dead");
+        else log("not dead");
+        return ResultGif.getResultGif(attacker.getRace(), attacker.getTransformation().getAbbreviated(), attacker.getAttack().getAbbreviated(),
+                defender.getRace(), defender.getTransformation().getAbbreviated(), defender.getAttack().getAbbreviated(), defender.takeDamage(damage));
     }
 
-    public void StrikeCharge(@NotNull Fighter attacker, @NotNull Fighter defender) {
+    public Gif StrikeCharge(@NotNull Fighter attacker, @NotNull Fighter defender) {
         attacker.randomizeStats();
         defender.randomizeStats();
         int damage = (int) (attacker.getStrikeAttack() - defender.getDefence() * 0.2);
         log(attacker, defender, "damage", damage);
-        Gif gif = ResultGif.getResultGif(attacker.getRace(), attacker.getTransformation().getAbbreviated(), attacker.getAttack().getAbbreviated(),
-                defender.getRace(), defender.getTransformation().getAbbreviated(), defender.getAttack().getAbbreviated(), defender.takeDamage(damage));
-        if (gif != null)
-            sendGif(gif.getLink());
-        if (damage >= defender.getHealth()) {
+        if (damage >= defender.getHealth())
             log("you are ded!");
-        } else log("not dead");
+        else log("not dead");
+        return ResultGif.getResultGif(attacker.getRace(), attacker.getTransformation().getAbbreviated(), attacker.getAttack().getAbbreviated(),
+                defender.getRace(), defender.getTransformation().getAbbreviated(), defender.getAttack().getAbbreviated(), defender.takeDamage(damage));
+
     }
 
-    public void KiCharge(@NotNull Fighter attacker, @NotNull Fighter defender) {
+    public Gif KiCharge(@NotNull Fighter attacker, @NotNull Fighter defender) {
         attacker.randomizeStats();
         defender.randomizeStats();
         int damage = (int) (attacker.getKiAttack() - defender.getDefence() * 0.2);
         log(attacker, defender, "damage", damage);
-        Gif gif = ResultGif.getResultGif(attacker.getRace(), attacker.getTransformation().getAbbreviated(), attacker.getAttack().getAbbreviated(),
-                defender.getRace(), defender.getTransformation().getAbbreviated(), defender.getAttack().getAbbreviated(), defender.takeDamage(damage));
-        if (gif != null)
-            sendGif(gif.getLink());
-        if (damage >= defender.getHealth()) {
+        if (damage >= defender.getHealth())
             log("you are ded!");
-        } else log("not dead");
+        else log("not dead");
+
+        return ResultGif.getResultGif(attacker.getRace(), attacker.getTransformation().getAbbreviated(), attacker.getAttack().getAbbreviated(),
+                defender.getRace(), defender.getTransformation().getAbbreviated(), defender.getAttack().getAbbreviated(), defender.takeDamage(damage));
     }
 
     private void end() {
@@ -450,9 +435,21 @@ public class Battle {
         Android24.jda.getTextChannelById(channelId).sendMessage(url).queue(message -> message.delete().queueAfter(15, TimeUnit.SECONDS));
     }
 
-    private void sendGif(Gif gif) {
+    private void sendGif(@Nullable Gif gif) {
         if (gif != null)
             Android24.jda.getTextChannelById(channelId).sendMessage(gif.getLink()).queue(message -> message.delete().queueAfter(15, TimeUnit.SECONDS));
+    }
+
+    private void updateResult(@Nullable Gif gif) {
+        if (gif != null)
+            Android24.jda.getTextChannelById(channelId).retrieveMessageById(resultEmbedId).queue(message -> {
+                if (message != null)
+                    message.editMessageEmbeds(new EmbedBuilder().setImage(gif.getLink()).build()).queue();
+                else
+                    Android24.jda.getTextChannelById(channelId).sendMessageEmbeds(new EmbedBuilder().setImage(gif.getLink()).build()).queue(
+                            msg -> resultEmbedId = msg.getIdLong());
+
+            });
     }
 
     private void log(Object data) {
@@ -461,16 +458,16 @@ public class Battle {
 
     private void log(String explanation, Object data) {
         System.out.println(explanation + " : " + data);
-        sendMessage(explanation + " : " + data);
+//        sendMessage(explanation + " : " + data);
     }
 
     private void log(Fighter attacker, Fighter defender, String explanation, Object data) {
         System.out.println(attacker);
         System.out.println(defender);
         System.out.println(data);
-        sendMessage("Attacker:\n" + attacker.toString());
-        sendMessage("Defender:\n" + defender.toString());
-        sendMessage(explanation + "\n" + data.toString());
+//        sendMessage("Attacker:\n" + attacker.toString());
+//        sendMessage("Defender:\n" + defender.toString());
+//        sendMessage(explanation + "\n" + data.toString());
     }
 
     public long getChannelId() {

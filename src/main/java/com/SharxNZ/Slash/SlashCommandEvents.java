@@ -400,9 +400,8 @@ public class SlashCommandEvents extends ListenerAdapter {
             }
 
             case "test" -> {
-                slashCommandEvent.reply("success").queue();
+                slashCommandEvent.reply(Android24.getCommitName()).queue();
             }
-
             //slashCommandEvent.getHook().sendFile().addEmbeds().queue();
             default -> slashCommandEvent.reply("Unregistered command :" + slashCommandEvent.getName() + " | " + slashCommandEvent.getSubcommandName()
                     + " ~ " + slashCommandEvent.getSubcommandGroup()).queue();

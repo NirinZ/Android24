@@ -115,7 +115,7 @@ public class TransGif extends AGif { // הכלאס הזה דורש תיקון ד
             precise = resultSet.getInt(1);
             other = resultSet.getInt(2) - precise;
             statement.close();
-            if (from != null && from.equals(to))
+            if ((from != null && from.equals(to)) || (from == null && to == null))
                 other = 0;
             if ((precise + other) == 0)
                 return null;

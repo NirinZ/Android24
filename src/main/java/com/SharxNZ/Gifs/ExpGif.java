@@ -1,5 +1,8 @@
 package com.SharxNZ.Gifs;
 
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Random;
 
 public abstract class ExpGif {
@@ -19,7 +22,8 @@ public abstract class ExpGif {
             "https://64.media.tumblr.com/fa8d0240b23f32f8e2e58ebbed567e7e/f87b91b4a9510de9-30/s500x750/95d937964d30b9cb9adbef32b64c9045a0dce8e5.gif",
             "https://64.media.tumblr.com/e4c912e3c36282f69c6a1fc50568741e/tumblr_pf22zoRzmD1ttia6ao5_400.gif"
     };
-    public static String getGif(){
-        return gifs[rand.nextInt(gifs.length)];
+    @Contract(" -> new")
+    public static @NotNull Gif getGif(){
+        return Gif.getGif((short) 15, gifs[rand.nextInt(gifs.length)]);
     }
 }
