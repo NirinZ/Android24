@@ -50,8 +50,8 @@ public abstract class Android24 {
     public static final long debugChannelID = 887426748306825217L;
     public static final long nirinsChannelID = 882524002516598784L;
     public static final long cacheChannelID = 866689902758068244L;
-    private static final String branch = "new_battle_system";
-    private static final String commitId = "save5";
+    private static final String branch = "master";
+    private static final String commitId = "";
     private static final long nirinId = 739532349280354404L;
     private static final HikariDataSource dataSource = new HikariDataSource();
     public static JDA jda;
