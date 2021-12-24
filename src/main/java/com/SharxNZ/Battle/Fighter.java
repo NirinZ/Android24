@@ -112,7 +112,7 @@ public class Fighter extends Stats {
         final double c = 0.5;
         final double x = attack/defence; // The precent of the attack from the defence
         final double multiplier = b * Math.pow(a, x) - c;
-        changeKi(-1*attack*multiplier);        
+        changeKi((int) (-1*attack*multiplier));
         return attack - defence;
     }
 
@@ -140,7 +140,7 @@ public class Fighter extends Stats {
         switch (attack.getAttackType()) {
             case Strike -> strikeAttack *= attack.getAttackPowerUp();
             case Ki -> kiAttack *= attack.getAttackPowerUp();
-            case Charge -> changeKi(super.ki / 15);
+            case Charge -> changeKi((int) (super.ki / 15));
 
         }
         defence *= attack.getDefencePowerUp();
