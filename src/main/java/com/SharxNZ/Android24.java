@@ -50,8 +50,8 @@ public abstract class Android24 {
     public static final long debugChannelID = 887426748306825217L;
     public static final long nirinsChannelID = 882524002516598784L;
     public static final long cacheChannelID = 866689902758068244L;
-    private static final String branch = "master";
-    private static final String commitId = "";
+    private static final String branch = "help";
+    private static final String commitId = "save 1";
     private static final long nirinId = 739532349280354404L;
     private static final HikariDataSource dataSource = new HikariDataSource();
     public static JDA jda;
@@ -60,6 +60,7 @@ public abstract class Android24 {
     public static short xp = 50; // should be 20
     public static User nirin;
     public static EventWaiter eventWaiter = new EventWaiter();
+    public static CommandData[] commands;
     private static CommandListUpdateAction commandListDebug;
     private static CommandListUpdateAction commandListAll;
 
@@ -120,6 +121,7 @@ public abstract class Android24 {
     public static void addCommands(CommandData... commandData) {
         commandListDebug.addCommands(commandData);
         commandListAll.addCommands(commandData);
+        commands = commandData;
     }
 
     private static void queueCommands() {

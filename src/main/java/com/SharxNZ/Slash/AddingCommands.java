@@ -11,6 +11,19 @@ public interface AddingCommands {
     static void AddingCommands() {
         Android24.addCommands(
 
+                // Help
+                new CommandData("help", "Those commands will explain about the bot and how to play the game")
+                        .addOptions(new OptionData(OptionType.STRING, "of", "The type of the inventory")
+                                .addChoice("general", "General explenation about the bot and how to use it")
+                                .addChoice("xp", "How dose the XP and leveling system works")
+                                .addChoice("power_points", "What are power points and how to use them")
+                                .addChoice("inventory", "How to use your inventory")
+                                .addChoice("shop", "How to use the shop")
+                                .addChoice("transformations", "Explenation about the transformations and the roles and how to use them")
+                                .addChoice("stats", "Explenation about your stats")
+                                .addChoice("gif", "Explaning about all the add_gif commands")
+                                .addChoice("battle", "Explaning everything about the battle system"))),
+
                 // server setup
                 new CommandData("server_setup", "Change the server's settings (only person with permissions can do it)")
                         .addOptions(new OptionData(OptionType.CHANNEL, "cmd_channel", "Set the server's commands channel"))

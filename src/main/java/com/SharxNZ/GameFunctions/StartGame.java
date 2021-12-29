@@ -27,7 +27,7 @@ public abstract class StartGame {
 
             OptionData optionData = new OptionData(OptionType.STRING, "race", "choose the race you want to play").setRequired(true);
             SelectionMenu.Builder smBuilder = SelectionMenu.create("start game")
-                    .setPlaceholder("Choose you race")
+                    .setPlaceholder("Choose your race")
                     .setRequiredRange(1, 1);
             while (resultSet.next()) {
                 optionData.addChoice(resultSet.getString(1), resultSet.getString(1));

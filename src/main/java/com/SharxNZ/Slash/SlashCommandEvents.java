@@ -83,6 +83,19 @@ public class SlashCommandEvents extends ListenerAdapter {
             case "level" -> slashCommandEvent.deferReply(slashCommandEvent.getOptions().isEmpty() || !slashCommandEvent.getOptions().get(0).getAsBoolean()).queue(
                     interactionHook -> interactionHook.sendFile(Level.returnLevel(guildID, userID, user.getAvatarUrl()), "Level.jpg").queue());
 
+            case "help" -> {
+                String of = slashCommandEvent.getOptions().isEmpty() ? "general" : slashCommandEvent.getOptions().get(0).getAsString()
+
+                switch (of){
+                    
+                    case "general" -> 
+
+
+                }
+
+                slashCommandEvent.replyEmbeds().addActionRow(Help.getMenu()).setEphemeral(true).queue();
+            }
+
             case "get_power_points" -> {
                 PowerPoints.getPPoints().remove(userID);
                 boolean ephemeral = slashCommandEvent.getOptionsByName("display").isEmpty() || !slashCommandEvent.getOptionsByName("display").get(0).getAsBoolean();
