@@ -13,4 +13,24 @@ public abstract class Help{
         return smBuilder.build();
     }
 
+    public static MessageEmbed getEmbed(){
+        return getEmbed("general");
+    }
+
+    public static MessageEmbed getEmbed(String topic){
+        
+        EmbedBuilder generalEmbed = new EmbedBuilder();
+        generalEmbed.setTitle(topic);
+
+        switch (topic){                    
+            case "general" -> {
+                generalEmbed.setDescription("Explaning the general");
+                generalEmbed.addField("Field");
+                generalEmbed.setFooter("Footer");
+            }
+        }
+
+        return generalEmbed.build();
+    }
+
 }
