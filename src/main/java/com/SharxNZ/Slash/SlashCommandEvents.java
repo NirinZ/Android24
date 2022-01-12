@@ -90,11 +90,14 @@ public class SlashCommandEvents extends ListenerAdapter {
             }
 
             case "get_power_points" -> {
+
+                //region Description
                 PowerPoints.getPPoints().remove(userID);
                 boolean ephemeral = slashCommandEvent.getOptionsByName("display").isEmpty() || !slashCommandEvent.getOptionsByName("display").get(0).getAsBoolean();
                 boolean refresh = !(slashCommandEvent.getOptionsByName("refresh").isEmpty() || !slashCommandEvent.getOptionsByName("refresh").get(0).getAsBoolean());
                 String args = ephemeral + ":" + refresh;
                 String buttonID = userID + "#$#" + args;
+                //endregion
                 // userID#command#ephemeral:refresh
                 ArrayList<ActionRow> ppButtons = new ArrayList<>(Arrays.asList(
                         //Raw 1

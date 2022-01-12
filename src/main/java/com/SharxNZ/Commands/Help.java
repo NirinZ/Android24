@@ -28,6 +28,17 @@ public abstract class Help{
                 generalEmbed.addField("Field");
                 generalEmbed.setFooter("Footer");
             }
+            case "xp" -> {
+                generalEmbed.setDescription("""
+                The games' leveling system is based on XP.
+                You can earn XP by activity on suppoted servers (text messages and VC time),
+                or as a reword (i.e. from a battle).
+                The amout of XP you have will determent your level. The more XP you have, the higher is your LVL!
+                //צריך להמשיך
+                                            """);
+                generalEmbed.addField("Field");
+                generalEmbed.setFooter("Footer");
+            }
         }
 
         return generalEmbed.build();
