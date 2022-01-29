@@ -34,8 +34,24 @@ public abstract class Help{
                 You can earn XP by activity on suppoted servers (text messages and VC time),
                 or as a reword (i.e. from a battle).
                 The amout of XP you have will determent your level. The more XP you have, the higher is your LVL!
-                //צריך להמשיך
+                By activity you will also get zeni, which is the currency of the game.
                                             """);
+                generalEmbed.addField("Field");
+                generalEmbed.setFooter("Footer");
+            }
+            case "power_points" -> {
+                generalEmbed.setDescription("""
+                Power Points are the games' stats point. That means you can use those points to control and change your stats,
+                by investing Power Points in the stats you want to improve (i.e. Health).
+                You can obtain Power Points by leveling up!
+                """);
+                generalEmbed.addField("Field");
+                generalEmbed.setFooter("Footer");
+            }
+            case "inventory" -> {
+                generalEmbed.setDescription("""
+                
+                """);
                 generalEmbed.addField("Field");
                 generalEmbed.setFooter("Footer");
             }
