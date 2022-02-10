@@ -50,7 +50,8 @@ public abstract class Help{
             }
             case "inventory" -> {
                 generalEmbed.setDescription("""
-                
+                All the items you have collected, (including skills and transformations) can be found here.
+                You can choose to viewe them all at once as a collectoin `list`, or one-by-one `individual`.
                 """);
                 generalEmbed.addField("Field");
                 generalEmbed.setFooter("Footer");
