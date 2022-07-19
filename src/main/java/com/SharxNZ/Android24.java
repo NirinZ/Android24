@@ -204,6 +204,7 @@ public abstract class Android24 {
         commandClientBuilder.addCommand(new Echo());
         commandClientBuilder.addCommand(new RefreshNames());
         commandClientBuilder.addCommand(new LeaveServer());
+        commandClientBuilder.addCommand(new AllInvites());
         commandClientBuilder.addCommand(new CleanDatabase());
         commandClientBuilder.addCommand(new StartGameCommand());
         commandClientBuilder.addCommand(new GetStats());
