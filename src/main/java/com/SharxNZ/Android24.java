@@ -141,6 +141,11 @@ public abstract class Android24 {
      * 2)
      * צריך ליעל את כל הקוד ולשפר ביצועים ולעשות שהוא יהיה יותר נקיא, נהיר וטוב.
      * שיהיו כמה שפחות SQL
+     *
+     *
+     * Bags:
+     * אם אני מתפתח משרת אחד, ושוב עושה את זה אבל משרת אחר, הבוט לא יודע להוריד לי את הרול לבד...
+     * נגיד אם אני הופך משרת 1 ל ססג ואז משרת שני לססב ובשרת 1 הופך לסס3 הבוט לא ידע להוריד לי את הרול של ססג בגלל שאני לא רשום כססג אלא כססב
      */
 
     public static void main(String[] args) throws LoginException, InterruptedException, SQLException, ImageProcessingException, IOException {

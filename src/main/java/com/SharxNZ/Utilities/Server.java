@@ -1,17 +1,12 @@
 package com.SharxNZ.Utilities;
 
 import com.SharxNZ.Android24;
-import org.jetbrains.annotations.Nullable;
 
-import javax.management.relation.Role;
 import javax.naming.NameNotFoundException;
-import java.lang.annotation.Annotation;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
-import static com.SharxNZ.Android24.jda;
 
 public class Server {
     protected long guildID;
@@ -34,7 +29,7 @@ public class Server {
             ResultSet resultSet = create.executeQuery();
             if (!resultSet.next()) {
                 create.close();
-                throw new NameNotFoundException("The guild name has not found");
+                throw new NameNotFoundException("The guild ID: " + guildID + " has not found");
             }
             this.guildID = guildID;
             commandsCh = resultSet.getLong(1);
