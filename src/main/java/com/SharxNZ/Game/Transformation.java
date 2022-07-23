@@ -4,16 +4,20 @@ import com.SharxNZ.Android24;
 
 import javax.naming.NameNotFoundException;
 import java.awt.*;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Transformation extends Ability {
 
     protected boolean soloTransformation;
     protected Color color;
 
+    public static Set<String> allTransformationsNames = new HashSet<>();
+
+    static {
+        updateTransformations();
+    }
 
     public Transformation(String name) throws NameNotFoundException, SQLException {
         if (name == null || name.equals("base"))
@@ -22,7 +26,7 @@ public class Transformation extends Ability {
         try (
                 Connection con = Android24.getConnection();
                 PreparedStatement getTransformation = con.prepareStatement(
-                        "SELECT * FROM android24.transformations where TransformationName = ? or TransformationAbbreviated = ?;")
+                            "SELECT * FROM android24.transformations where TransformationName = ? or TransformationAbbreviated = ?;")
         ) {
 
             getTransformation.setString(1, name);
@@ -89,6 +93,21 @@ public class Transformation extends Ability {
             Android24.logError(throwables);
         }
         return false;
+    }
+
+    public static void updateTransformations(){
+        try (
+                Connection con = Android24.getConnection();
+                Statement allTransStatement = con.createStatement();
+                ResultSet allTransSet = allTransStatement.executeQuery(
+                        "SELECT TransformationName FROM android24.transformations;")
+        ){
+            while (allTransSet.next())
+                allTransformationsNames.add(allTransSet.getString(1));
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+            Android24.logError(throwables);
+        }
     }
 
     public boolean isSoloTransformation() {

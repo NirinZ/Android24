@@ -22,6 +22,7 @@ import com.drew.imaging.ImageProcessingException;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -191,10 +192,12 @@ public class SlashCommandEvents extends ListenerAdapter {
                                             .queue(interactionHook -> interactionHook.deleteOriginal().queueAfter(gif.getLength() * 3, TimeUnit.SECONDS));
                                 return;
                             }
-
-                            if (being.getTransformation().getName() != null && member.getRoles().stream().anyMatch(role -> role.getName().equals(being.getTransformation().getName())))
-                                guild.removeRoleFromMember(userID,
-                                        guild.getRolesByName(being.getTransformation().getName(), true).get(0)).queue();
+                            // Should not be needed, since I'm not using the being.getTransformation()
+                            //if (/*being.getTransformation().getName() != null &&*/ member.getRoles().stream().anyMatch(role -> Transformation.allTransformationsNames.contains(role.getName())))
+                            for (Role role : member.getRoles()) {
+                                if (Transformation.allTransformationsNames.contains(role.getName()))
+                                    guild.removeRoleFromMember(userID, role).queue();
+                            }
 
                             if (guild.getRoles().stream().anyMatch(role -> role.getName().equals(newTransformation.getName()))) {
                                 guild.addRoleToMember(userID,
@@ -240,9 +243,11 @@ public class SlashCommandEvents extends ListenerAdapter {
                 } else if (slashCommandEvent.getOption("name").getAsString().equalsIgnoreCase("base")) {
                     if (being.getTransformation().getName() != null) {
                         guild.retrieveMemberById(userID).queue(member -> {
-                            if (member.getRoles().stream().anyMatch(role -> role.getName().equals(being.getTransformation().getName())))
-                                guild.removeRoleFromMember(userID,
-                                        guild.getRolesByName(being.getTransformation().getName(), true).get(0)).queue();
+//                            if (member.getRoles().stream().anyMatch(role -> Transformation.allTransformationsNames.contains(role.getName())))
+                            for (Role role : member.getRoles()) {
+                                if (Transformation.allTransformationsNames.contains(role.getName()))
+                                    guild.removeRoleFromMember(userID, role).queue();
+                            }
                             Gif gif = TransGif.getTransGif(being.getTransformation().getAbbreviated(), null);
                             try {
                                 being.setTransformation(new Transformation("base"));

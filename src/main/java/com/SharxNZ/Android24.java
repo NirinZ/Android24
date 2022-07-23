@@ -128,6 +128,11 @@ public abstract class Android24 {
     }
 
     /**
+     * Important:
+     * הגיפים לא עובדים, צריך לסדר אותם
+     *
+     *
+     *
      * Improvements:
      * 1)
      * ניתן לשפר ביצועים אם אני אעשה אבדוק אם אני יכול לעשות get במקום retrieve.
@@ -146,6 +151,9 @@ public abstract class Android24 {
      * Bags:
      * אם אני מתפתח משרת אחד, ושוב עושה את זה אבל משרת אחר, הבוט לא יודע להוריד לי את הרול לבד...
      * נגיד אם אני הופך משרת 1 ל ססג ואז משרת שני לססב ובשרת 1 הופך לסס3 הבוט לא ידע להוריד לי את הרול של ססג בגלל שאני לא רשום כססג אלא כססב
+     *
+     * כשהמשחק ישתחרר בצורת בטא צריך לעשות באלאנס דחוףףף, כרגע המשחק ממש לא כיף ונגמר בone shot אפילו אם יש הבדל כח קטן
+     * בגלל שכל הרמות כח עובדים בכפולות
      */
 
     public static void main(String[] args) throws LoginException, InterruptedException, SQLException, ImageProcessingException, IOException {
