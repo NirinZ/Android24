@@ -11,6 +11,24 @@ public interface AddingCommands {
     static void AddingCommands() {
         Android24.addCommands(
 
+                // Words
+                new CommandData("words", "words")
+                        .addSubcommands(new SubcommandData("learn", "learn the words")
+                                .addOptions(new OptionData(OptionType.STRING, "language", "The language you want to learn")
+                                        .addChoice("Hebrew", "Hebrew")
+                                        .addChoice("English", "English")
+                                        .setRequired(true))
+                                .addOptions(new OptionData(OptionType.STRING, "color", "The colors you want to see [R\\Y\\G]"))
+                                .addOptions(new OptionData(OptionType.INTEGER, "number", "The number of the words to show")))
+                        .addSubcommands(new SubcommandData("find", "Find a word")
+                                .addOptions(new OptionData(OptionType.STRING, "language", "The language you want to learn")
+                                        .addChoice("Hebrew", "Hebrew")
+                                        .addChoice("English", "English")
+                                        .setRequired(true))
+                                .addOptions(new OptionData(OptionType.STRING, "name", "The name of the word").setRequired(true))
+                                .addOptions(new OptionData(OptionType.STRING, "color", "The colors you want to see [R\\Y\\G]"))),
+
+
                 // server setup
                 new CommandData("server_setup", "Change the server's settings (only person with permissions can do it)")
                         .addOptions(new OptionData(OptionType.CHANNEL, "cmd_channel", "Set the server's commands channel"))

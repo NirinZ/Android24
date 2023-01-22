@@ -113,7 +113,7 @@ public class Battle {
         }, 1, TimeUnit.MINUTES, () -> { // should be 1 minute
             switch (turnType) {
                 case Attack -> {
-                    if (passes > battles.size() * 2) {
+                    if (passes > battles.size() * 2) { // לא הגיוני. זה צריך להיות לפי מספר הלוחמים לא מספר הקרבות שיש ברקע. אני לא משנה עקב חוסר ריענן בקוד
                         sendMessage("The battle is over due to inactivity");
                         end();
                         return;

@@ -54,6 +54,7 @@ public abstract class Android24 {
     private static final String commitId = "";
     private static final long nirinId = 739532349280354404L;
     private static final HikariDataSource dataSource = new HikariDataSource();
+    private static final HikariDataSource wordsDataSource = new HikariDataSource();
     public static JDA jda;
     public static String prefix = "!";
     public static float difficulty = 0.4f; // should be 0.3
@@ -70,6 +71,15 @@ public abstract class Android24 {
     public static Connection getConnection() {
         try {
             return dataSource.getConnection();
+        } catch (SQLException throwables) {
+            logError(throwables);
+            return null;
+        }
+    }
+
+    public static Connection getWordsConnection() {
+        try {
+            return wordsDataSource.getConnection();
         } catch (SQLException throwables) {
             logError(throwables);
             return null;
@@ -170,6 +180,13 @@ public abstract class Android24 {
         dataSource.setUsername("Android24");
         dataSource.setPassword(System.getenv("MySQLPass"));
         dataSource.setMinimumIdle(6);
+
+        // Words Database
+        wordsDataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
+        wordsDataSource.setJdbcUrl("jdbc:mysql://sql11.freesqldatabase.com/?user=sql11423530");
+        wordsDataSource.setUsername("sql11423530");
+        wordsDataSource.setPassword(System.getenv("WordsDBpass"));
+        wordsDataSource.setMinimumIdle(3);
 
 
         //!docs JDABuilder#setMemberCachePolicy
