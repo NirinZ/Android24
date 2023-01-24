@@ -50,7 +50,7 @@ public abstract class Android24 {
     public static final long debugChannelID = 887426748306825217L;
     public static final long nirinsChannelID = 882524002516598784L;
     public static final long cacheChannelID = 866689902758068244L;
-    private static final String branch = "master";
+    private static final String branch = "Words";
     private static final String commitId = "";
     private static final long nirinId = 739532349280354404L;
     private static final HikariDataSource dataSource = new HikariDataSource();
@@ -91,7 +91,7 @@ public abstract class Android24 {
         StringBuilder builder = new StringBuilder();
         for (StackTraceElement stack : throwables.getStackTrace())
             builder.append(stack).append("\n");
-        if (builder.length() + throwables.toString().length() > 1950)
+        if (builder.length() + throwables.toString().length() < 1950)
             jda.getTextChannelById(debugChannelID).sendMessage("<@" + nirinId + ">\n" + throwables + "\nStack Trace:\n"
                     + builder).queue();
         else
@@ -136,6 +136,8 @@ public abstract class Android24 {
         commandListDebug.queue();
         commandListAll.queue();
     }
+
+    //todo להכניס את הכפתורים של הצבעים
 
     /**
      * Important:

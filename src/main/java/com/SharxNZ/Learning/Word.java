@@ -1,12 +1,13 @@
 package com.SharxNZ.Learning;
 
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.utils.MarkdownUtil;
 
-enum WordsColor {
-    Green, Yellow, Red
-}
+import java.awt.*;
+
+//enum WordsColor {
+//    Green, Yellow, Red
+//}
 
 public class Word {
 
@@ -20,9 +21,9 @@ public class Word {
     protected String translation;
     protected String example;
     protected String translatedExample;
-    protected WordsColor color;
+    protected char color;
 
-    public Word(String word, String translation, String example, String translatedExample, WordsColor color) {
+    public Word(String word, String translation, String example, String translatedExample, char color) {
         this.word = word;
         this.translation = translation;
         this.example = example;
@@ -30,23 +31,21 @@ public class Word {
         this.color = color;
     }
 
-    public MessageEmbed getEmbed() {
+    public EmbedBuilder getEmbed() {
         EmbedBuilder embedBuilder = new EmbedBuilder();
         embedBuilder.setTitle(word);
         embedBuilder.setDescription(MarkdownUtil.spoiler(translation));
-        embedBuilder.addField("Cost 💵", cost + "$", true);
-        embedBuilder.addField("Counter Attack", counter + "", true);
-        embedBuilder.addField("Attack Type", attackType + "", true);
-        embedBuilder.addField("Attack power up", attackPowerUp + "", true);
-        embedBuilder.addField("Defence power up", defencePowerUp + "", true);
-        embedBuilder.addField("Speed power up", speedPowerUp + "", true);
-        embedBuilder.addField("Ki consumption", kiConsumption + "", true);
-        if (getForcedRace() != null)
-            embedBuilder.addField("Only for race: ", forcedRace, true);
-        embedBuilder.addField("Description", description, false);
-        embedBuilder.setImage(getGif());
-
-//        return embedBuilder;
+        embedBuilder.addField("Example", example, true);
+        embedBuilder.addField("Translated Example", MarkdownUtil.spoiler(translatedExample), true);
+        Color embedColor = new Color(255,255,255);
+        switch (color) {
+            case 'G' -> embedColor = Color.green;
+            case 'Y' -> embedColor = Color.yellow;
+            case 'R' -> embedColor = Color.RED;
+        }
+        embedBuilder.setColor(embedColor);
+//        embedBuilder.setImage(getGif());
+        return embedBuilder;
     }
 
     public String getWord() {
@@ -81,11 +80,11 @@ public class Word {
         this.translatedExample = translatedExample;
     }
 
-    public WordsColor getColor() {
+    public char getColor() {
         return color;
     }
 
-    public void setColor(WordsColor color) {
+    public void setColor(char color) {
         this.color = color;
     }
 }

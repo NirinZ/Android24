@@ -14,6 +14,7 @@ import com.SharxNZ.Gifs.ActionGif;
 import com.SharxNZ.Gifs.Gif;
 import com.SharxNZ.Gifs.ResultGif;
 import com.SharxNZ.Gifs.TransGif;
+import com.SharxNZ.Learning.WordsList;
 import com.SharxNZ.Shop.Shop;
 import com.SharxNZ.Utilities.Embeds;
 import com.SharxNZ.Utilities.Server;
@@ -73,6 +74,41 @@ public class SlashCommandEvents extends ListenerAdapter {
 
             case "ping" -> slashCommandEvent.reply("Pong!").queue();
             //slashCommandEvent.getHook().sendFile()
+
+            case "words" -> {
+                ArrayList<ActionRow> shpButtons = new ArrayList<>(Arrays.asList(
+                        //Raw 1
+                        ActionRow.of(Button.success("wrd#know#" + slashCommandEvent.getId(), "✔"),
+                                Button.danger("wrd#dknow#" + slashCommandEvent.getId(), "❌"))
+                        //Raw 2
+//                        ActionRow.of(Button.success("sce#buy#" + slashCommandEvent.getId(), "Buy 💵"))
+                ));
+
+                if (slashCommandEvent.getSubcommandName().equals("learn")) {
+                    String language = slashCommandEvent.getOptionsByName("language").get(0).getAsString();
+                    String color = "GYR";
+                    if (!slashCommandEvent.getOptionsByName("color").isEmpty())
+                        color = slashCommandEvent.getOptionsByName("color").get(0).getAsString();
+                    int number = 1;
+                    if (!slashCommandEvent.getOptionsByName("number").isEmpty())
+                        number = (int) slashCommandEvent.getOptionsByName("number").get(0).getAsLong();
+
+                    try {
+                        WordsList words = new WordsList(language, color, number);
+                        if (words.getWords().isEmpty())
+                            slashCommandEvent.replyEmbeds(Embeds.errorEmbed("You didn't got any words!")).queue();
+                        else
+                            slashCommandEvent.replyEmbeds(words.startLearningEvent(user, slashCommandEvent.getId()))
+                                    .addActionRows(shpButtons).setEphemeral(true).queue();
+                    } catch (SQLException throwables) {
+                        throwables.printStackTrace();
+                        Android24.logError(throwables);
+                        slashCommandEvent.replyEmbeds(Embeds.errorEmbed(throwables.toString())).setEphemeral(true).queue();
+                    }
+
+                } else if (slashCommandEvent.getSubcommandName().equals("find")) {
+                }
+            }
 
             case "stats" -> {
                 if (!slashCommandEvent.getOptions().isEmpty() && slashCommandEvent.getOptions().get(0).getAsBoolean())
