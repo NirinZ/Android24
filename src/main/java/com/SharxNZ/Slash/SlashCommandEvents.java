@@ -14,6 +14,7 @@ import com.SharxNZ.Gifs.ActionGif;
 import com.SharxNZ.Gifs.Gif;
 import com.SharxNZ.Gifs.ResultGif;
 import com.SharxNZ.Gifs.TransGif;
+import com.SharxNZ.Learning.Word;
 import com.SharxNZ.Learning.WordsList;
 import com.SharxNZ.Shop.Shop;
 import com.SharxNZ.Utilities.Embeds;
@@ -76,16 +77,19 @@ public class SlashCommandEvents extends ListenerAdapter {
             //slashCommandEvent.getHook().sendFile()
 
             case "words" -> {
+                String language = slashCommandEvent.getOptionsByName("language").get(0).getAsString();
                 ArrayList<ActionRow> shpButtons = new ArrayList<>(Arrays.asList(
                         //Raw 1
-                        ActionRow.of(Button.success("wrd#know#" + slashCommandEvent.getId(), "✔"),
-                                Button.danger("wrd#dknow#" + slashCommandEvent.getId(), "❌"))
+                        ActionRow.of(Button.success(Word.colorWordPrefix + "G#"+ language + "#" + slashCommandEvent.getId(), "🟢"),
+                                Button.secondary(Word.colorWordPrefix + "Y#" + language + "#" + slashCommandEvent.getId(), "🟡"),
+                                Button.danger(Word.colorWordPrefix + "R#" + language + "#" + slashCommandEvent.getId(), "🔴")),
+
                         //Raw 2
-//                        ActionRow.of(Button.success("sce#buy#" + slashCommandEvent.getId(), "Buy 💵"))
+                        ActionRow.of(Button.success(WordsList.sePrefix + "know#" + slashCommandEvent.getId(), "✔"),
+                                Button.danger(WordsList.sePrefix + "dknow#" + slashCommandEvent.getId(), "❌"))
                 ));
 
                 if (slashCommandEvent.getSubcommandName().equals("learn")) {
-                    String language = slashCommandEvent.getOptionsByName("language").get(0).getAsString();
                     String color = "GYR";
                     if (!slashCommandEvent.getOptionsByName("color").isEmpty())
                         color = slashCommandEvent.getOptionsByName("color").get(0).getAsString();
@@ -103,10 +107,11 @@ public class SlashCommandEvents extends ListenerAdapter {
                     } catch (SQLException throwables) {
                         throwables.printStackTrace();
                         Android24.logError(throwables);
-                        slashCommandEvent.replyEmbeds(Embeds.errorEmbed(throwables.toString())).setEphemeral(true).queue();
+                        slashCommandEvent.replyEmbeds(Embeds.errorEmbed(throwables)).setEphemeral(true).queue();
                     }
 
                 } else if (slashCommandEvent.getSubcommandName().equals("find")) {
+                    slashCommandEvent.reply("This function is still under development...").setEphemeral(true).queue();
                 }
             }
 

@@ -8,6 +8,7 @@ import com.SharxNZ.Battle.Battle;
 import com.SharxNZ.Buttons.BattleButtons;
 import com.SharxNZ.Buttons.PPButtons;
 import com.SharxNZ.Buttons.ShopButton;
+import com.SharxNZ.Buttons.WordsButtons;
 import com.SharxNZ.Commands.*;
 import com.SharxNZ.Commands.GameCommands.GetStats;
 import com.SharxNZ.Commands.GameCommands.Inventory;
@@ -86,16 +87,16 @@ public abstract class Android24 {
         }
     }
 
-    public static void logError(@NotNull Exception throwables) {
-        throwables.printStackTrace();
+    public static void logError(@NotNull Exception throwable) {
+        throwable.printStackTrace();
         StringBuilder builder = new StringBuilder();
-        for (StackTraceElement stack : throwables.getStackTrace())
+        for (StackTraceElement stack : throwable.getStackTrace())
             builder.append(stack).append("\n");
-        if (builder.length() + throwables.toString().length() < 1950)
-            jda.getTextChannelById(debugChannelID).sendMessage("<@" + nirinId + ">\n" + throwables + "\nStack Trace:\n"
+        if (builder.length() + throwable.toString().length() < 1950)
+            jda.getTextChannelById(debugChannelID).sendMessage("<@" + nirinId + ">\n" + throwable + "\nStack Trace:\n"
                     + builder).queue();
         else
-            jda.getTextChannelById(debugChannelID).sendMessage("<@" + nirinId + ">\n" + throwables + "\nStack Trace:\n"
+            jda.getTextChannelById(debugChannelID).sendMessage("<@" + nirinId + ">\n" + throwable + "\nStack Trace:\n"
                     + builder.substring(0, 1000)).queue();
     }
 
@@ -137,7 +138,7 @@ public abstract class Android24 {
         commandListAll.queue();
     }
 
-    //todo להכניס את הכפתורים של הצבעים
+    //todo work on the find function
 
     /**
      * Important:
@@ -166,12 +167,18 @@ public abstract class Android24 {
      *
      * כשהמשחק ישתחרר בצורת בטא צריך לעשות באלאנס דחוףףף, כרגע המשחק ממש לא כיף ונגמר בone shot אפילו אם יש הבדל כח קטן
      * בגלל שכל הרמות כח עובדים בכפולות
+     *
+     * Others:
+     * ללמוד איך להשתמש ב- לוגר של JDA ו-HikariPool
+     *
      */
 
     public static void main(String[] args) throws LoginException, InterruptedException, SQLException, ImageProcessingException, IOException {
 
-//        String url = "http.g";
-
+//        String t2 = "כגק";
+//
+//        System.out.println();
+//
 //        System.exit(9);
 
         // java --enable-preview -jar bot-b.jar > log.log
@@ -185,9 +192,10 @@ public abstract class Android24 {
 
         // Words Database
         wordsDataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
-        wordsDataSource.setJdbcUrl("jdbc:mysql://sql11.freesqldatabase.com/?user=sql11423530");
+        wordsDataSource.setJdbcUrl("jdbc:mysql://sql11.freesqldatabase.com/?user=sql11423530?currentSchema=sql11423530");
         wordsDataSource.setUsername("sql11423530");
         wordsDataSource.setPassword(System.getenv("WordsDBpass"));
+        wordsDataSource.setSchema("sql11423530");
         wordsDataSource.setMinimumIdle(3);
 
 
@@ -221,6 +229,7 @@ public abstract class Android24 {
         jda.addEventListener(new ShopButton());
         jda.addEventListener(new GFButtons());
         jda.addEventListener(new BattleButtons());
+        jda.addEventListener(new WordsButtons());
         jda.addEventListener(eventWaiter);
         Level.Level();
         StartGame.StartGame();

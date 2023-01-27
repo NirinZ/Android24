@@ -1,9 +1,13 @@
 package com.SharxNZ.Learning;
 
+import com.SharxNZ.Android24;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.utils.MarkdownUtil;
 
 import java.awt.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
 //enum WordsColor {
 //    Green, Yellow, Red
@@ -11,12 +15,7 @@ import java.awt.*;
 
 public class Word {
 
-    /**
-    *  חשבתי לעשות שהוא ימשוך את המילה בפעולה הבונה,
-     *  אבל אם אני רוצה מספר גדול של מילים, עדיף כבר למשוך אותם בבת אחת
-     *  לכן בפ"ב, עדיף לעשות רק את התכונות של המילה, ללא הקריאה לDB
-    * */
-
+    public static final String colorWordPrefix = "colorword#";
     protected String word;
     protected String translation;
     protected String example;
@@ -31,11 +30,15 @@ public class Word {
         this.color = color;
     }
 
+//    public Word getWordByTitle(String title) {
+//        SQL for the word
+//    }
+
     public EmbedBuilder getEmbed() {
         EmbedBuilder embedBuilder = new EmbedBuilder();
         embedBuilder.setTitle(word);
         embedBuilder.setDescription(MarkdownUtil.spoiler(translation));
-        embedBuilder.addField("Example", example, true);
+        embedBuilder.addField("Example", MarkdownUtil.spoiler(example), true);
         embedBuilder.addField("Translated Example", MarkdownUtil.spoiler(translatedExample), true);
         Color embedColor = new Color(255,255,255);
         switch (color) {
@@ -46,6 +49,30 @@ public class Word {
         embedBuilder.setColor(embedColor);
 //        embedBuilder.setImage(getGif());
         return embedBuilder;
+    }
+
+    public static Color changeColor(String language, String word, String color) throws SQLException {
+        // ניתן להכניס כאן פעולה שמזהה את השפה של המילה, וכך מורידה את הצורך לספק שפה.
+        // ניתן לעשות זאת במידה ואצתרך לקרוא לפעולה הזו ממקום אחר שלא יכול לספק לי שפת מקור.
+        // כנראה אעשה את זה אם אוסיף אפשרות ללמוד אנגלית ועברית בו זמנית באותה רשימה.
+
+        try (
+                Connection con = Android24.getWordsConnection();
+                PreparedStatement colorStatement = con.prepareStatement(
+                        String.format("UPDATE sql11423530.%s SET `color` = ? WHERE `word` = ?;", language))
+                ){
+            colorStatement.setString(1, color);
+            colorStatement.setString(2, word);
+            colorStatement.executeUpdate();
+
+            Color embedColor = new Color(255,255,255);
+            switch (color) {
+                case "G" -> embedColor = Color.green;
+                case "Y" -> embedColor = Color.yellow;
+                case "R" -> embedColor = Color.RED;
+            }
+            return embedColor;
+        }
     }
 
     public String getWord() {

@@ -40,6 +40,10 @@ public abstract class Embeds {
         return new EmbedBuilder().setTitle(text).setColor(Color.red).build();
     }
 
+    public static MessageEmbed errorEmbed(Exception throwable){
+        return new EmbedBuilder().setTitle(throwable.toString()).setColor(Color.red).build();
+    }
+
     public static MessageEmbed successEmbed(String text){
         return new EmbedBuilder().setTitle(text).setColor(Color.green).build();
     }

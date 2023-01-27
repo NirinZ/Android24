@@ -16,6 +16,8 @@ import java.util.Queue;
 import java.util.concurrent.TimeUnit;
 
 public class WordsList {
+
+    public static final String sePrefix = "scrollingEvent#";
     protected Queue<Word> words = new LinkedList<>();
 
     public WordsList(String language, String colors, int number) throws SQLException {
@@ -27,7 +29,7 @@ public class WordsList {
                         WHERE color in (?, ?, ?)
                         ORDER BY Rand()
                         LIMIT ?;
-                        """, language.toLowerCase()))
+                        """, language))
                 ) {
             getWords.setString(1, colors.charAt(0) + "");
             getWords.setString(2, colors.charAt(colors.length()/3) + "");
@@ -63,21 +65,30 @@ public class WordsList {
         return getCurrentEmbed(user);
     }
 
+    /**
+     * The reason that there is Listener here and in the WordsButtons, is that in here I gust changing the color in
+     * the scrolling event, and in the buttons, I'm also changing the value at the DataBase + editing the Embed.
+     * I wanted to edit the embed in the buttons because I'll use it to edit also the embeds of the find function
+     * */
     private void scrollingEvent(User user, String id) {
-        Android24.eventWaiter.waitForEvent(ButtonClickEvent.class, bce -> bce.getComponentId().startsWith("wrd#")
+        Android24.eventWaiter.waitForEvent(ButtonClickEvent.class, bce -> (bce.getComponentId().startsWith(sePrefix) || bce.getComponentId().startsWith(Word.colorWordPrefix))
                 && bce.getComponentId().endsWith(id) && bce.getUser().equals(user), bce -> {
-            /*else*/ {
+            /*else { */
+            if (bce.getComponentId().startsWith(sePrefix)) {
                 switch (bce.getComponentId().split("#")[1]) {
                     case "know" -> words.poll();
                     case "dknow" -> words.add(words.poll());
                 }
-            }
-            if (!words.isEmpty()) {
-                bce.editMessageEmbeds(getCurrentEmbed(user)).queue();
+                if (!words.isEmpty()) {
+                    bce.editMessageEmbeds(getCurrentEmbed(user)).queue();
+                    scrollingEvent(user, id);
+                } else
+                    bce.editMessageEmbeds(Embeds.successEmbed("You done the list! 😊")).setActionRows().queue();
+            } else if (bce.getComponentId().startsWith(Word.colorWordPrefix)){
+                words.peek().setColor(bce.getComponentId().split("#")[1].charAt(0));
                 scrollingEvent(user, id);
-            } else
-                bce.editMessageEmbeds(Embeds.successEmbed("You done the list! 😊")).setActionRows().queue();
-        }, 2, TimeUnit.MINUTES, () -> {
+            }
+        }, 5, TimeUnit.MINUTES, () -> {
         });
     }
 
