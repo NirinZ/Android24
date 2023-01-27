@@ -25,7 +25,7 @@ public class WordsList {
                 Connection con = Android24.getWordsConnection();
                 PreparedStatement getWords = con.prepareStatement(String.format( """
                         SELECT *
-                        FROM sql11423530.%s
+                        FROM %s
                         WHERE color in (?, ?, ?)
                         ORDER BY Rand()
                         LIMIT ?;

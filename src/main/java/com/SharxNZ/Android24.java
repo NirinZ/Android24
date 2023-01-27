@@ -192,7 +192,7 @@ public abstract class Android24 {
 
         // Words Database
         wordsDataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
-        wordsDataSource.setJdbcUrl("jdbc:mysql://sql11.freesqldatabase.com/?user=sql11423530?currentSchema=sql11423530");
+        wordsDataSource.setJdbcUrl("jdbc:mysql://sql11.freesqldatabase.com/sql11423530");
         wordsDataSource.setUsername("sql11423530");
         wordsDataSource.setPassword(System.getenv("WordsDBpass"));
         wordsDataSource.setSchema("sql11423530");

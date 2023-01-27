@@ -59,7 +59,7 @@ public class Word {
         try (
                 Connection con = Android24.getWordsConnection();
                 PreparedStatement colorStatement = con.prepareStatement(
-                        String.format("UPDATE sql11423530.%s SET `color` = ? WHERE `word` = ?;", language))
+                        String.format("UPDATE %s SET `color` = ? WHERE `word` = ?;", language))
                 ){
             colorStatement.setString(1, color);
             colorStatement.setString(2, word);
