@@ -56,7 +56,7 @@ public class WordsList {
 
     public MessageEmbed getCurrentEmbed(User user) {
         if (!words.isEmpty())
-            return words.peek().getEmbed().setFooter(user.getName() , user.getAvatarUrl()).build();
+            return words.peek().getEmbed().setFooter(user.getName() + "    Words left: " + words.size(), user.getAvatarUrl()).build();
         return Embeds.errorEmbed("The list is empty for some reason...");
     }
 
