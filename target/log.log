@@ -1,0 +1,10 @@
+13:07:39.457 [1;36mmain                              [0;39m [31m          [0;39m [1;32mJDA            [0;39m [34mINFO  [0;39m Login Successful!
+13:07:39.770 [1;36mJDA MainWS-ReadThread             [0;39m [31m          [0;39m [1;32mWebSocketClient[0;39m [34mINFO  [0;39m Connected to WebSocket
+13:07:40.483 [1;36mJDA MainWS-ReadThread             [0;39m [31m          [0;39m [1;32mJDA            [0;39m [34mINFO  [0;39m Finished Loading!
+13:07:40.581 [1;36mmain                              [0;39m [31m          [0;39m [1;32mHikariDataSourc[0;39m [34mINFO  [0;39m HikariPool-1 - Starting...
+13:07:41.108 [1;36mmain                              [0;39m [31m          [0;39m [1;32mHikariPool     [0;39m [34mINFO  [0;39m HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@6ca18a14
+13:07:41.111 [1;36mmain                              [0;39m [31m          [0;39m [1;32mHikariDataSourc[0;39m [34mINFO  [0;39m HikariPool-1 - Start completed.
+Joined
+Joined
+Joined
+Joined
